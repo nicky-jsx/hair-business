@@ -226,6 +226,13 @@ export function getAllSpecialties(): Specialty[] {
   return Array.from(set).sort();
 }
 
+function getRatingThreshold(filter: string): number {
+  if (filter === "5") return 5;
+  if (filter === "4.5+") return 4.5;
+  if (filter === "4+") return 4;
+  return 0;
+}
+
 export function filterStylists(filters: StylistFilters): Stylist[] {
   const query = filters.query.trim().toLowerCase();
 
@@ -236,7 +243,15 @@ export function filterStylists(filters: StylistFilters): Stylist[] {
     const matchesRegion =
       !filters.region || stylist.region === filters.region;
 
-    if (!query) return matchesSpecialty && matchesRegion;
+    const matchesPrice =
+      !filters.priceRange || stylist.priceRange === filters.priceRange;
+
+    const matchesRating =
+      !filters.rating || stylist.rating >= getRatingThreshold(filters.rating);
+
+    const baseMatch = matchesSpecialty && matchesRegion && matchesPrice && matchesRating;
+
+    if (!query) return baseMatch;
 
     const searchable = [
       stylist.name,
@@ -248,6 +263,6 @@ export function filterStylists(filters: StylistFilters): Stylist[] {
       .join(" ")
       .toLowerCase();
 
-    return matchesSpecialty && matchesRegion && searchable.includes(query);
+    return baseMatch && searchable.includes(query);
   });
 }

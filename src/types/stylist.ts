@@ -36,10 +36,18 @@ export interface Stylist {
   bookingUrl: string | null;
 }
 
+export type PriceRange = "£" | "££" | "£££";
+export const PRICE_RANGES: PriceRange[] = ["£", "££", "£££"];
+
+export type RatingFilter = "4+" | "4.5+" | "5";
+export const RATING_FILTERS: RatingFilter[] = ["4+", "4.5+", "5"];
+
 export interface StylistFilters {
   query: string;
   specialty: Specialty | null;
   region: Region | null;
+  priceRange: PriceRange | null;
+  rating: RatingFilter | null;
 }
 
 export function formatRegion(region: Region): string {

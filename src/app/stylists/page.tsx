@@ -5,8 +5,16 @@ import { Suspense, useMemo, useState } from "react";
 import { FilterChips } from "@/components/search/FilterChips";
 import { SearchBar } from "@/components/search/SearchBar";
 import { StylistGrid } from "@/components/stylist/StylistGrid";
-import { filterStylists, getAllSpecialties } from "@/data/stylists";
-import { REGIONS, type Region, type Specialty } from "@/types/stylist";
+import { filterStylists } from "@/data/stylists";
+import {
+  PRICE_RANGES,
+  RATING_FILTERS,
+  REGIONS,
+  type PriceRange,
+  type RatingFilter,
+  type Region,
+  type Specialty,
+} from "@/types/stylist";
 
 function isRegion(value: string | null): value is Region {
   return value !== null && REGIONS.includes(value as Region);
@@ -34,12 +42,14 @@ function DiscoverContent() {
   const [specialty, setSpecialty] = useState<Specialty | null>(
     isSpecialty(specialtyParam) ? specialtyParam : null
   );
+  const [priceRange, setPriceRange] = useState<PriceRange | null>(null);
+  const [rating, setRating] = useState<RatingFilter | null>(null);
 
   const specialties = ENABLED_SPECIALTIES;
 
   const results = useMemo(
-    () => filterStylists({ query, specialty, region }),
-    [query, specialty, region]
+    () => filterStylists({ query, specialty, region, priceRange, rating }),
+    [query, specialty, region, priceRange, rating]
   );
 
   return (
@@ -68,14 +78,36 @@ function DiscoverContent() {
         <FilterChips options={REGIONS} selected={region} onSelect={setRegion} />
       </section>
 
-      <section className="mb-6">
+      <section className="mb-4">
         <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-gray-400">
-          Specialty
+          Category
         </p>
         <FilterChips
           options={specialties}
           selected={specialty}
           onSelect={setSpecialty}
+        />
+      </section>
+
+      <section className="mb-4">
+        <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-gray-400">
+          Price
+        </p>
+        <FilterChips
+          options={PRICE_RANGES}
+          selected={priceRange}
+          onSelect={setPriceRange}
+        />
+      </section>
+
+      <section className="mb-6">
+        <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-gray-400">
+          Rating
+        </p>
+        <FilterChips
+          options={RATING_FILTERS}
+          selected={rating}
+          onSelect={setRating}
         />
       </section>
 
