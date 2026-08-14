@@ -2,7 +2,6 @@ import Image from "next/image";
 import Link from "next/link";
 import { formatRegion } from "@/types/stylist";
 import type { Stylist } from "@/types/stylist";
-import { ProfileRating } from "./ProfileRating";
 
 interface ProfileHeaderProps {
   stylist: Stylist;
@@ -61,11 +60,9 @@ export function ProfileHeader({ stylist }: ProfileHeaderProps) {
         </h1>
         <p className="mt-1 text-base text-brand-600">{stylist.tagline}</p>
 
-        <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-2">
-          <span className="text-sm text-gray-500">
-            {formatRegion(stylist.region)}
-          </span>
-          <ProfileRating rating={stylist.rating} reviewCount={stylist.reviewCount} />
+        <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-gray-500">
+          <span>{formatRegion(stylist.region)}</span>
+          <span>{stylist.yearsExperience} yrs experience</span>
         </div>
       </div>
     </>

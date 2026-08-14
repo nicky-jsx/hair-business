@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { StylistNavLink } from "@/components/layout/StylistNavLink";
 
 export function Header() {
   return (
@@ -12,6 +13,7 @@ export function Header() {
             Strand
           </span>
         </Link>
+        <StylistNavLink />
       </div>
     </header>
   );

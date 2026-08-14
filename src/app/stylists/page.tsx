@@ -12,10 +12,12 @@ function isRegion(value: string | null): value is Region {
   return value !== null && REGIONS.includes(value as Region);
 }
 
+const ENABLED_SPECIALTIES: Specialty[] = ["Wigs", "Braids"];
+
 function isSpecialty(value: string | null): value is Specialty {
   return (
     value !== null &&
-    (getAllSpecialties() as readonly string[]).includes(value)
+    ENABLED_SPECIALTIES.includes(value as Specialty)
   );
 }
 
@@ -33,7 +35,7 @@ function DiscoverContent() {
     isSpecialty(specialtyParam) ? specialtyParam : null
   );
 
-  const specialties = getAllSpecialties();
+  const specialties = ENABLED_SPECIALTIES;
 
   const results = useMemo(
     () => filterStylists({ query, specialty, region }),

@@ -2,12 +2,14 @@ import Link from "next/link";
 import { SearchBar } from "@/components/search/SearchBar";
 import { StylistCard } from "@/components/stylist/StylistCard";
 import { Button } from "@/components/ui/Button";
-import { getAllSpecialties, getFeaturedStylists } from "@/data/stylists";
-import { REGIONS } from "@/types/stylist";
+import { getFeaturedStylists } from "@/data/stylists";
+import { REGIONS, type Specialty } from "@/types/stylist";
+
+const ENABLED_SPECIALTIES: Specialty[] = ["Wigs", "Braids"];
 
 export default function HomePage() {
   const featured = getFeaturedStylists();
-  const specialties = getAllSpecialties().slice(0, 6);
+  const specialties = ENABLED_SPECIALTIES;
 
   return (
     <div className="px-5 pb-8">

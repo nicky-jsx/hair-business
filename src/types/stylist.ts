@@ -33,6 +33,7 @@ export interface Stylist {
   reviewCount: number;
   services: Service[];
   portfolio: string[];
+  bookingUrl: string | null;
 }
 
 export interface StylistFilters {
@@ -47,4 +48,22 @@ export function formatRegion(region: Region): string {
 
 export function formatPrice(price: number): string {
   return `£${price}`;
+}
+
+export function normaliseBookingUrl(input: string): string | null {
+  const trimmed = input.trim();
+  if (!trimmed) return null;
+  if (/^https?:\/\//i.test(trimmed)) return trimmed;
+  return `https://${trimmed}`;
+}
+
+export function isValidBookingUrl(input: string): boolean {
+  const url = normaliseBookingUrl(input);
+  if (!url) return true;
+  try {
+    new URL(url);
+    return true;
+  } catch {
+    return false;
+  }
 }

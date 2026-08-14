@@ -47,6 +47,7 @@ export const stylists: Stylist[] = [
       { name: "Cornrows", price: 55, duration: "1.5 hrs" },
     ],
     portfolio: portfolioSets.braids,
+    bookingUrl: null,
   },
   {
     id: "2",
@@ -69,6 +70,7 @@ export const stylists: Stylist[] = [
       { name: "Kids Cut (under 12)", price: 22, duration: "30 mins" },
     ],
     portfolio: portfolioSets.cuts,
+    bookingUrl: null,
   },
   {
     id: "3",
@@ -91,6 +93,7 @@ export const stylists: Stylist[] = [
       { name: "Extension Install", price: 180, duration: "3–4 hrs" },
     ],
     portfolio: portfolioSets.color,
+    bookingUrl: null,
   },
   {
     id: "4",
@@ -113,6 +116,7 @@ export const stylists: Stylist[] = [
       { name: "Sew-In Extensions", price: 160, duration: "3 hrs" },
     ],
     portfolio: portfolioSets.braids,
+    bookingUrl: null,
   },
   {
     id: "5",
@@ -135,6 +139,7 @@ export const stylists: Stylist[] = [
       { name: "Loc Repair", price: 30, duration: "30 mins" },
     ],
     portfolio: portfolioSets.cuts,
+    bookingUrl: null,
   },
   {
     id: "6",
@@ -157,6 +162,7 @@ export const stylists: Stylist[] = [
       { name: "Wig Maintenance", price: 45, duration: "1 hr" },
     ],
     portfolio: portfolioSets.color,
+    bookingUrl: null,
   },
   {
     id: "7",
@@ -179,6 +185,7 @@ export const stylists: Stylist[] = [
       { name: "Natural Hair Detangle", price: 25, duration: "45 mins" },
     ],
     portfolio: portfolioSets.braids,
+    bookingUrl: null,
   },
   {
     id: "8",
@@ -201,6 +208,7 @@ export const stylists: Stylist[] = [
       { name: "Consultation", price: 25, duration: "30 mins" },
     ],
     portfolio: portfolioSets.cuts,
+    bookingUrl: null,
   },
 ];
 

@@ -1,17 +1,30 @@
+"use client";
+
 import { notFound } from "next/navigation";
+import { use } from "react";
 import { Badge } from "@/components/ui/Badge";
 import { BookNowButton } from "@/components/stylist/profile/BookNowButton";
 import { ProfileHeader } from "@/components/stylist/profile/ProfileHeader";
 import { ProfilePortfolio } from "@/components/stylist/profile/ProfilePortfolio";
 import { ProfileServices } from "@/components/stylist/profile/ProfileServices";
-import { getStylistById } from "@/data/stylists";
+import { useStylistStore } from "@/context/StylistStoreProvider";
 
-interface ProfilePageProps {
+interface StylistProfileViewProps {
   params: Promise<{ id: string }>;
 }
 
-export default async function StylistProfilePage({ params }: ProfilePageProps) {
-  const { id } = await params;
+export function StylistProfileView({ params }: StylistProfileViewProps) {
+  const { id } = use(params);
+  const { ready, getStylistById } = useStylistStore();
+
+  if (!ready) {
+    return (
+      <div className="flex items-center justify-center py-20">
+        <div className="h-8 w-8 animate-spin rounded-full border-2 border-brand-200 border-t-brand-600" />
+      </div>
+    );
+  }
+
   const stylist = getStylistById(id);
 
   if (!stylist) {

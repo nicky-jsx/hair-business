@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Inter, Playfair_Display } from "next/font/google";
 import { Header } from "@/components/layout/Header";
 import { BottomNav } from "@/components/layout/BottomNav";
+import { StylistStoreProvider } from "@/context/StylistStoreProvider";
 import "./globals.css";
 
 const inter = Inter({
@@ -36,11 +37,13 @@ export default function RootLayout({
       <body
         className={`${inter.variable} ${playfair.variable} font-sans min-h-dvh`}
       >
-        <div className="mx-auto flex min-h-dvh max-w-lg flex-col">
-          <Header />
-          <main className="flex-1 pb-20">{children}</main>
-          <BottomNav />
-        </div>
+        <StylistStoreProvider>
+          <div className="mx-auto flex min-h-dvh max-w-lg flex-col">
+            <Header />
+            <main className="flex-1 pb-20">{children}</main>
+            <BottomNav />
+          </div>
+        </StylistStoreProvider>
       </body>
     </html>
   );

@@ -49,8 +49,11 @@ const navItems = [
 export function BottomNav() {
   const pathname = usePathname();
 
-  // Hide bottom nav on profile pages for cleaner layout
-  if (pathname.startsWith("/stylists/") && pathname !== "/stylists") {
+  // Hide bottom nav on profile pages and stylist portal for cleaner layout
+  if (
+    (pathname.startsWith("/stylists/") && pathname !== "/stylists") ||
+    pathname.startsWith("/stylist/")
+  ) {
     return null;
   }
 
