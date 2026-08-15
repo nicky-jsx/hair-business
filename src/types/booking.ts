@@ -43,6 +43,7 @@ export interface TimeSlot {
 
 export interface BookingFormData {
   serviceId: string;
+  servicePrice?: number;
   date: string;
   time: string;
   customerName: string;

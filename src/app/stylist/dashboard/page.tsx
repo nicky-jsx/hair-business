@@ -5,12 +5,12 @@ import { useRouter } from "next/navigation";
 import { AvailabilityManager } from "@/components/stylist/dashboard/AvailabilityManager";
 import { BookingsList } from "@/components/stylist/dashboard/BookingsList";
 import { Button } from "@/components/ui/Button";
-import { useStylistStore } from "@/context/StylistStoreProvider";
+import { useAuth } from "@/context/AuthContext";
 import { formatRegion } from "@/types/stylist";
 
 export default function StylistDashboardPage() {
   const router = useRouter();
-  const { ready, account, signOut, getStylistById } = useStylistStore();
+  const { ready, account, profile, signOut } = useAuth();
 
   if (!ready) {
     return (
@@ -41,10 +41,6 @@ export default function StylistDashboardPage() {
     );
   }
 
-  const profile = account.stylistId
-    ? getStylistById(account.stylistId)
-    : undefined;
-
   return (
     <div className="px-5 pb-8 pt-6">
       <p className="mb-2 text-sm font-medium text-brand-600">Your dashboard</p>
@@ -55,7 +51,7 @@ export default function StylistDashboardPage() {
       {profile ? (
         <div className="mt-6 space-y-6">
           {/* Profile card */}
-          <div className="rounded-2xl border border-gray-100 bg-white p-5 shadow-card">
+          <div className="rounded-xl border border-gray-100 bg-white p-5 shadow-sm">
             <p className="text-sm font-medium text-gray-500">Your profile</p>
             <p className="mt-1 font-semibold text-gray-900">{profile.name}</p>
             <p className="text-sm text-brand-600">{profile.tagline}</p>
@@ -97,7 +93,7 @@ export default function StylistDashboardPage() {
           </p>
         </div>
       ) : (
-        <div className="mt-6 rounded-2xl bg-surface-muted p-5">
+        <div className="mt-6 rounded-xl bg-surface-muted p-5">
           <h2 className="font-semibold text-gray-900">Complete your profile</h2>
           <p className="mt-1 mb-4 text-sm text-gray-500">
             You haven&apos;t set up your stylist profile yet. It only takes a

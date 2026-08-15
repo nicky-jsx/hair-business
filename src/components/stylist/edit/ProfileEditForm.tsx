@@ -4,10 +4,9 @@ import { useRouter } from "next/navigation";
 import { FormEvent, useState } from "react";
 import { Button } from "@/components/ui/Button";
 import { Input, Select, Textarea } from "@/components/ui/FormField";
-import { useStylistStore } from "@/context/StylistStoreProvider";
+import { useAuth } from "@/context/AuthContext";
+import { updateStylistProfile } from "@/lib/stylist-profile-db";
 import {
-  isValidBookingUrl,
-  normaliseBookingUrl,
   REGIONS,
   type Region,
   type Service,
@@ -31,8 +30,9 @@ interface ProfileEditFormProps {
 
 export function ProfileEditForm({ profile }: ProfileEditFormProps) {
   const router = useRouter();
-  const { updateProfile } = useStylistStore();
+  const { refreshProfile } = useAuth();
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
 
   const [tagline, setTagline] = useState(profile.tagline);
@@ -50,9 +50,6 @@ export function ProfileEditForm({ profile }: ProfileEditFormProps) {
 
   const [avatar, setAvatar] = useState(profile.avatar);
   const [coverImage, setCoverImage] = useState(profile.coverImage);
-  const [portfolioUrls, setPortfolioUrls] = useState(
-    profile.portfolio.join("\n")
-  );
 
   function toggleSpecialty(specialty: Specialty) {
     setSpecialties((prev) =>
@@ -80,7 +77,7 @@ export function ProfileEditForm({ profile }: ProfileEditFormProps) {
     setServices((prev) => prev.filter((_, i) => i !== index));
   }
 
-  function handleSubmit(e: FormEvent) {
+  async function handleSubmit(e: FormEvent) {
     e.preventDefault();
     setError("");
     setSuccess(false);
@@ -104,18 +101,9 @@ export function ProfileEditForm({ profile }: ProfileEditFormProps) {
       return;
     }
 
-    if (!isValidBookingUrl(bookingUrl)) {
-      setError("Please enter a valid booking URL.");
-      return;
-    }
+    setLoading(true);
 
-    const portfolio = portfolioUrls
-      .split("\n")
-      .map((url) => url.trim())
-      .filter(Boolean);
-
-    const updated: Stylist = {
-      ...profile,
+    const result = await updateStylistProfile(profile.id, {
       tagline: tagline.trim(),
       bio: bio.trim(),
       region,
@@ -123,22 +111,29 @@ export function ProfileEditForm({ profile }: ProfileEditFormProps) {
       specialties,
       priceRange: derivePriceRange(validServices),
       services: validServices,
-      avatar: avatar.trim() || profile.avatar,
-      coverImage: coverImage.trim() || profile.coverImage,
-      portfolio: portfolio.length > 0 ? portfolio : profile.portfolio,
-      bookingUrl: normaliseBookingUrl(bookingUrl),
-    };
+      avatarUrl: avatar.trim() || undefined,
+      coverImageUrl: coverImage.trim() || undefined,
+      bookingUrl: bookingUrl.trim() || null,
+    });
 
-    updateProfile(updated);
+    setLoading(false);
+
+    if (result.error) {
+      setError(result.error);
+      return;
+    }
+
     setSuccess(true);
+    await refreshProfile();
     setTimeout(() => router.push("/stylist/dashboard"), 1000);
   }
 
   return (
     <form onSubmit={handleSubmit} className="space-y-5">
       {error && (
-        <div className="rounded-xl bg-red-50 px-4 py-3 text-sm text-red-600">
-          {error}
+        <div className="rounded-xl bg-red-50 px-4 py-3">
+          <p className="text-sm font-medium text-red-800">Something went wrong</p>
+          <p className="text-sm text-red-600">{error}</p>
         </div>
       )}
 
@@ -148,7 +143,7 @@ export function ProfileEditForm({ profile }: ProfileEditFormProps) {
         </div>
       )}
 
-      <div className="rounded-2xl border border-gray-100 bg-white p-4">
+      <div className="rounded-xl border border-gray-100 bg-white p-4 shadow-sm">
         <h2 className="mb-4 font-semibold text-gray-900">Basic info</h2>
         <div className="space-y-4">
           <Input
@@ -215,13 +210,13 @@ export function ProfileEditForm({ profile }: ProfileEditFormProps) {
         </div>
       </div>
 
-      <div className="rounded-2xl border border-gray-100 bg-white p-4">
+      <div className="rounded-xl border border-gray-100 bg-white p-4 shadow-sm">
         <h2 className="mb-4 font-semibold text-gray-900">Services & prices</h2>
         <div className="space-y-4">
           {services.map((service, index) => (
             <div
               key={index}
-              className="space-y-3 rounded-xl border border-gray-100 bg-surface-muted p-3"
+              className="space-y-3 rounded-xl border border-gray-100 bg-gray-50 p-3"
             >
               <div className="flex items-center justify-between">
                 <span className="text-sm font-medium text-gray-700">
@@ -283,10 +278,10 @@ export function ProfileEditForm({ profile }: ProfileEditFormProps) {
         </div>
       </div>
 
-      <div className="rounded-2xl border border-gray-100 bg-white p-4">
+      <div className="rounded-xl border border-gray-100 bg-white p-4 shadow-sm">
         <h2 className="mb-4 font-semibold text-gray-900">Booking link</h2>
         <Input
-          label="External booking URL"
+          label="External booking URL (optional)"
           name="bookingUrl"
           type="url"
           placeholder="https://book.fresha.com/your-salon"
@@ -294,11 +289,11 @@ export function ProfileEditForm({ profile }: ProfileEditFormProps) {
           onChange={(e) => setBookingUrl(e.target.value)}
         />
         <p className="mt-1.5 text-xs text-gray-400">
-          Link to Square, Fresha, Calendly, or your own booking page.
+          Leave blank to use the built-in booking system.
         </p>
       </div>
 
-      <div className="rounded-2xl border border-gray-100 bg-white p-4">
+      <div className="rounded-xl border border-gray-100 bg-white p-4 shadow-sm">
         <h2 className="mb-4 font-semibold text-gray-900">Photos</h2>
         <div className="space-y-4">
           <Input
@@ -317,13 +312,6 @@ export function ProfileEditForm({ profile }: ProfileEditFormProps) {
             value={coverImage}
             onChange={(e) => setCoverImage(e.target.value)}
           />
-          <Textarea
-            label="Portfolio photo URLs"
-            name="portfolio"
-            placeholder="One URL per line"
-            value={portfolioUrls}
-            onChange={(e) => setPortfolioUrls(e.target.value)}
-          />
         </div>
       </div>
 
@@ -333,11 +321,12 @@ export function ProfileEditForm({ profile }: ProfileEditFormProps) {
           variant="secondary"
           className="flex-1"
           onClick={() => router.back()}
+          disabled={loading}
         >
           Cancel
         </Button>
-        <Button type="submit" className="flex-1" size="lg">
-          Save changes
+        <Button type="submit" className="flex-1" size="lg" disabled={loading}>
+          {loading ? "Saving..." : "Save changes"}
         </Button>
       </div>
     </form>

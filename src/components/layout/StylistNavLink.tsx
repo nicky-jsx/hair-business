@@ -1,10 +1,10 @@
 "use client";
 
 import Link from "next/link";
-import { useStylistStore } from "@/context/StylistStoreProvider";
+import { useAuth } from "@/context/AuthContext";
 
 export function StylistNavLink() {
-  const { ready, account } = useStylistStore();
+  const { ready, account } = useAuth();
 
   if (!ready) return null;
 

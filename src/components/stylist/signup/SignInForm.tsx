@@ -5,15 +5,15 @@ import { useRouter } from "next/navigation";
 import { FormEvent, useState } from "react";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/FormField";
-import { useStylistStore } from "@/context/StylistStoreProvider";
+import { useAuth } from "@/context/AuthContext";
 
 export function SignInForm() {
   const router = useRouter();
-  const { signIn } = useStylistStore();
+  const { signIn } = useAuth();
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
-  function handleSubmit(e: FormEvent<HTMLFormElement>) {
+  async function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setError("");
     setLoading(true);
@@ -22,7 +22,8 @@ export function SignInForm() {
     const email = form.get("email") as string;
     const password = form.get("password") as string;
 
-    const result = signIn({ email, password });
+    const result = await signIn({ email, password });
+    
     if (result.error) {
       setError(result.error);
       setLoading(false);
@@ -35,8 +36,9 @@ export function SignInForm() {
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       {error && (
-        <div className="rounded-xl bg-red-50 px-4 py-3 text-sm text-red-600">
-          {error}
+        <div className="rounded-xl bg-red-50 px-4 py-3">
+          <p className="text-sm font-medium text-red-800">Something went wrong</p>
+          <p className="text-sm text-red-600">{error}</p>
         </div>
       )}
 
@@ -59,7 +61,7 @@ export function SignInForm() {
       />
 
       <Button type="submit" fullWidth size="lg" disabled={loading}>
-        {loading ? "Signing in…" : "Sign in"}
+        {loading ? "Signing in..." : "Sign in"}
       </Button>
 
       <p className="text-center text-sm text-gray-500">

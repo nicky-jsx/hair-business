@@ -3,11 +3,11 @@
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import { ProfileCreationForm } from "@/components/stylist/onboarding/ProfileCreationForm";
-import { useStylistStore } from "@/context/StylistStoreProvider";
+import { useAuth } from "@/context/AuthContext";
 
 export default function StylistOnboardingPage() {
   const router = useRouter();
-  const { ready, account } = useStylistStore();
+  const { ready, account } = useAuth();
 
   useEffect(() => {
     if (!ready) return;

@@ -3,11 +3,11 @@
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import { ProfileEditForm } from "@/components/stylist/edit/ProfileEditForm";
-import { useStylistStore } from "@/context/StylistStoreProvider";
+import { useAuth } from "@/context/AuthContext";
 
 export default function StylistEditPage() {
   const router = useRouter();
-  const { ready, account, getStylistById } = useStylistStore();
+  const { ready, account, profile } = useAuth();
 
   useEffect(() => {
     if (!ready) return;
@@ -28,12 +28,10 @@ export default function StylistEditPage() {
     );
   }
 
-  const profile = getStylistById(account.stylistId);
-
   if (!profile) {
     return (
-      <div className="px-5 py-8 text-center">
-        <p className="text-gray-500">Profile not found.</p>
+      <div className="flex items-center justify-center py-20">
+        <div className="h-8 w-8 animate-spin rounded-full border-2 border-brand-200 border-t-brand-600" />
       </div>
     );
   }

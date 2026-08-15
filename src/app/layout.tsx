@@ -2,7 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Inter, Playfair_Display } from "next/font/google";
 import { Header } from "@/components/layout/Header";
 import { BottomNav } from "@/components/layout/BottomNav";
-import { StylistStoreProvider } from "@/context/StylistStoreProvider";
+import { AuthProvider } from "@/context/AuthContext";
 import { ServiceWorkerRegistration } from "@/components/pwa/ServiceWorkerRegistration";
 import { InstallPrompt } from "@/components/pwa/InstallPrompt";
 import { SplashScreen } from "@/components/pwa/SplashScreen";
@@ -55,7 +55,7 @@ export default function RootLayout({
       <body
         className={`${inter.variable} ${playfair.variable} font-sans min-h-dvh`}
       >
-        <StylistStoreProvider>
+        <AuthProvider>
           <ServiceWorkerRegistration />
           <SplashScreen />
           <div className="mx-auto flex min-h-dvh max-w-lg flex-col bg-surface lg:my-4 lg:min-h-[calc(100dvh-2rem)] lg:rounded-3xl lg:shadow-xl lg:ring-1 lg:ring-gray-200">
@@ -64,7 +64,7 @@ export default function RootLayout({
             <BottomNav />
           </div>
           <InstallPrompt />
-        </StylistStoreProvider>
+        </AuthProvider>
       </body>
     </html>
   );

@@ -4,30 +4,19 @@ import { useRouter } from "next/navigation";
 import { FormEvent, useState } from "react";
 import { Button } from "@/components/ui/Button";
 import { Input, Select, Textarea } from "@/components/ui/FormField";
-import { useStylistStore } from "@/context/StylistStoreProvider";
+import { useAuth } from "@/context/AuthContext";
+import { createStylistProfile } from "@/lib/stylist-profile-db";
+import { linkStylistProfile } from "@/lib/auth-db";
 import {
-  isValidBookingUrl,
-  normaliseBookingUrl,
   REGIONS,
   type Region,
   type Service,
   type Specialty,
-  type Stylist,
 } from "@/types/stylist";
 
 const ALL_SPECIALTIES: Specialty[] = ["Braids", "Wigs", "Locs", "Eyelashes"];
 
-const DEFAULT_AVATAR =
-  "https://images.unsplash.com/photo-1580618672591-eb180b1a973f?w=400&h=400&fit=crop&crop=face";
-const DEFAULT_COVER =
-  "https://images.unsplash.com/photo-1562322140-8baeececf3df?w=800&h=400&fit=crop";
-const DEFAULT_PORTFOLIO = [
-  "https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?w=600&h=600&fit=crop",
-  "https://images.unsplash.com/photo-1562322140-8baeececf3df?w=600&h=600&fit=crop",
-  "https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?w=600&h=600&fit=crop",
-];
-
-const STEPS = ["About you", "Services & booking", "Photos"];
+const STEPS = ["About you", "Services", "Photos"];
 
 function derivePriceRange(services: Service[]): "£" | "££" | "£££" {
   if (services.length === 0) return "££";
@@ -39,9 +28,10 @@ function derivePriceRange(services: Service[]): "£" | "££" | "£££" {
 
 export function ProfileCreationForm() {
   const router = useRouter();
-  const { account, createProfile } = useStylistStore();
+  const { account, setAccountStylistId } = useAuth();
   const [step, setStep] = useState(0);
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const [tagline, setTagline] = useState("");
   const [bio, setBio] = useState("");
@@ -52,11 +42,9 @@ export function ProfileCreationForm() {
   const [services, setServices] = useState<Service[]>([
     { name: "", price: 0, duration: "" },
   ]);
-  const [bookingUrl, setBookingUrl] = useState("");
 
   const [avatar, setAvatar] = useState("");
   const [coverImage, setCoverImage] = useState("");
-  const [portfolioUrls, setPortfolioUrls] = useState("");
 
   function toggleSpecialty(specialty: Specialty | null) {
     if (!specialty) {
@@ -88,7 +76,7 @@ export function ProfileCreationForm() {
     setServices((prev) => prev.filter((_, i) => i !== index));
   }
 
-  function handleNext(e: FormEvent) {
+  async function handleNext(e: FormEvent) {
     e.preventDefault();
     setError("");
 
@@ -113,49 +101,47 @@ export function ProfileCreationForm() {
         setError("Add at least one complete service.");
         return;
       }
-      if (!isValidBookingUrl(bookingUrl)) {
-        setError("Please enter a valid booking URL.");
-        return;
-      }
       setStep(2);
       return;
     }
 
+    // Final step - create profile
     if (!account) {
       setError("You must be signed in to create a profile.");
       return;
     }
 
+    setLoading(true);
+
     const validServices = services.filter(
       (s) => s.name.trim() && s.price > 0 && s.duration.trim()
     );
 
-    const portfolio = portfolioUrls
-      .split("\n")
-      .map((url) => url.trim())
-      .filter(Boolean);
-
-    const stylist: Stylist = {
-      id: `user-${crypto.randomUUID()}`,
+    const result = await createStylistProfile({
       name: account.name,
       tagline: tagline.trim(),
       bio: bio.trim(),
-      avatar: avatar.trim() || DEFAULT_AVATAR,
-      coverImage: coverImage.trim() || DEFAULT_COVER,
       region: region!,
       specialties,
       yearsExperience: parseInt(yearsExperience, 10),
       priceRange: derivePriceRange(validServices),
-      featured: false,
-      rating: 0,
-      reviewCount: 0,
       services: validServices,
-      portfolio: portfolio.length > 0 ? portfolio : DEFAULT_PORTFOLIO,
-      bookingUrl: normaliseBookingUrl(bookingUrl),
-    };
+      avatarUrl: avatar.trim() || undefined,
+      coverImageUrl: coverImage.trim() || undefined,
+    });
 
-    createProfile(stylist);
-    router.push(`/stylists/${stylist.id}`);
+    if (result.error) {
+      setError(result.error);
+      setLoading(false);
+      return;
+    }
+
+    if (result.stylist) {
+      // Link the stylist profile to the account
+      await linkStylistProfile(account.id, result.stylist.id);
+      setAccountStylistId(result.stylist.id);
+      router.push(`/stylists/${result.stylist.id}`);
+    }
   }
 
   return (
@@ -186,8 +172,9 @@ export function ProfileCreationForm() {
 
       <form onSubmit={handleNext} className="space-y-5">
         {error && (
-          <div className="rounded-xl bg-red-50 px-4 py-3 text-sm text-red-600">
-            {error}
+          <div className="rounded-xl bg-red-50 px-4 py-3">
+            <p className="text-sm font-medium text-red-800">Something went wrong</p>
+            <p className="text-sm text-red-600">{error}</p>
           </div>
         )}
 
@@ -267,7 +254,7 @@ export function ProfileCreationForm() {
             {services.map((service, index) => (
               <div
                 key={index}
-                className="space-y-3 rounded-2xl border border-gray-100 bg-white p-4"
+                className="space-y-3 rounded-xl border border-gray-100 bg-white p-4 shadow-sm"
               >
                 <div className="flex items-center justify-between">
                   <span className="text-sm font-medium text-gray-700">
@@ -319,21 +306,6 @@ export function ProfileCreationForm() {
             <Button type="button" variant="secondary" fullWidth onClick={addService}>
               + Add another service
             </Button>
-
-            <div className="border-t border-gray-100 pt-5">
-              <Input
-                label="External booking link"
-                name="bookingUrl"
-                type="url"
-                placeholder="https://book.fresha.com/your-salon"
-                value={bookingUrl}
-                onChange={(e) => setBookingUrl(e.target.value)}
-              />
-              <p className="mt-1.5 text-xs text-gray-400">
-                Optional. Link to Square, Fresha, Calendly, or your own booking
-                page. Clients will use this when they tap Book Now.
-              </p>
-            </div>
           </>
         )}
 
@@ -359,13 +331,6 @@ export function ProfileCreationForm() {
               value={coverImage}
               onChange={(e) => setCoverImage(e.target.value)}
             />
-            <Textarea
-              label="Portfolio photo URLs"
-              name="portfolio"
-              placeholder="One URL per line"
-              value={portfolioUrls}
-              onChange={(e) => setPortfolioUrls(e.target.value)}
-            />
           </>
         )}
 
@@ -376,12 +341,13 @@ export function ProfileCreationForm() {
               variant="secondary"
               className="flex-1"
               onClick={() => setStep((s) => s - 1)}
+              disabled={loading}
             >
               Back
             </Button>
           )}
-          <Button type="submit" className="flex-1" size="lg">
-            {step < 2 ? "Continue" : "Publish profile"}
+          <Button type="submit" className="flex-1" size="lg" disabled={loading}>
+            {loading ? "Creating..." : step < 2 ? "Continue" : "Publish profile"}
           </Button>
         </div>
       </form>

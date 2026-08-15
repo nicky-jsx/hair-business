@@ -2,6 +2,13 @@
 
 import { useState, useMemo } from "react";
 
+function formatDateStr(date: Date): string {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+}
+
 interface DatePickerProps {
   selectedDate: string;
   onSelect: (date: string) => void;
@@ -130,7 +137,7 @@ export function DatePicker({ selectedDate, onSelect }: DatePickerProps) {
               return <div key={`empty-${index}`} />;
             }
 
-            const dateStr = date.toISOString().split("T")[0];
+            const dateStr = formatDateStr(date);
             const isPast = date < today;
             const isSelected = dateStr === selectedDate;
             const isToday = date.getTime() === today.getTime();

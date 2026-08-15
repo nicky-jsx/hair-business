@@ -9,9 +9,7 @@ import type {
 import { generateTimeSlots, formatTime, TIME_SLOT_INTERVAL } from "@/types/booking";
 import type {
   StylistAvailabilityRow,
-  BookingRow,
   BlockedTimeRow,
-  ServiceRow,
 } from "@/types/database";
 
 // Fetch stylist availability for all days
@@ -65,7 +63,7 @@ export async function fetchBookingsForDate(
 
   const { data, error } = await supabase
     .from("bookings")
-    .select("*, services(name, price)")
+    .select("*")
     .eq("stylist_id", stylistId)
     .eq("booking_date", date)
     .neq("status", "cancelled");
@@ -75,13 +73,11 @@ export async function fetchBookingsForDate(
     return [];
   }
 
-  type BookingWithService = BookingRow & { services: Pick<ServiceRow, "name" | "price"> | null };
-  const rows = data as BookingWithService[] | null;
-
-  return (rows ?? []).map((row) => ({
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return (data ?? []).map((row: any) => ({
     id: row.id,
     stylistId: row.stylist_id,
-    serviceId: row.service_id,
+    serviceId: row.service_name,
     customerName: row.customer_name,
     customerEmail: row.customer_email,
     customerPhone: row.customer_phone,
@@ -91,8 +87,8 @@ export async function fetchBookingsForDate(
     status: row.status,
     notes: row.notes,
     createdAt: row.created_at,
-    serviceName: row.services?.name,
-    servicePrice: row.services?.price,
+    serviceName: row.service_name,
+    servicePrice: row.service_price,
   }));
 }
 
@@ -107,7 +103,7 @@ export async function fetchUpcomingBookings(
 
   const { data, error } = await supabase
     .from("bookings")
-    .select("*, services(name, price)")
+    .select("*")
     .eq("stylist_id", stylistId)
     .gte("booking_date", today)
     .neq("status", "cancelled")
@@ -119,13 +115,11 @@ export async function fetchUpcomingBookings(
     return [];
   }
 
-  type BookingWithService = BookingRow & { services: Pick<ServiceRow, "name" | "price"> | null };
-  const rows = data as BookingWithService[] | null;
-
-  return (rows ?? []).map((row) => ({
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return (data ?? []).map((row: any) => ({
     id: row.id,
     stylistId: row.stylist_id,
-    serviceId: row.service_id,
+    serviceId: row.service_name,
     customerName: row.customer_name,
     customerEmail: row.customer_email,
     customerPhone: row.customer_phone,
@@ -135,8 +129,8 @@ export async function fetchUpcomingBookings(
     status: row.status,
     notes: row.notes,
     createdAt: row.created_at,
-    serviceName: row.services?.name,
-    servicePrice: row.services?.price,
+    serviceName: row.service_name,
+    servicePrice: row.service_price,
   }));
 }
 
@@ -263,7 +257,8 @@ export async function createBooking(
     .from("bookings")
     .insert({
       stylist_id: stylistId,
-      service_id: data.serviceId,
+      service_name: data.serviceId, // This is actually the service name
+      service_price: data.servicePrice,
       customer_name: data.customerName,
       customer_email: data.customerEmail,
       customer_phone: data.customerPhone,
@@ -281,22 +276,20 @@ export async function createBooking(
     return { error: "Failed to create booking. Please try again." };
   }
 
-  const row = result as BookingRow;
-
   return {
     booking: {
-      id: row.id,
-      stylistId: row.stylist_id,
-      serviceId: row.service_id,
-      customerName: row.customer_name,
-      customerEmail: row.customer_email,
-      customerPhone: row.customer_phone,
-      bookingDate: row.booking_date,
-      startTime: row.start_time,
-      endTime: row.end_time,
-      status: row.status,
-      notes: row.notes,
-      createdAt: row.created_at,
+      id: result.id,
+      stylistId: result.stylist_id,
+      serviceId: result.service_name,
+      customerName: result.customer_name,
+      customerEmail: result.customer_email,
+      customerPhone: result.customer_phone,
+      bookingDate: result.booking_date,
+      startTime: result.start_time,
+      endTime: result.end_time,
+      status: result.status,
+      notes: result.notes,
+      createdAt: result.created_at,
     },
   };
 }

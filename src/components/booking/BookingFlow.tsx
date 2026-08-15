@@ -55,6 +55,7 @@ export function BookingFlow({ stylist, onClose }: BookingFlowProps) {
 
     const formData: BookingFormData = {
       serviceId: selectedService.name,
+      servicePrice: selectedService.price,
       date: selectedDate,
       time: selectedTime,
       customerName: customerData.name,

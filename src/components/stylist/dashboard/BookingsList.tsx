@@ -71,7 +71,7 @@ export function BookingsList({ stylistId }: BookingsListProps) {
   return (
     <div className="space-y-3">
       {bookings.map((booking) => {
-        const date = new Date(booking.bookingDate);
+        const date = parseLocalDate(booking.bookingDate);
         const isToday = isDateToday(date);
         const isTomorrow = isDateTomorrow(date);
 
@@ -174,6 +174,11 @@ function formatTime(time: string): string {
   const ampm = hour >= 12 ? "PM" : "AM";
   const displayHour = hour % 12 || 12;
   return `${displayHour}:${minutes} ${ampm}`;
+}
+
+function parseLocalDate(dateStr: string): Date {
+  const [year, month, day] = dateStr.split("-").map(Number);
+  return new Date(year, month - 1, day);
 }
 
 function isDateToday(date: Date): boolean {
