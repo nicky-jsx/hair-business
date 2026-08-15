@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/Button";
 import { fetchFeaturedStylists } from "@/lib/stylists-db";
 import { REGIONS, type Specialty } from "@/types/stylist";
 
-const ENABLED_SPECIALTIES: Specialty[] = ["Wigs", "Braids", "Locs", "Extensions", "Eyelashes"];
+const ENABLED_SPECIALTIES: Specialty[] = ["Wigs", "Braids", "Locs", "Eyelashes"];
 
 export const revalidate = 60; // Revalidate every 60 seconds
 

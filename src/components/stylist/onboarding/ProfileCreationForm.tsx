@@ -15,7 +15,7 @@ import {
   type Stylist,
 } from "@/types/stylist";
 
-const ALL_SPECIALTIES: Specialty[] = ["Braids", "Wigs", "Locs", "Extensions", "Eyelashes"];
+const ALL_SPECIALTIES: Specialty[] = ["Braids", "Wigs", "Locs", "Eyelashes"];
 
 const DEFAULT_AVATAR =
   "https://images.unsplash.com/photo-1580618672591-eb180b1a973f?w=400&h=400&fit=crop&crop=face";

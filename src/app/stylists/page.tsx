@@ -21,7 +21,7 @@ function isRegion(value: string | null): value is Region {
   return value !== null && REGIONS.includes(value as Region);
 }
 
-const ENABLED_SPECIALTIES: Specialty[] = ["Wigs", "Braids", "Locs", "Extensions", "Eyelashes"];
+const ENABLED_SPECIALTIES: Specialty[] = ["Wigs", "Braids", "Locs", "Eyelashes"];
 
 function isSpecialty(value: string | null): value is Specialty {
   return (
