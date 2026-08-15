@@ -16,8 +16,8 @@ const playfair = Playfair_Display({
 });
 
 export const metadata: Metadata = {
-  title: "Strand — Find Your Stylist in London",
-  description: "Discover talented hair stylists across London",
+  title: "Strand — Find Your Professional in London",
+  description: "Discover talented hair and beauty professionals across London",
 };
 
 export const viewport: Viewport = {

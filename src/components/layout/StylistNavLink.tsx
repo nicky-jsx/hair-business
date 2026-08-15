@@ -12,9 +12,9 @@ export function StylistNavLink() {
     ? "/stylist/dashboard"
     : account
       ? "/stylist/onboarding"
-      : "/stylist/sign-up";
+      : "/stylist/sign-in";
 
-  const label = account ? "Dashboard" : "Join";
+  const label = account ? "Dashboard" : "Stylist login";
 
   return (
     <Link

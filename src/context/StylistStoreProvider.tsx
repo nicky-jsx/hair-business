@@ -15,11 +15,12 @@ import {
   getSessionAccountId,
   linkProfileToAccount,
   saveCustomStylist,
+  signIn,
   signOut,
   signUp,
   updateCustomStylist,
 } from "@/lib/stylist-store";
-import type { StylistAccount, SignUpInput } from "@/types/account";
+import type { StylistAccount, SignInInput, SignUpInput } from "@/types/account";
 import type { Stylist, StylistFilters } from "@/types/stylist";
 import { formatRegion } from "@/types/stylist";
 
@@ -28,6 +29,7 @@ interface StylistStoreContextValue {
   stylists: Stylist[];
   account: StylistAccount | null;
   signUp: (input: SignUpInput) => { error?: string };
+  signIn: (input: SignInInput) => { error?: string };
   signOut: () => void;
   createProfile: (stylist: Stylist) => void;
   updateProfile: (stylist: Stylist) => void;
@@ -107,6 +109,16 @@ export function StylistStoreProvider({
     [refresh]
   );
 
+  const handleSignIn = useCallback(
+    (input: SignInInput) => {
+      const result = signIn(input.email, input.password);
+      if ("error" in result) return { error: result.error };
+      refresh();
+      return {};
+    },
+    [refresh]
+  );
+
   const handleSignOut = useCallback(() => {
     signOut();
     refresh();
@@ -136,6 +148,7 @@ export function StylistStoreProvider({
       stylists,
       account,
       signUp: handleSignUp,
+      signIn: handleSignIn,
       signOut: handleSignOut,
       createProfile,
       updateProfile,
@@ -148,6 +161,7 @@ export function StylistStoreProvider({
       stylists,
       account,
       handleSignUp,
+      handleSignIn,
       handleSignOut,
       createProfile,
       updateProfile,

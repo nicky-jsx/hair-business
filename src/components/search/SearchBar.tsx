@@ -13,7 +13,7 @@ interface SearchBarProps {
 
 export function SearchBar({
   defaultValue = "",
-  placeholder = "Search stylists, regions, specialties…",
+  placeholder = "Search professionals, regions, specialties…",
   autoFocus = false,
   onSearch,
   navigateOnSubmit = false,

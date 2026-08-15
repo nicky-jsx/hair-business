@@ -8,7 +8,7 @@ interface StylistGridProps {
 
 export function StylistGrid({
   stylists,
-  emptyMessage = "No stylists found. Try a different search.",
+  emptyMessage = "No professionals found. Try a different search.",
 }: StylistGridProps) {
   if (stylists.length === 0) {
     return (

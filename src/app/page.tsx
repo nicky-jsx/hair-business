@@ -2,27 +2,29 @@ import Link from "next/link";
 import { SearchBar } from "@/components/search/SearchBar";
 import { StylistCard } from "@/components/stylist/StylistCard";
 import { Button } from "@/components/ui/Button";
-import { getFeaturedStylists } from "@/data/stylists";
+import { fetchFeaturedStylists } from "@/lib/stylists-db";
 import { REGIONS, type Specialty } from "@/types/stylist";
 
-const ENABLED_SPECIALTIES: Specialty[] = ["Wigs", "Braids"];
+const ENABLED_SPECIALTIES: Specialty[] = ["Wigs", "Braids", "Locs", "Extensions", "Eyelashes"];
 
-export default function HomePage() {
-  const featured = getFeaturedStylists();
+export const revalidate = 60; // Revalidate every 60 seconds
+
+export default async function HomePage() {
+  const featured = await fetchFeaturedStylists();
   const specialties = ENABLED_SPECIALTIES;
 
   return (
     <div className="px-5 pb-8">
       {/* Hero */}
       <section className="pt-6 pb-8">
-        <p className="mb-2 text-sm font-medium text-brand-600">London&apos;s stylist directory</p>
+        <p className="mb-2 text-sm font-medium text-brand-600">London&apos;s beauty directory</p>
         <h1 className="font-display text-3xl font-semibold leading-tight tracking-tight text-gray-900">
           Find your perfect
           <br />
-          <span className="text-brand-600">stylist in London</span>
+          <span className="text-brand-600">professional in London</span>
         </h1>
         <p className="mt-3 text-base text-gray-500 leading-relaxed">
-          Discover talented hair professionals across North, East, South, and West
+          Discover talented hair and beauty professionals across North, East, South, and West
           London. Browse styles, compare specialties, and find your match.
         </p>
       </section>
@@ -69,10 +71,10 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Featured stylists */}
+      {/* Featured professionals */}
       <section className="mb-8">
         <div className="mb-4 flex items-center justify-between">
-          <h2 className="text-lg font-semibold text-gray-900">Featured stylists</h2>
+          <h2 className="text-lg font-semibold text-gray-900">Featured professionals</h2>
           <Link
             href="/stylists"
             className="text-sm font-medium text-brand-600 hover:text-brand-700"
@@ -91,7 +93,7 @@ export default function HomePage() {
       <section className="rounded-2xl bg-gradient-to-br from-brand-600 to-brand-800 p-6 text-white">
         <h2 className="font-display text-xl font-semibold">Ready to explore?</h2>
         <p className="mt-2 text-sm text-brand-100 leading-relaxed">
-          Browse stylists across North, East, South, and West London.
+          Browse professionals across North, East, South, and West London.
         </p>
         <Link href="/stylists" className="mt-4 inline-block">
           <Button
@@ -99,7 +101,7 @@ export default function HomePage() {
             size="md"
             className="border-0 bg-white text-brand-700 hover:bg-brand-50"
           >
-            Browse all stylists
+            Browse all
           </Button>
         </Link>
       </section>

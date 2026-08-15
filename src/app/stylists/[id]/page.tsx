@@ -4,7 +4,9 @@ import { BookNowButton } from "@/components/stylist/profile/BookNowButton";
 import { ProfileHeader } from "@/components/stylist/profile/ProfileHeader";
 import { ProfilePortfolio } from "@/components/stylist/profile/ProfilePortfolio";
 import { ProfileServices } from "@/components/stylist/profile/ProfileServices";
-import { getStylistById } from "@/data/stylists";
+import { fetchStylistById } from "@/lib/stylists-db";
+
+export const revalidate = 60;
 
 interface ProfilePageProps {
   params: Promise<{ id: string }>;
@@ -12,7 +14,7 @@ interface ProfilePageProps {
 
 export default async function StylistProfilePage({ params }: ProfilePageProps) {
   const { id } = await params;
-  const stylist = getStylistById(id);
+  const stylist = await fetchStylistById(id);
 
   if (!stylist) {
     notFound();

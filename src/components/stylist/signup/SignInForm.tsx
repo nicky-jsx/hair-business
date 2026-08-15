@@ -7,9 +7,9 @@ import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/FormField";
 import { useStylistStore } from "@/context/StylistStoreProvider";
 
-export function SignUpForm() {
+export function SignInForm() {
   const router = useRouter();
-  const { signUp } = useStylistStore();
+  const { signIn } = useStylistStore();
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -19,31 +19,17 @@ export function SignUpForm() {
     setLoading(true);
 
     const form = new FormData(e.currentTarget);
-    const name = form.get("name") as string;
     const email = form.get("email") as string;
     const password = form.get("password") as string;
-    const confirm = form.get("confirm") as string;
 
-    if (password.length < 6) {
-      setError("Password must be at least 6 characters.");
-      setLoading(false);
-      return;
-    }
-
-    if (password !== confirm) {
-      setError("Passwords do not match.");
-      setLoading(false);
-      return;
-    }
-
-    const result = signUp({ name, email, password });
+    const result = signIn({ email, password });
     if (result.error) {
       setError(result.error);
       setLoading(false);
       return;
     }
 
-    router.push("/stylist/onboarding");
+    router.push("/stylist/dashboard");
   }
 
   return (
@@ -53,15 +39,6 @@ export function SignUpForm() {
           {error}
         </div>
       )}
-
-      <Input
-        label="Full name"
-        name="name"
-        type="text"
-        placeholder="Your name"
-        required
-        autoComplete="name"
-      />
 
       <Input
         label="Email"
@@ -76,31 +53,22 @@ export function SignUpForm() {
         label="Password"
         name="password"
         type="password"
-        placeholder="At least 6 characters"
+        placeholder="Your password"
         required
-        autoComplete="new-password"
-      />
-
-      <Input
-        label="Confirm password"
-        name="confirm"
-        type="password"
-        placeholder="Repeat your password"
-        required
-        autoComplete="new-password"
+        autoComplete="current-password"
       />
 
       <Button type="submit" fullWidth size="lg" disabled={loading}>
-        {loading ? "Creating account…" : "Create account"}
+        {loading ? "Signing in…" : "Sign in"}
       </Button>
 
       <p className="text-center text-sm text-gray-500">
-        Already have an account?{" "}
+        Don&apos;t have an account?{" "}
         <Link
-          href="/stylist/sign-in"
+          href="/stylist/sign-up"
           className="font-medium text-brand-600 hover:text-brand-700"
         >
-          Sign in
+          Create one
         </Link>
       </p>
     </form>

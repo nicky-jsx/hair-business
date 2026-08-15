@@ -1,0 +1,118 @@
+-- Seed data for Strand - Sample stylists
+-- Run this after schema.sql
+
+-- Insert sample stylists
+insert into stylists (id, name, tagline, bio, avatar_url, cover_image_url, region, years_experience, price_range, featured, booking_url) values
+  ('11111111-1111-1111-1111-111111111111', 'Amara Johnson', 'Protective styles with precision', 'Specializing in knotless braids, loc maintenance, and natural hair care. Based in North London, I believe every client deserves a style that protects and celebrates their hair.', 'https://images.unsplash.com/photo-1580618672591-eb180b1a973f?w=400&h=400&fit=crop&crop=face', 'https://images.unsplash.com/photo-1562322140-8baeececf3df?w=800&h=400&fit=crop', 'North', 8, '££', true, null),
+  ('22222222-2222-2222-2222-222222222222', 'Marcus Chen', 'Sharp cuts, clean fades', 'Barber-stylist hybrid with a focus on precision cuts and modern fades. Working from a studio in East London, whether you want a classic look or something fresh, I''ve got you covered.', 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop&crop=face', 'https://images.unsplash.com/photo-1622286342621-4bd786c2447c?w=800&h=400&fit=crop', 'East', 12, '££', true, null),
+  ('33333333-3333-3333-3333-333333333333', 'Zara Williams', 'Colour that turns heads', 'Vivid colours, balayage, and healthy colour transformations. I use premium products to keep your hair vibrant and strong from my salon in West London.', 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=400&h=400&fit=crop&crop=face', 'https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?w=800&h=400&fit=crop', 'West', 6, '£££', true, null),
+  ('44444444-4444-4444-4444-444444444444', 'Destiny Moore', 'Silk presses & blowouts', 'Known for bone-straight silk presses and bouncy blowouts. I treat every head of hair with the care it deserves at my South London studio.', 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=400&h=400&fit=crop&crop=face', 'https://images.unsplash.com/photo-1519699047748-de8e457a634e?w=800&h=400&fit=crop', 'South', 10, '££', false, null),
+  ('55555555-5555-5555-5555-555555555555', 'Jaylen Brooks', 'Loc artist & retwist pro', 'From starter locs to mature maintenance, I help you grow and style your loc journey with patience and skill from my chair in East London.', 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400&h=400&fit=crop&crop=face', 'https://images.unsplash.com/photo-1595476108010-b4d1f102b1f1?w=800&h=400&fit=crop', 'East', 7, '££', false, null),
+  ('66666666-6666-6666-6666-666666666666', 'Keisha Patel', 'Wig installs & custom units', 'Flawless wig installs, custom unit construction, and lace melting that looks completely natural. Based in North London.', 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=400&h=400&fit=crop&crop=face', 'https://images.unsplash.com/photo-1487412947147-5cebf100ffc2?w=800&h=400&fit=crop', 'North', 5, '£££', false, null),
+  ('77777777-7777-7777-7777-777777777777', 'Tiana Rivers', 'Kids braids & teen styles', 'Gentle, patient, and creative styles for kids and teens. From simple cornrows to intricate patterns, serving families across South London.', 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400&h=400&fit=crop&crop=face', 'https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?w=800&h=400&fit=crop', 'South', 4, '£', false, null),
+  ('88888888-8888-8888-8888-888888888888', 'Andre Foster', 'Editorial cuts & styling', 'Fashion-forward cuts and editorial styling for those who want to stand out. Featured in multiple beauty campaigns, working from West London.', 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&h=400&fit=crop&crop=face', 'https://images.unsplash.com/photo-1634449577050-15f4c093a3e0?w=800&h=400&fit=crop', 'West', 15, '£££', true, null);
+
+-- Insert specialties
+insert into stylist_specialties (stylist_id, specialty) values
+  ('11111111-1111-1111-1111-111111111111', 'Braids'),
+  ('11111111-1111-1111-1111-111111111111', 'Locs'),
+  ('11111111-1111-1111-1111-111111111111', 'Natural Hair'),
+  ('22222222-2222-2222-2222-222222222222', 'Cuts'),
+  ('22222222-2222-2222-2222-222222222222', 'Natural Hair'),
+  ('33333333-3333-3333-3333-333333333333', 'Color'),
+  ('33333333-3333-3333-3333-333333333333', 'Silk Press'),
+  ('33333333-3333-3333-3333-333333333333', 'Extensions'),
+  ('44444444-4444-4444-4444-444444444444', 'Silk Press'),
+  ('44444444-4444-4444-4444-444444444444', 'Natural Hair'),
+  ('44444444-4444-4444-4444-444444444444', 'Extensions'),
+  ('55555555-5555-5555-5555-555555555555', 'Locs'),
+  ('55555555-5555-5555-5555-555555555555', 'Natural Hair'),
+  ('66666666-6666-6666-6666-666666666666', 'Wigs'),
+  ('66666666-6666-6666-6666-666666666666', 'Extensions'),
+  ('66666666-6666-6666-6666-666666666666', 'Braids'),
+  ('77777777-7777-7777-7777-777777777777', 'Braids'),
+  ('77777777-7777-7777-7777-777777777777', 'Natural Hair'),
+  ('88888888-8888-8888-8888-888888888888', 'Cuts'),
+  ('88888888-8888-8888-8888-888888888888', 'Color'),
+  ('88888888-8888-8888-8888-888888888888', 'Natural Hair');
+
+-- Insert services
+insert into services (stylist_id, name, price, duration) values
+  ('11111111-1111-1111-1111-111111111111', 'Knotless Braids (medium)', 120, '4–5 hrs'),
+  ('11111111-1111-1111-1111-111111111111', 'Loc Retwist', 65, '2 hrs'),
+  ('11111111-1111-1111-1111-111111111111', 'Natural Hair Wash & Blowdry', 45, '1 hr'),
+  ('11111111-1111-1111-1111-111111111111', 'Cornrows', 55, '1.5 hrs'),
+  ('22222222-2222-2222-2222-222222222222', 'Skin Fade', 35, '45 mins'),
+  ('22222222-2222-2222-2222-222222222222', 'Shape Up & Beard Trim', 28, '30 mins'),
+  ('22222222-2222-2222-2222-222222222222', 'Scissor Cut', 40, '1 hr'),
+  ('22222222-2222-2222-2222-222222222222', 'Kids Cut (under 12)', 22, '30 mins'),
+  ('33333333-3333-3333-3333-333333333333', 'Full Colour', 150, '3 hrs'),
+  ('33333333-3333-3333-3333-333333333333', 'Balayage', 200, '4 hrs'),
+  ('33333333-3333-3333-3333-333333333333', 'Silk Press', 55, '1.5 hrs'),
+  ('33333333-3333-3333-3333-333333333333', 'Extension Install', 180, '3–4 hrs'),
+  ('44444444-4444-4444-4444-444444444444', 'Silk Press', 50, '1.5 hrs'),
+  ('44444444-4444-4444-4444-444444444444', 'Blowout & Style', 40, '1 hr'),
+  ('44444444-4444-4444-4444-444444444444', 'Deep Condition Treatment', 35, '45 mins'),
+  ('44444444-4444-4444-4444-444444444444', 'Sew-In Extensions', 160, '3 hrs'),
+  ('55555555-5555-5555-5555-555555555555', 'Loc Retwist', 70, '2 hrs'),
+  ('55555555-5555-5555-5555-555555555555', 'Starter Locs', 100, '3 hrs'),
+  ('55555555-5555-5555-5555-555555555555', 'Loc Style', 45, '1 hr'),
+  ('55555555-5555-5555-5555-555555555555', 'Loc Repair', 30, '30 mins'),
+  ('66666666-6666-6666-6666-666666666666', 'Wig Install (glueless)', 80, '1.5 hrs'),
+  ('66666666-6666-6666-6666-666666666666', 'Custom Unit Construction', 250, '1 week turnaround'),
+  ('66666666-6666-6666-6666-666666666666', 'Lace Front Install', 100, '2 hrs'),
+  ('66666666-6666-6666-6666-666666666666', 'Wig Maintenance', 45, '1 hr'),
+  ('77777777-7777-7777-7777-777777777777', 'Kids Braids', 40, '1.5 hrs'),
+  ('77777777-7777-7777-7777-777777777777', 'Teen Box Braids', 65, '2.5 hrs'),
+  ('77777777-7777-7777-7777-777777777777', 'Simple Cornrows', 30, '1 hr'),
+  ('77777777-7777-7777-7777-777777777777', 'Natural Hair Detangle', 25, '45 mins'),
+  ('88888888-8888-8888-8888-888888888888', 'Editorial Cut', 75, '1 hr'),
+  ('88888888-8888-8888-8888-888888888888', 'Creative Colour', 180, '3 hrs'),
+  ('88888888-8888-8888-8888-888888888888', 'Event Styling', 90, '1.5 hrs'),
+  ('88888888-8888-8888-8888-888888888888', 'Consultation', 25, '30 mins');
+
+-- Insert portfolio photos
+insert into portfolio_photos (stylist_id, photo_url, sort_order) values
+  ('11111111-1111-1111-1111-111111111111', 'https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?w=600&h=600&fit=crop', 0),
+  ('11111111-1111-1111-1111-111111111111', 'https://images.unsplash.com/photo-1562322140-8baeececf3df?w=600&h=600&fit=crop', 1),
+  ('11111111-1111-1111-1111-111111111111', 'https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?w=600&h=600&fit=crop', 2),
+  ('11111111-1111-1111-1111-111111111111', 'https://images.unsplash.com/photo-1519699047748-de8e457a634e?w=600&h=600&fit=crop', 3),
+  ('22222222-2222-2222-2222-222222222222', 'https://images.unsplash.com/photo-1622286342621-4bd786c2447c?w=600&h=600&fit=crop', 0),
+  ('22222222-2222-2222-2222-222222222222', 'https://images.unsplash.com/photo-1634449577050-15f4c093a3e0?w=600&h=600&fit=crop', 1),
+  ('22222222-2222-2222-2222-222222222222', 'https://images.unsplash.com/photo-1595476108010-b4d1f102b1f1?w=600&h=600&fit=crop', 2),
+  ('33333333-3333-3333-3333-333333333333', 'https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?w=600&h=600&fit=crop', 0),
+  ('33333333-3333-3333-3333-333333333333', 'https://images.unsplash.com/photo-1516975080664-ed2fc6a13737?w=600&h=600&fit=crop', 1),
+  ('33333333-3333-3333-3333-333333333333', 'https://images.unsplash.com/photo-1487412947147-5cebf100ffc2?w=600&h=600&fit=crop', 2),
+  ('44444444-4444-4444-4444-444444444444', 'https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?w=600&h=600&fit=crop', 0),
+  ('44444444-4444-4444-4444-444444444444', 'https://images.unsplash.com/photo-1562322140-8baeececf3df?w=600&h=600&fit=crop', 1),
+  ('55555555-5555-5555-5555-555555555555', 'https://images.unsplash.com/photo-1622286342621-4bd786c2447c?w=600&h=600&fit=crop', 0),
+  ('55555555-5555-5555-5555-555555555555', 'https://images.unsplash.com/photo-1634449577050-15f4c093a3e0?w=600&h=600&fit=crop', 1),
+  ('66666666-6666-6666-6666-666666666666', 'https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?w=600&h=600&fit=crop', 0),
+  ('66666666-6666-6666-6666-666666666666', 'https://images.unsplash.com/photo-1516975080664-ed2fc6a13737?w=600&h=600&fit=crop', 1),
+  ('77777777-7777-7777-7777-777777777777', 'https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?w=600&h=600&fit=crop', 0),
+  ('77777777-7777-7777-7777-777777777777', 'https://images.unsplash.com/photo-1562322140-8baeececf3df?w=600&h=600&fit=crop', 1),
+  ('88888888-8888-8888-8888-888888888888', 'https://images.unsplash.com/photo-1622286342621-4bd786c2447c?w=600&h=600&fit=crop', 0),
+  ('88888888-8888-8888-8888-888888888888', 'https://images.unsplash.com/photo-1634449577050-15f4c093a3e0?w=600&h=600&fit=crop', 1);
+
+-- Insert sample reviews
+insert into reviews (stylist_id, reviewer_name, rating, comment) values
+  ('11111111-1111-1111-1111-111111111111', 'Sarah M.', 5, 'Amazing braids! Amara is so talented and patient.'),
+  ('11111111-1111-1111-1111-111111111111', 'Michelle T.', 5, 'Best knotless braids I''ve ever had. Will definitely be back!'),
+  ('11111111-1111-1111-1111-111111111111', 'Jessica L.', 5, 'Love my new locs! Amara really knows what she''s doing.'),
+  ('11111111-1111-1111-1111-111111111111', 'Tanya R.', 4, 'Great service, very professional.'),
+  ('22222222-2222-2222-2222-222222222222', 'James K.', 5, 'Best fade in East London, no question.'),
+  ('22222222-2222-2222-2222-222222222222', 'David O.', 5, 'Marcus is a perfectionist. Always leave looking sharp.'),
+  ('22222222-2222-2222-2222-222222222222', 'Chris P.', 4, 'Solid cuts every time.'),
+  ('33333333-3333-3333-3333-333333333333', 'Emma W.', 5, 'Zara did the most beautiful balayage on my hair!'),
+  ('33333333-3333-3333-3333-333333333333', 'Olivia B.', 5, 'Absolutely love my new colour. So vibrant!'),
+  ('33333333-3333-3333-3333-333333333333', 'Sophie H.', 5, 'Worth every penny. My hair has never looked better.'),
+  ('44444444-4444-4444-4444-444444444444', 'Nicole J.', 5, 'The best silk press in South London!'),
+  ('44444444-4444-4444-4444-444444444444', 'Ashley D.', 4, 'Great blowout, very bouncy and lasted all week.'),
+  ('55555555-5555-5555-5555-555555555555', 'Marcus T.', 5, 'Jaylen is the loc guru. My locs have never looked better.'),
+  ('55555555-5555-5555-5555-555555555555', 'Anthony R.', 5, 'Excellent retwist, very neat and tidy.'),
+  ('66666666-6666-6666-6666-666666666666', 'Priya S.', 5, 'My wig install was flawless! Looked so natural.'),
+  ('66666666-6666-6666-6666-666666666666', 'Aisha M.', 5, 'Keisha''s custom units are incredible quality.'),
+  ('77777777-7777-7777-7777-777777777777', 'Lisa H.', 5, 'Tiana was so patient with my daughter. Beautiful braids!'),
+  ('77777777-7777-7777-7777-777777777777', 'Carla W.', 4, 'Great with kids, very gentle and creative.'),
+  ('88888888-8888-8888-8888-888888888888', 'Michael F.', 5, 'Andre gave me the freshest cut I''ve ever had.'),
+  ('88888888-8888-8888-8888-888888888888', 'Ryan C.', 5, 'Editorial quality styling. Highly recommend!');

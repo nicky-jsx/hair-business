@@ -26,11 +26,16 @@ export default function StylistDashboardPage() {
           Stylist dashboard
         </h1>
         <p className="mt-2 mb-6 text-sm text-gray-500">
-          Sign up to list your business on Strand.
+          Sign in or sign up to manage your profile.
         </p>
-        <Link href="/stylist/sign-up">
-          <Button size="lg">Create account</Button>
-        </Link>
+        <div className="flex flex-col gap-3">
+          <Link href="/stylist/sign-in">
+            <Button size="lg" fullWidth>Sign in</Button>
+          </Link>
+          <Link href="/stylist/sign-up">
+            <Button size="lg" variant="secondary" fullWidth>Create account</Button>
+          </Link>
+        </div>
       </div>
     );
   }
@@ -57,14 +62,17 @@ export default function StylistDashboardPage() {
             </p>
             <div className="mt-4 flex gap-2">
               <Link href={`/stylists/${profile.id}`} className="flex-1">
-                <Button variant="primary" fullWidth size="sm">
+                <Button variant="secondary" fullWidth size="sm">
                   View profile
+                </Button>
+              </Link>
+              <Link href="/stylist/edit" className="flex-1">
+                <Button variant="primary" fullWidth size="sm">
+                  Edit profile
                 </Button>
               </Link>
             </div>
           </div>
-
-          <BookingLinkForm profile={profile} />
 
           <p className="text-xs text-gray-400">
             Signed in as {account.email}

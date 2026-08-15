@@ -36,7 +36,7 @@ export function getCurrentAccount(): StylistAccount | null {
 export function signUp(
   name: string,
   email: string,
-  _password: string
+  password: string
 ): { account: StylistAccount } | { error: string } {
   const accounts = getAccounts();
   const normalised = email.trim().toLowerCase();
@@ -49,6 +49,7 @@ export function signUp(
     id: crypto.randomUUID(),
     email: normalised,
     name: name.trim(),
+    password,
     stylistId: null,
     createdAt: new Date().toISOString(),
   };
@@ -56,6 +57,27 @@ export function signUp(
   writeJson(ACCOUNTS_KEY, [...accounts, account]);
   writeJson(SESSION_KEY, account.id);
 
+  return { account };
+}
+
+export function signIn(
+  email: string,
+  password: string
+): { account: StylistAccount } | { error: string } {
+  const accounts = getAccounts();
+  const normalised = email.trim().toLowerCase();
+
+  const account = accounts.find((a) => a.email === normalised);
+
+  if (!account) {
+    return { error: "No account found with this email." };
+  }
+
+  if (account.password !== password) {
+    return { error: "Incorrect password." };
+  }
+
+  writeJson(SESSION_KEY, account.id);
   return { account };
 }
 

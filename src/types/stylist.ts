@@ -6,7 +6,8 @@ export type Specialty =
   | "Color"
   | "Cuts"
   | "Extensions"
-  | "Wigs";
+  | "Wigs"
+  | "Eyelashes";
 
 export const REGIONS = ["North", "East", "South", "West"] as const;
 export type Region = (typeof REGIONS)[number];
