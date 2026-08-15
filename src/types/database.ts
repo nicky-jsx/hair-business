@@ -111,6 +111,74 @@ export interface Database {
         };
         Update: Partial<Database["public"]["Tables"]["reviews"]["Insert"]>;
       };
+      stylist_availability: {
+        Row: {
+          id: string;
+          stylist_id: string;
+          day_of_week: number;
+          start_time: string;
+          end_time: string;
+          is_available: boolean;
+          created_at: string;
+        };
+        Insert: Omit<
+          Database["public"]["Tables"]["stylist_availability"]["Row"],
+          "id" | "created_at"
+        > & {
+          id?: string;
+          created_at?: string;
+        };
+        Update: Partial<
+          Database["public"]["Tables"]["stylist_availability"]["Insert"]
+        >;
+      };
+      bookings: {
+        Row: {
+          id: string;
+          stylist_id: string;
+          service_id: string;
+          customer_name: string;
+          customer_email: string;
+          customer_phone: string;
+          booking_date: string;
+          start_time: string;
+          end_time: string;
+          status: "confirmed" | "cancelled" | "completed";
+          notes: string | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: Omit<
+          Database["public"]["Tables"]["bookings"]["Row"],
+          "id" | "created_at" | "updated_at"
+        > & {
+          id?: string;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: Partial<Database["public"]["Tables"]["bookings"]["Insert"]>;
+      };
+      blocked_times: {
+        Row: {
+          id: string;
+          stylist_id: string;
+          blocked_date: string;
+          start_time: string | null;
+          end_time: string | null;
+          reason: string | null;
+          created_at: string;
+        };
+        Insert: Omit<
+          Database["public"]["Tables"]["blocked_times"]["Row"],
+          "id" | "created_at"
+        > & {
+          id?: string;
+          created_at?: string;
+        };
+        Update: Partial<
+          Database["public"]["Tables"]["blocked_times"]["Insert"]
+        >;
+      };
     };
     Views: {
       stylist_ratings: {
@@ -131,3 +199,8 @@ export type PortfolioPhotoRow =
 export type ReviewRow = Database["public"]["Tables"]["reviews"]["Row"];
 export type StylistRatingRow =
   Database["public"]["Views"]["stylist_ratings"]["Row"];
+export type StylistAvailabilityRow =
+  Database["public"]["Tables"]["stylist_availability"]["Row"];
+export type BookingRow = Database["public"]["Tables"]["bookings"]["Row"];
+export type BlockedTimeRow =
+  Database["public"]["Tables"]["blocked_times"]["Row"];

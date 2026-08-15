@@ -1,0 +1,360 @@
+import { getSupabase } from "./supabase";
+import type {
+  Booking,
+  StylistAvailability,
+  BlockedTime,
+  TimeSlot,
+  BookingFormData,
+} from "@/types/booking";
+import { generateTimeSlots, formatTime, TIME_SLOT_INTERVAL } from "@/types/booking";
+import type {
+  StylistAvailabilityRow,
+  BookingRow,
+  BlockedTimeRow,
+  ServiceRow,
+} from "@/types/database";
+
+// Fetch stylist availability for all days
+export async function fetchStylistAvailability(
+  stylistId: string
+): Promise<StylistAvailability[]> {
+  const supabase = getSupabase();
+  if (!supabase) return getDefaultAvailability(stylistId);
+
+  const { data, error } = await supabase
+    .from("stylist_availability")
+    .select("*")
+    .eq("stylist_id", stylistId)
+    .order("day_of_week");
+
+  if (error) {
+    console.error("Error fetching availability:", error);
+    return getDefaultAvailability(stylistId);
+  }
+
+  const rows = data as StylistAvailabilityRow[] | null;
+
+  return (rows ?? []).map((row) => ({
+    id: row.id,
+    stylistId: row.stylist_id,
+    dayOfWeek: row.day_of_week,
+    startTime: row.start_time,
+    endTime: row.end_time,
+    isAvailable: row.is_available,
+  }));
+}
+
+function getDefaultAvailability(stylistId: string): StylistAvailability[] {
+  return Array.from({ length: 7 }, (_, i) => ({
+    id: `default-${i}`,
+    stylistId,
+    dayOfWeek: i,
+    startTime: "09:00",
+    endTime: "21:00",
+    isAvailable: i !== 0, // Sunday off
+  }));
+}
+
+// Fetch bookings for a stylist on a specific date
+export async function fetchBookingsForDate(
+  stylistId: string,
+  date: string
+): Promise<Booking[]> {
+  const supabase = getSupabase();
+  if (!supabase) return [];
+
+  const { data, error } = await supabase
+    .from("bookings")
+    .select("*, services(name, price)")
+    .eq("stylist_id", stylistId)
+    .eq("booking_date", date)
+    .neq("status", "cancelled");
+
+  if (error) {
+    console.error("Error fetching bookings:", error);
+    return [];
+  }
+
+  type BookingWithService = BookingRow & { services: Pick<ServiceRow, "name" | "price"> | null };
+  const rows = data as BookingWithService[] | null;
+
+  return (rows ?? []).map((row) => ({
+    id: row.id,
+    stylistId: row.stylist_id,
+    serviceId: row.service_id,
+    customerName: row.customer_name,
+    customerEmail: row.customer_email,
+    customerPhone: row.customer_phone,
+    bookingDate: row.booking_date,
+    startTime: row.start_time,
+    endTime: row.end_time,
+    status: row.status,
+    notes: row.notes,
+    createdAt: row.created_at,
+    serviceName: row.services?.name,
+    servicePrice: row.services?.price,
+  }));
+}
+
+// Fetch upcoming bookings for a stylist
+export async function fetchUpcomingBookings(
+  stylistId: string
+): Promise<Booking[]> {
+  const supabase = getSupabase();
+  if (!supabase) return [];
+
+  const today = new Date().toISOString().split("T")[0];
+
+  const { data, error } = await supabase
+    .from("bookings")
+    .select("*, services(name, price)")
+    .eq("stylist_id", stylistId)
+    .gte("booking_date", today)
+    .neq("status", "cancelled")
+    .order("booking_date")
+    .order("start_time");
+
+  if (error) {
+    console.error("Error fetching bookings:", error);
+    return [];
+  }
+
+  type BookingWithService = BookingRow & { services: Pick<ServiceRow, "name" | "price"> | null };
+  const rows = data as BookingWithService[] | null;
+
+  return (rows ?? []).map((row) => ({
+    id: row.id,
+    stylistId: row.stylist_id,
+    serviceId: row.service_id,
+    customerName: row.customer_name,
+    customerEmail: row.customer_email,
+    customerPhone: row.customer_phone,
+    bookingDate: row.booking_date,
+    startTime: row.start_time,
+    endTime: row.end_time,
+    status: row.status,
+    notes: row.notes,
+    createdAt: row.created_at,
+    serviceName: row.services?.name,
+    servicePrice: row.services?.price,
+  }));
+}
+
+// Fetch blocked times for a date
+export async function fetchBlockedTimes(
+  stylistId: string,
+  date: string
+): Promise<BlockedTime[]> {
+  const supabase = getSupabase();
+  if (!supabase) return [];
+
+  const { data, error } = await supabase
+    .from("blocked_times")
+    .select("*")
+    .eq("stylist_id", stylistId)
+    .eq("blocked_date", date);
+
+  if (error) {
+    console.error("Error fetching blocked times:", error);
+    return [];
+  }
+
+  const rows = data as BlockedTimeRow[] | null;
+
+  return (rows ?? []).map((row) => ({
+    id: row.id,
+    stylistId: row.stylist_id,
+    blockedDate: row.blocked_date,
+    startTime: row.start_time,
+    endTime: row.end_time,
+    reason: row.reason,
+  }));
+}
+
+// Get available time slots for a date
+export async function getAvailableSlots(
+  stylistId: string,
+  date: string,
+  serviceDurationMins: number
+): Promise<TimeSlot[]> {
+  const dateObj = new Date(date);
+  const dayOfWeek = dateObj.getDay();
+
+  // Get availability for this day
+  const availability = await fetchStylistAvailability(stylistId);
+  const dayAvailability = availability.find((a) => a.dayOfWeek === dayOfWeek);
+
+  if (!dayAvailability || !dayAvailability.isAvailable) {
+    return [];
+  }
+
+  // Generate all possible slots (3-hour intervals)
+  const allSlots = generateTimeSlots(
+    dayAvailability.startTime,
+    dayAvailability.endTime,
+    TIME_SLOT_INTERVAL
+  );
+
+  // Get existing bookings
+  const bookings = await fetchBookingsForDate(stylistId, date);
+  const blockedTimes = await fetchBlockedTimes(stylistId, date);
+
+  // Check each slot
+  return allSlots.map((slotTime) => {
+    const slotStart = timeToMinutes(slotTime);
+    const slotEnd = slotStart + serviceDurationMins;
+    const dayEnd = timeToMinutes(dayAvailability.endTime);
+
+    // Check if slot would extend past closing
+    if (slotEnd > dayEnd) {
+      return { time: slotTime, label: formatTime(slotTime), available: false };
+    }
+
+    // Check if slot overlaps with any booking
+    const hasBookingConflict = bookings.some((booking) => {
+      const bookingStart = timeToMinutes(booking.startTime);
+      const bookingEnd = timeToMinutes(booking.endTime);
+      return slotStart < bookingEnd && slotEnd > bookingStart;
+    });
+
+    // Check if slot overlaps with blocked time
+    const hasBlockedConflict = blockedTimes.some((blocked) => {
+      if (!blocked.startTime || !blocked.endTime) return true; // Whole day blocked
+      const blockedStart = timeToMinutes(blocked.startTime);
+      const blockedEnd = timeToMinutes(blocked.endTime);
+      return slotStart < blockedEnd && slotEnd > blockedStart;
+    });
+
+    return {
+      time: slotTime,
+      label: formatTime(slotTime),
+      available: !hasBookingConflict && !hasBlockedConflict,
+    };
+  });
+}
+
+function timeToMinutes(time: string): number {
+  const [hours, minutes] = time.split(":").map(Number);
+  return hours * 60 + minutes;
+}
+
+function minutesToTime(mins: number): string {
+  const hours = Math.floor(mins / 60);
+  const minutes = mins % 60;
+  return `${hours.toString().padStart(2, "0")}:${minutes.toString().padStart(2, "0")}`;
+}
+
+// Create a booking
+export async function createBooking(
+  stylistId: string,
+  data: BookingFormData,
+  serviceDurationMins: number
+): Promise<{ booking?: Booking; error?: string }> {
+  const supabase = getSupabase();
+  if (!supabase) {
+    return { error: "Database not configured" };
+  }
+
+  const startTime = data.time;
+  const endTime = minutesToTime(timeToMinutes(startTime) + serviceDurationMins);
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { data: result, error } = await (supabase as any)
+    .from("bookings")
+    .insert({
+      stylist_id: stylistId,
+      service_id: data.serviceId,
+      customer_name: data.customerName,
+      customer_email: data.customerEmail,
+      customer_phone: data.customerPhone,
+      booking_date: data.date,
+      start_time: startTime,
+      end_time: endTime,
+      notes: data.notes,
+      status: "confirmed",
+    })
+    .select()
+    .single();
+
+  if (error) {
+    console.error("Error creating booking:", error);
+    return { error: "Failed to create booking. Please try again." };
+  }
+
+  const row = result as BookingRow;
+
+  return {
+    booking: {
+      id: row.id,
+      stylistId: row.stylist_id,
+      serviceId: row.service_id,
+      customerName: row.customer_name,
+      customerEmail: row.customer_email,
+      customerPhone: row.customer_phone,
+      bookingDate: row.booking_date,
+      startTime: row.start_time,
+      endTime: row.end_time,
+      status: row.status,
+      notes: row.notes,
+      createdAt: row.created_at,
+    },
+  };
+}
+
+// Update stylist availability
+export async function updateAvailability(
+  stylistId: string,
+  dayOfWeek: number,
+  data: { startTime?: string; endTime?: string; isAvailable?: boolean }
+): Promise<{ error?: string }> {
+  const supabase = getSupabase();
+  if (!supabase) {
+    return { error: "Database not configured" };
+  }
+
+  const updateData: Record<string, unknown> = {};
+  if (data.startTime !== undefined) updateData.start_time = data.startTime;
+  if (data.endTime !== undefined) updateData.end_time = data.endTime;
+  if (data.isAvailable !== undefined) updateData.is_available = data.isAvailable;
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { error } = await (supabase as any)
+    .from("stylist_availability")
+    .upsert({
+      stylist_id: stylistId,
+      day_of_week: dayOfWeek,
+      ...updateData,
+    }, {
+      onConflict: "stylist_id,day_of_week",
+    });
+
+  if (error) {
+    console.error("Error updating availability:", error);
+    return { error: "Failed to update availability" };
+  }
+
+  return {};
+}
+
+// Cancel a booking
+export async function cancelBooking(
+  bookingId: string
+): Promise<{ error?: string }> {
+  const supabase = getSupabase();
+  if (!supabase) {
+    return { error: "Database not configured" };
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { error } = await (supabase as any)
+    .from("bookings")
+    .update({ status: "cancelled" })
+    .eq("id", bookingId);
+
+  if (error) {
+    console.error("Error cancelling booking:", error);
+    return { error: "Failed to cancel booking" };
+  }
+
+  return {};
+}

@@ -2,7 +2,8 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { BookingLinkForm } from "@/components/stylist/dashboard/BookingLinkForm";
+import { AvailabilityManager } from "@/components/stylist/dashboard/AvailabilityManager";
+import { BookingsList } from "@/components/stylist/dashboard/BookingsList";
 import { Button } from "@/components/ui/Button";
 import { useStylistStore } from "@/context/StylistStoreProvider";
 import { formatRegion } from "@/types/stylist";
@@ -52,7 +53,8 @@ export default function StylistDashboardPage() {
       </h1>
 
       {profile ? (
-        <div className="mt-6 space-y-4">
+        <div className="mt-6 space-y-6">
+          {/* Profile card */}
           <div className="rounded-2xl border border-gray-100 bg-white p-5 shadow-card">
             <p className="text-sm font-medium text-gray-500">Your profile</p>
             <p className="mt-1 font-semibold text-gray-900">{profile.name}</p>
@@ -73,6 +75,22 @@ export default function StylistDashboardPage() {
               </Link>
             </div>
           </div>
+
+          {/* Availability section */}
+          <section>
+            <h2 className="mb-3 text-sm font-semibold uppercase tracking-wider text-gray-400">
+              Availability
+            </h2>
+            <AvailabilityManager stylistId={profile.id} />
+          </section>
+
+          {/* Bookings section */}
+          <section>
+            <h2 className="mb-3 text-sm font-semibold uppercase tracking-wider text-gray-400">
+              Upcoming bookings
+            </h2>
+            <BookingsList stylistId={profile.id} />
+          </section>
 
           <p className="text-xs text-gray-400">
             Signed in as {account.email}
