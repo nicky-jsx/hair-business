@@ -26,12 +26,10 @@ export function DatePicker({ selectedDate, onSelect }: DatePickerProps) {
 
     const days: (Date | null)[] = [];
 
-    // Add empty cells for days before the first day
     for (let i = 0; i < firstDay; i++) {
       days.push(null);
     }
 
-    // Add all days in the month
     for (let i = 1; i <= lastDate; i++) {
       days.push(new Date(year, month, i));
     }
@@ -62,91 +60,101 @@ export function DatePicker({ selectedDate, onSelect }: DatePickerProps) {
       currentMonth.getMonth() <= today.getMonth());
 
   return (
-    <div className="p-4">
-      <h2 className="mb-4 text-lg font-semibold text-gray-900">
-        Select a date
-      </h2>
-
-      {/* Month navigation */}
-      <div className="mb-4 flex items-center justify-between">
-        <button
-          onClick={goToPrevMonth}
-          disabled={isPastMonth}
-          className="flex h-10 w-10 items-center justify-center rounded-full text-gray-500 hover:bg-gray-100 disabled:opacity-30 disabled:hover:bg-transparent"
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 20 20"
-            fill="currentColor"
-            className="h-5 w-5"
-          >
-            <path
-              fillRule="evenodd"
-              d="M11.78 5.22a.75.75 0 0 1 0 1.06L8.06 10l3.72 3.72a.75.75 0 1 1-1.06 1.06l-4.25-4.25a.75.75 0 0 1 0-1.06l4.25-4.25a.75.75 0 0 1 1.06 0Z"
-              clipRule="evenodd"
-            />
-          </svg>
-        </button>
-        <p className="font-semibold text-gray-900">{monthName}</p>
-        <button
-          onClick={goToNextMonth}
-          className="flex h-10 w-10 items-center justify-center rounded-full text-gray-500 hover:bg-gray-100"
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 20 20"
-            fill="currentColor"
-            className="h-5 w-5"
-          >
-            <path
-              fillRule="evenodd"
-              d="M8.22 5.22a.75.75 0 0 1 1.06 0l4.25 4.25a.75.75 0 0 1 0 1.06l-4.25 4.25a.75.75 0 0 1-1.06-1.06L11.94 10 8.22 6.28a.75.75 0 0 1 0-1.06Z"
-              clipRule="evenodd"
-            />
-          </svg>
-        </button>
+    <div className="p-5">
+      <div className="mb-6">
+        <h2 className="text-xl font-semibold text-gray-900">
+          Pick a date
+        </h2>
+        <p className="mt-1 text-sm text-gray-500">
+          Choose your preferred appointment date
+        </p>
       </div>
 
-      {/* Weekday headers */}
-      <div className="mb-2 grid grid-cols-7 text-center text-xs font-medium text-gray-400">
-        {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((day) => (
-          <div key={day} className="py-2">
-            {day}
-          </div>
-        ))}
-      </div>
-
-      {/* Calendar grid */}
-      <div className="grid grid-cols-7 gap-1">
-        {daysInMonth.map((date, index) => {
-          if (!date) {
-            return <div key={`empty-${index}`} />;
-          }
-
-          const dateStr = date.toISOString().split("T")[0];
-          const isPast = date < today;
-          const isSelected = dateStr === selectedDate;
-          const isToday = date.getTime() === today.getTime();
-
-          return (
-            <button
-              key={dateStr}
-              onClick={() => !isPast && onSelect(dateStr)}
-              disabled={isPast}
-              className={`flex h-12 w-full items-center justify-center rounded-xl text-sm font-medium transition-all ${
-                isSelected
-                  ? "bg-brand-600 text-white"
-                  : isPast
-                    ? "text-gray-300"
-                    : isToday
-                      ? "bg-brand-50 text-brand-600 hover:bg-brand-100"
-                      : "text-gray-900 hover:bg-gray-100"
-              }`}
+      {/* Calendar card */}
+      <div className="rounded-xl border border-gray-100 bg-white p-4 shadow-sm">
+        {/* Month navigation */}
+        <div className="mb-4 flex items-center justify-between">
+          <button
+            onClick={goToPrevMonth}
+            disabled={isPastMonth}
+            className="flex h-9 w-9 items-center justify-center rounded-lg text-gray-400 transition-colors hover:bg-gray-50 hover:text-gray-600 disabled:cursor-not-allowed disabled:opacity-30 disabled:hover:bg-transparent"
+            aria-label="Previous month"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 20 20"
+              fill="currentColor"
+              className="h-5 w-5"
             >
-              {date.getDate()}
-            </button>
-          );
-        })}
+              <path
+                fillRule="evenodd"
+                d="M11.78 5.22a.75.75 0 0 1 0 1.06L8.06 10l3.72 3.72a.75.75 0 1 1-1.06 1.06l-4.25-4.25a.75.75 0 0 1 0-1.06l4.25-4.25a.75.75 0 0 1 1.06 0Z"
+                clipRule="evenodd"
+              />
+            </svg>
+          </button>
+          <h3 className="text-sm font-semibold text-gray-900">{monthName}</h3>
+          <button
+            onClick={goToNextMonth}
+            className="flex h-9 w-9 items-center justify-center rounded-lg text-gray-400 transition-colors hover:bg-gray-50 hover:text-gray-600"
+            aria-label="Next month"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 20 20"
+              fill="currentColor"
+              className="h-5 w-5"
+            >
+              <path
+                fillRule="evenodd"
+                d="M8.22 5.22a.75.75 0 0 1 1.06 0l4.25 4.25a.75.75 0 0 1 0 1.06l-4.25 4.25a.75.75 0 0 1-1.06-1.06L11.94 10 8.22 6.28a.75.75 0 0 1 0-1.06Z"
+                clipRule="evenodd"
+              />
+            </svg>
+          </button>
+        </div>
+
+        {/* Weekday headers */}
+        <div className="mb-2 grid grid-cols-7 text-center">
+          {["S", "M", "T", "W", "T", "F", "S"].map((day, i) => (
+            <div key={i} className="py-2 text-xs font-medium text-gray-400">
+              {day}
+            </div>
+          ))}
+        </div>
+
+        {/* Calendar grid */}
+        <div className="grid grid-cols-7 gap-1">
+          {daysInMonth.map((date, index) => {
+            if (!date) {
+              return <div key={`empty-${index}`} />;
+            }
+
+            const dateStr = date.toISOString().split("T")[0];
+            const isPast = date < today;
+            const isSelected = dateStr === selectedDate;
+            const isToday = date.getTime() === today.getTime();
+
+            return (
+              <button
+                key={dateStr}
+                onClick={() => !isPast && onSelect(dateStr)}
+                disabled={isPast}
+                className={`flex h-10 w-full items-center justify-center rounded-lg text-sm font-medium transition-all ${
+                  isSelected
+                    ? "bg-brand-600 text-white shadow-sm"
+                    : isPast
+                      ? "cursor-not-allowed text-gray-200"
+                      : isToday
+                        ? "bg-brand-50 text-brand-700 hover:bg-brand-100"
+                        : "text-gray-700 hover:bg-gray-50"
+                }`}
+              >
+                {date.getDate()}
+              </button>
+            );
+          })}
+        </div>
       </div>
     </div>
   );

@@ -10,6 +10,7 @@ interface CustomerFormProps {
   service: Service;
   date: string;
   time: string;
+  stylistName: string;
   onSubmit: (data: {
     name: string;
     email: string;
@@ -23,6 +24,7 @@ export function CustomerForm({
   service,
   date,
   time,
+  stylistName,
   onSubmit,
   loading,
 }: CustomerFormProps) {
@@ -45,20 +47,70 @@ export function CustomerForm({
   }
 
   return (
-    <div className="p-4">
-      <h2 className="mb-4 text-lg font-semibold text-gray-900">
-        Your details
-      </h2>
+    <div className="p-5">
+      <div className="mb-6">
+        <h2 className="text-xl font-semibold text-gray-900">
+          Your details
+        </h2>
+        <p className="mt-1 text-sm text-gray-500">
+          We&apos;ll send your confirmation here
+        </p>
+      </div>
 
       {/* Booking summary */}
-      <div className="mb-6 rounded-2xl bg-brand-50 p-4">
-        <p className="font-medium text-gray-900">{service.name}</p>
-        <p className="text-sm text-gray-600">
-          {formattedDate} at {formattedTime}
-        </p>
-        <p className="mt-1 text-sm font-semibold text-brand-600">
-          {formatPrice(service.price)}
-        </p>
+      <div className="mb-6 rounded-xl border border-gray-100 bg-white p-4 shadow-sm">
+        <div className="flex items-start justify-between">
+          <div>
+            <p className="font-semibold text-gray-900">{service.name}</p>
+            <p className="mt-0.5 text-sm text-gray-500">with {stylistName}</p>
+          </div>
+          <p className="text-base font-semibold text-brand-600">
+            {formatPrice(service.price)}
+          </p>
+        </div>
+        <div className="mt-3 flex items-center gap-4 border-t border-gray-50 pt-3">
+          <div className="flex items-center gap-1.5 text-sm text-gray-500">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 20 20"
+              fill="currentColor"
+              className="h-4 w-4 text-gray-400"
+            >
+              <path d="M5.75 2a.75.75 0 0 1 .75.75V4h7V2.75a.75.75 0 0 1 1.5 0V4h.25A2.75 2.75 0 0 1 18 6.75v8.5A2.75 2.75 0 0 1 15.25 18H4.75A2.75 2.75 0 0 1 2 15.25v-8.5A2.75 2.75 0 0 1 4.75 4H5V2.75A.75.75 0 0 1 5.75 2Z" />
+            </svg>
+            <span>{formattedDate}</span>
+          </div>
+          <div className="flex items-center gap-1.5 text-sm text-gray-500">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 20 20"
+              fill="currentColor"
+              className="h-4 w-4 text-gray-400"
+            >
+              <path
+                fillRule="evenodd"
+                d="M10 18a8 8 0 1 0 0-16 8 8 0 0 0 0 16Zm.75-13a.75.75 0 0 0-1.5 0v5c0 .414.336.75.75.75h4a.75.75 0 0 0 0-1.5h-3.25V5Z"
+                clipRule="evenodd"
+              />
+            </svg>
+            <span>{formattedTime}</span>
+          </div>
+          <div className="flex items-center gap-1.5 text-sm text-gray-500">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 20 20"
+              fill="currentColor"
+              className="h-4 w-4 text-gray-400"
+            >
+              <path
+                fillRule="evenodd"
+                d="M10 18a8 8 0 1 0 0-16 8 8 0 0 0 0 16Zm.75-13a.75.75 0 0 0-1.5 0v5c0 .414.336.75.75.75h4a.75.75 0 0 0 0-1.5h-3.25V5Z"
+                clipRule="evenodd"
+              />
+            </svg>
+            <span>{service.duration}</span>
+          </div>
+        </div>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-4">
@@ -98,9 +150,10 @@ export function CustomerForm({
         <Textarea
           label="Notes (optional)"
           name="notes"
-          placeholder="Any special requests or notes..."
+          placeholder="Any special requests..."
           value={notes}
           onChange={(e) => setNotes(e.target.value)}
+          rows={3}
         />
 
         <div className="pt-2">

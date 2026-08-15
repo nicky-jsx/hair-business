@@ -51,26 +51,21 @@ export function AvailabilityManager({ stylistId }: AvailabilityManagerProps) {
   if (loading) {
     return (
       <div className="flex items-center justify-center py-8">
-        <div className="h-6 w-6 animate-spin rounded-full border-2 border-brand-200 border-t-brand-600" />
+        <div className="h-6 w-6 animate-spin rounded-full border-2 border-gray-200 border-t-brand-600" />
       </div>
     );
   }
 
   return (
-    <div className="rounded-2xl border border-gray-100 bg-white shadow-card">
-      <div className="border-b border-gray-100 px-4 py-3">
-        <h2 className="font-semibold text-gray-900">Working hours</h2>
-        <p className="text-xs text-gray-500">Set your availability for each day</p>
-      </div>
-
-      <div className="divide-y divide-gray-100">
+    <div className="rounded-xl border border-gray-100 bg-white shadow-sm">
+      <div className="divide-y divide-gray-50">
         {availability
           .sort((a, b) => a.dayOfWeek - b.dayOfWeek)
           .map((day) => (
             <div
               key={day.dayOfWeek}
-              className={`flex items-center justify-between px-4 py-3 ${
-                !day.isAvailable ? "bg-gray-50" : ""
+              className={`flex items-center justify-between px-4 py-3.5 ${
+                !day.isAvailable ? "bg-gray-50/50" : ""
               }`}
             >
               <div className="flex items-center gap-3">
@@ -79,10 +74,12 @@ export function AvailabilityManager({ stylistId }: AvailabilityManagerProps) {
                   disabled={saving === day.dayOfWeek}
                   className={`relative h-6 w-11 rounded-full transition-colors ${
                     day.isAvailable ? "bg-brand-600" : "bg-gray-200"
-                  }`}
+                  } ${saving === day.dayOfWeek ? "opacity-50" : ""}`}
+                  role="switch"
+                  aria-checked={day.isAvailable}
                 >
                   <span
-                    className={`absolute top-0.5 h-5 w-5 rounded-full bg-white shadow transition-transform ${
+                    className={`absolute top-0.5 h-5 w-5 rounded-full bg-white shadow-sm transition-transform ${
                       day.isAvailable ? "left-[22px]" : "left-0.5"
                     }`}
                   />
@@ -104,7 +101,7 @@ export function AvailabilityManager({ stylistId }: AvailabilityManagerProps) {
                       handleTimeChange(day.dayOfWeek, "startTime", e.target.value)
                     }
                     disabled={saving === day.dayOfWeek}
-                    className="rounded-lg border border-gray-200 bg-white px-2 py-1 text-xs"
+                    className="rounded-lg border border-gray-200 bg-white px-2 py-1.5 text-xs text-gray-700 transition-colors hover:border-gray-300 focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500"
                   >
                     {generateTimeOptions().map((time) => (
                       <option key={time} value={time}>
@@ -112,14 +109,14 @@ export function AvailabilityManager({ stylistId }: AvailabilityManagerProps) {
                       </option>
                     ))}
                   </select>
-                  <span className="text-gray-400">–</span>
+                  <span className="text-gray-300">–</span>
                   <select
                     value={day.endTime}
                     onChange={(e) =>
                       handleTimeChange(day.dayOfWeek, "endTime", e.target.value)
                     }
                     disabled={saving === day.dayOfWeek}
-                    className="rounded-lg border border-gray-200 bg-white px-2 py-1 text-xs"
+                    className="rounded-lg border border-gray-200 bg-white px-2 py-1.5 text-xs text-gray-700 transition-colors hover:border-gray-300 focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500"
                   >
                     {generateTimeOptions().map((time) => (
                       <option key={time} value={time}>

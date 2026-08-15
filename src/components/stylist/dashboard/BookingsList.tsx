@@ -36,31 +36,33 @@ export function BookingsList({ stylistId }: BookingsListProps) {
   if (loading) {
     return (
       <div className="flex items-center justify-center py-8">
-        <div className="h-6 w-6 animate-spin rounded-full border-2 border-brand-200 border-t-brand-600" />
+        <div className="h-6 w-6 animate-spin rounded-full border-2 border-gray-200 border-t-brand-600" />
       </div>
     );
   }
 
   if (bookings.length === 0) {
     return (
-      <div className="rounded-2xl bg-gray-50 p-6 text-center">
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          fill="none"
-          viewBox="0 0 24 24"
-          strokeWidth={1.5}
-          stroke="currentColor"
-          className="mx-auto mb-3 h-10 w-10 text-gray-300"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5"
-          />
-        </svg>
-        <p className="text-gray-500">No upcoming bookings</p>
-        <p className="mt-1 text-sm text-gray-400">
-          Bookings will appear here when customers book with you.
+      <div className="rounded-xl border border-gray-100 bg-white p-8 text-center shadow-sm">
+        <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-gray-50">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            strokeWidth={1.5}
+            stroke="currentColor"
+            className="h-6 w-6 text-gray-400"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5"
+            />
+          </svg>
+        </div>
+        <p className="font-medium text-gray-900">No upcoming bookings</p>
+        <p className="mt-1 text-sm text-gray-500">
+          Bookings will appear here when customers book with you
         </p>
       </div>
     );
@@ -86,35 +88,31 @@ export function BookingsList({ stylistId }: BookingsListProps) {
         return (
           <div
             key={booking.id}
-            className="rounded-2xl border border-gray-100 bg-white p-4 shadow-sm"
+            className="rounded-xl border border-gray-100 bg-white p-4 shadow-sm"
           >
-            <div className="mb-3 flex items-start justify-between">
+            <div className="flex items-start justify-between">
               <div>
                 <p className="font-semibold text-gray-900">
                   {booking.customerName}
                 </p>
-                <p className="text-sm text-brand-600">{booking.serviceName}</p>
+                <p className="mt-0.5 text-sm text-brand-600">{booking.serviceName}</p>
               </div>
               {booking.servicePrice && (
-                <span className="font-semibold text-gray-900">
+                <span className="text-sm font-semibold text-gray-900">
                   {formatPrice(booking.servicePrice)}
                 </span>
               )}
             </div>
 
-            <div className="flex items-center gap-4 text-sm text-gray-500">
+            <div className="mt-3 flex items-center gap-4 text-sm text-gray-500">
               <div className="flex items-center gap-1.5">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   viewBox="0 0 20 20"
                   fill="currentColor"
-                  className="h-4 w-4"
+                  className="h-4 w-4 text-gray-400"
                 >
-                  <path
-                    fillRule="evenodd"
-                    d="M5.75 2a.75.75 0 0 1 .75.75V4h7V2.75a.75.75 0 0 1 1.5 0V4h.25A2.75 2.75 0 0 1 18 6.75v8.5A2.75 2.75 0 0 1 15.25 18H4.75A2.75 2.75 0 0 1 2 15.25v-8.5A2.75 2.75 0 0 1 4.75 4H5V2.75A.75.75 0 0 1 5.75 2Z"
-                    clipRule="evenodd"
-                  />
+                  <path d="M5.75 2a.75.75 0 0 1 .75.75V4h7V2.75a.75.75 0 0 1 1.5 0V4h.25A2.75 2.75 0 0 1 18 6.75v8.5A2.75 2.75 0 0 1 15.25 18H4.75A2.75 2.75 0 0 1 2 15.25v-8.5A2.75 2.75 0 0 1 4.75 4H5V2.75A.75.75 0 0 1 5.75 2Z" />
                 </svg>
                 <span className={isToday ? "font-medium text-brand-600" : ""}>
                   {dateLabel}
@@ -125,7 +123,7 @@ export function BookingsList({ stylistId }: BookingsListProps) {
                   xmlns="http://www.w3.org/2000/svg"
                   viewBox="0 0 20 20"
                   fill="currentColor"
-                  className="h-4 w-4"
+                  className="h-4 w-4 text-gray-400"
                 >
                   <path
                     fillRule="evenodd"
@@ -139,18 +137,18 @@ export function BookingsList({ stylistId }: BookingsListProps) {
               </div>
             </div>
 
-            <div className="mt-3 flex items-center justify-between border-t border-gray-100 pt-3">
-              <div className="flex items-center gap-2 text-xs text-gray-400">
+            <div className="mt-3 flex items-center justify-between border-t border-gray-50 pt-3">
+              <div className="flex items-center gap-3 text-xs text-gray-400">
                 <a
                   href={`mailto:${booking.customerEmail}`}
-                  className="hover:text-brand-600"
+                  className="hover:text-brand-600 hover:underline"
                 >
                   {booking.customerEmail}
                 </a>
-                <span>•</span>
+                <span className="text-gray-200">·</span>
                 <a
                   href={`tel:${booking.customerPhone}`}
-                  className="hover:text-brand-600"
+                  className="hover:text-brand-600 hover:underline"
                 >
                   {booking.customerPhone}
                 </a>
@@ -158,7 +156,7 @@ export function BookingsList({ stylistId }: BookingsListProps) {
               <button
                 onClick={() => handleCancel(booking.id)}
                 disabled={cancelling === booking.id}
-                className="text-xs text-red-500 hover:text-red-600 disabled:opacity-50"
+                className="text-xs font-medium text-gray-400 transition-colors hover:text-red-500 disabled:opacity-50"
               >
                 {cancelling === booking.id ? "Cancelling..." : "Cancel"}
               </button>
