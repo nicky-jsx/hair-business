@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { AvailabilityManager } from "@/components/stylist/dashboard/AvailabilityManager";
 import { BookingsList } from "@/components/stylist/dashboard/BookingsList";
+import { DepositManager } from "@/components/stylist/dashboard/DepositManager";
 import { Button } from "@/components/ui/Button";
 import { useAuth } from "@/context/AuthContext";
 import { formatRegion } from "@/types/stylist";
@@ -71,6 +72,18 @@ export default function StylistDashboardPage() {
               </Link>
             </div>
           </div>
+
+          {/* Deposit section */}
+          <section>
+            <h2 className="mb-3 text-sm font-semibold uppercase tracking-wider text-gray-400">
+              Deposit
+            </h2>
+            <DepositManager
+              stylistId={profile.id}
+              initialType={profile.depositType}
+              initialValue={profile.depositValue}
+            />
+          </section>
 
           {/* Availability section */}
           <section>

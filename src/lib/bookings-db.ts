@@ -87,6 +87,9 @@ export async function fetchBookingsForDate(
     status: row.status,
     notes: row.notes,
     createdAt: row.created_at,
+    paymentOption: row.payment_option ?? "full",
+    depositAmount: row.deposit_amount ?? 0,
+    totalPrice: row.total_price ?? row.service_price ?? 0,
     serviceName: row.service_name,
     servicePrice: row.service_price,
   }));
@@ -129,6 +132,9 @@ export async function fetchUpcomingBookings(
     status: row.status,
     notes: row.notes,
     createdAt: row.created_at,
+    paymentOption: row.payment_option ?? "full",
+    depositAmount: row.deposit_amount ?? 0,
+    totalPrice: row.total_price ?? row.service_price ?? 0,
     serviceName: row.service_name,
     servicePrice: row.service_price,
   }));
@@ -267,13 +273,25 @@ export async function createBooking(
       end_time: endTime,
       notes: data.notes,
       status: "confirmed",
+      payment_option: data.paymentOption,
+      deposit_amount: data.depositAmount,
+      total_price: data.totalPrice,
     })
     .select()
     .single();
 
   if (error) {
-    console.error("Error creating booking:", error);
-    return { error: "Failed to create booking. Please try again." };
+    console.error("Error creating booking:", {
+      message: error.message,
+      details: error.details,
+      hint: error.hint,
+      code: error.code,
+    });
+    return {
+      error:
+        error.message ||
+        "Failed to create booking. Please try again.",
+    };
   }
 
   return {
@@ -290,6 +308,9 @@ export async function createBooking(
       status: result.status,
       notes: result.notes,
       createdAt: result.created_at,
+      paymentOption: result.payment_option ?? data.paymentOption,
+      depositAmount: result.deposit_amount ?? data.depositAmount,
+      totalPrice: result.total_price ?? data.totalPrice,
     },
   };
 }

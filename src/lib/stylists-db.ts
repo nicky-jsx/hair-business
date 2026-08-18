@@ -111,6 +111,10 @@ export async function fetchAllStylists(): Promise<Stylist[]> {
     portfolio: portfolioMap.get(s.id) ?? [],
     bookingUrl: s.booking_url,
     bookingPolicy: parseBookingPolicy(s),
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    depositType: ((s as any).deposit_type ?? null) as Stylist["depositType"],
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    depositValue: (s as any).deposit_value ?? null,
   }));
 }
 
@@ -195,7 +199,38 @@ export async function fetchStylistById(id: string): Promise<Stylist | null> {
     portfolio,
     bookingUrl: stylist.booking_url,
     bookingPolicy: parseBookingPolicy(stylist),
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    depositType: ((stylist as any).deposit_type ?? null) as Stylist["depositType"],
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    depositValue: (stylist as any).deposit_value ?? null,
   };
+}
+
+export async function updateStylistDeposit(
+  stylistId: string,
+  depositType: NonNullable<Stylist["depositType"]>,
+  depositValue: number
+): Promise<{ error?: string }> {
+  const supabase = getSupabase();
+  if (!supabase) {
+    return { error: "Database not configured." };
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { error } = await (supabase as any)
+    .from("stylists")
+    .update({
+      deposit_type: depositType,
+      deposit_value: depositType === "none" ? 0 : depositValue,
+    })
+    .eq("id", stylistId);
+
+  if (error) {
+    console.error("Error updating deposit:", error);
+    return { error: "Failed to save deposit settings." };
+  }
+
+  return {};
 }
 
 export async function fetchFeaturedStylists(): Promise<Stylist[]> {

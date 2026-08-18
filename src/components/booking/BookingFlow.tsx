@@ -7,8 +7,9 @@ import { TimeSlotPicker } from "./TimeSlotPicker";
 import { CustomerForm } from "./CustomerForm";
 import { BookingConfirmation } from "./BookingConfirmation";
 import { createBooking } from "@/lib/bookings-db";
+import { calculateDepositAmount } from "@/types/stylist";
 import type { Stylist, Service } from "@/types/stylist";
-import type { Booking, BookingFormData } from "@/types/booking";
+import type { Booking, BookingFormData, PaymentOption } from "@/types/booking";
 
 interface BookingFlowProps {
   stylist: Stylist;
@@ -47,11 +48,18 @@ export function BookingFlow({ stylist, onClose }: BookingFlowProps) {
     email: string;
     phone: string;
     notes?: string;
+    paymentOption: PaymentOption;
   }) => {
     if (!selectedService || !selectedDate || !selectedTime) return;
 
     setLoading(true);
     setError("");
+
+    const total = selectedService.price;
+    const depositAmount =
+      customerData.paymentOption === "deposit"
+        ? calculateDepositAmount(total, stylist.depositType, stylist.depositValue)
+        : 0;
 
     const formData: BookingFormData = {
       serviceId: selectedService.name,
@@ -62,6 +70,9 @@ export function BookingFlow({ stylist, onClose }: BookingFlowProps) {
       customerEmail: customerData.email,
       customerPhone: customerData.phone,
       notes: customerData.notes,
+      paymentOption: customerData.paymentOption,
+      depositAmount,
+      totalPrice: total,
     };
 
     const durationMins = parseDuration(selectedService.duration);
@@ -210,6 +221,11 @@ export function BookingFlow({ stylist, onClose }: BookingFlowProps) {
             date={selectedDate}
             time={selectedTime}
             stylistName={stylist.name}
+            depositAmount={calculateDepositAmount(
+              selectedService.price,
+              stylist.depositType,
+              stylist.depositValue
+            )}
             onSubmit={handleSubmit}
             loading={loading}
           />

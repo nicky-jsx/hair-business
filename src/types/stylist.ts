@@ -18,6 +18,20 @@ export interface Service {
   duration: string;
 }
 
+export type DepositType = "percentage" | "fixed" | "none";
+
+export function calculateDepositAmount(
+  price: number,
+  type: DepositType | null | undefined,
+  value: number | null | undefined
+): number {
+  if (!type || type === "none" || !value || value <= 0) return 0;
+  if (type === "percentage") {
+    return Math.min(price, Math.round((price * value) / 100));
+  }
+  return Math.min(price, Math.round(value));
+}
+
 export interface BookingPolicy {
   deposit: string;
   cancellation: string;
@@ -56,6 +70,8 @@ export interface Stylist {
   portfolio: string[];
   bookingUrl: string | null;
   bookingPolicy?: BookingPolicy | null;
+  depositType?: DepositType | null;
+  depositValue?: number | null;
 }
 
 export type PriceRange = "£" | "££" | "£££";

@@ -11,11 +11,16 @@ export interface Booking {
   status: "confirmed" | "cancelled" | "completed";
   notes: string | null;
   createdAt: string;
+  paymentOption: PaymentOption;
+  depositAmount: number;
+  totalPrice: number;
   // Joined data
   serviceName?: string;
   servicePrice?: number;
   stylistName?: string;
 }
+
+export type PaymentOption = "deposit" | "full";
 
 export interface StylistAvailability {
   id: string;
@@ -50,6 +55,9 @@ export interface BookingFormData {
   customerEmail: string;
   customerPhone: string;
   notes?: string;
+  paymentOption: PaymentOption;
+  depositAmount: number;
+  totalPrice: number;
 }
 
 export const DAYS_OF_WEEK = [

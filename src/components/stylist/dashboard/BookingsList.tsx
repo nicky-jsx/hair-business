@@ -97,11 +97,21 @@ export function BookingsList({ stylistId }: BookingsListProps) {
                 </p>
                 <p className="mt-0.5 text-sm text-brand-600">{booking.serviceName}</p>
               </div>
-              {booking.servicePrice && (
+              <div className="text-right">
                 <span className="text-sm font-semibold text-gray-900">
-                  {formatPrice(booking.servicePrice)}
+                  {formatPrice(booking.totalPrice || booking.servicePrice || 0)}
                 </span>
-              )}
+                {booking.paymentOption === "deposit" && booking.depositAmount > 0 && (
+                  <span className="mt-0.5 block text-[11px] text-gray-400">
+                    {formatPrice(booking.depositAmount)} deposit paid ·{" "}
+                    {formatPrice(
+                      (booking.totalPrice || booking.servicePrice || 0) -
+                        booking.depositAmount
+                    )}{" "}
+                    due
+                  </span>
+                )}
+              </div>
             </div>
 
             <div className="mt-3 flex items-center gap-4 text-sm text-gray-500">

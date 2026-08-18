@@ -5,17 +5,20 @@ import { Button } from "@/components/ui/Button";
 import { Input, Textarea } from "@/components/ui/FormField";
 import { formatPrice } from "@/types/stylist";
 import type { Service } from "@/types/stylist";
+import type { PaymentOption } from "@/types/booking";
 
 interface CustomerFormProps {
   service: Service;
   date: string;
   time: string;
   stylistName: string;
+  depositAmount: number;
   onSubmit: (data: {
     name: string;
     email: string;
     phone: string;
     notes?: string;
+    paymentOption: PaymentOption;
   }) => void;
   loading: boolean;
 }
@@ -25,93 +28,129 @@ export function CustomerForm({
   date,
   time,
   stylistName,
+  depositAmount,
   onSubmit,
   loading,
 }: CustomerFormProps) {
+  const total = service.price;
+  const hasDeposit = depositAmount > 0 && depositAmount < total;
+  const remaining = total - depositAmount;
+
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
   const [notes, setNotes] = useState("");
+  const [paymentOption, setPaymentOption] = useState<PaymentOption>(
+    hasDeposit ? "deposit" : "full"
+  );
 
-  const formattedDate = new Date(date).toLocaleDateString("en-GB", {
-    weekday: "short",
-    day: "numeric",
-    month: "short",
-  });
-
+  const formattedDate = new Date(`${date}T00:00:00`).toLocaleDateString(
+    "en-GB",
+    { weekday: "short", day: "numeric", month: "short" }
+  );
   const formattedTime = formatTimeDisplay(time);
 
   function handleSubmit(e: FormEvent) {
     e.preventDefault();
-    onSubmit({ name, email, phone, notes: notes || undefined });
+    onSubmit({
+      name,
+      email,
+      phone,
+      notes: notes || undefined,
+      paymentOption: hasDeposit ? paymentOption : "full",
+    });
   }
 
   return (
     <div className="p-5">
       <div className="mb-6">
-        <h2 className="text-xl font-semibold text-gray-900">
+        <h2 className="font-display text-xl font-semibold text-primary">
           Your details
         </h2>
-        <p className="mt-1 text-sm text-gray-500">
+        <p className="mt-1 text-sm text-on-surface-variant">
           We&apos;ll send your confirmation here
         </p>
       </div>
 
       {/* Booking summary */}
-      <div className="mb-6 rounded-xl border border-gray-100 bg-white p-4 shadow-sm">
+      <div className="mb-6 rounded-xl bg-surface-container-lowest p-4 shadow-ambient">
         <div className="flex items-start justify-between">
           <div>
-            <p className="font-semibold text-gray-900">{service.name}</p>
-            <p className="mt-0.5 text-sm text-gray-500">with {stylistName}</p>
+            <p className="font-display font-semibold text-primary">{service.name}</p>
+            <p className="mt-0.5 text-sm text-on-surface-variant">with {stylistName}</p>
           </div>
-          <p className="text-base font-semibold text-brand-600">
-            {formatPrice(service.price)}
+          <p className="font-display text-base font-semibold text-secondary">
+            {formatPrice(total)}
           </p>
         </div>
-        <div className="mt-3 flex items-center gap-4 border-t border-gray-50 pt-3">
-          <div className="flex items-center gap-1.5 text-sm text-gray-500">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 20 20"
-              fill="currentColor"
-              className="h-4 w-4 text-gray-400"
-            >
-              <path d="M5.75 2a.75.75 0 0 1 .75.75V4h7V2.75a.75.75 0 0 1 1.5 0V4h.25A2.75 2.75 0 0 1 18 6.75v8.5A2.75 2.75 0 0 1 15.25 18H4.75A2.75 2.75 0 0 1 2 15.25v-8.5A2.75 2.75 0 0 1 4.75 4H5V2.75A.75.75 0 0 1 5.75 2Z" />
-            </svg>
-            <span>{formattedDate}</span>
-          </div>
-          <div className="flex items-center gap-1.5 text-sm text-gray-500">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 20 20"
-              fill="currentColor"
-              className="h-4 w-4 text-gray-400"
-            >
-              <path
-                fillRule="evenodd"
-                d="M10 18a8 8 0 1 0 0-16 8 8 0 0 0 0 16Zm.75-13a.75.75 0 0 0-1.5 0v5c0 .414.336.75.75.75h4a.75.75 0 0 0 0-1.5h-3.25V5Z"
-                clipRule="evenodd"
-              />
-            </svg>
-            <span>{formattedTime}</span>
-          </div>
-          <div className="flex items-center gap-1.5 text-sm text-gray-500">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 20 20"
-              fill="currentColor"
-              className="h-4 w-4 text-gray-400"
-            >
-              <path
-                fillRule="evenodd"
-                d="M10 18a8 8 0 1 0 0-16 8 8 0 0 0 0 16Zm.75-13a.75.75 0 0 0-1.5 0v5c0 .414.336.75.75.75h4a.75.75 0 0 0 0-1.5h-3.25V5Z"
-                clipRule="evenodd"
-              />
-            </svg>
-            <span>{service.duration}</span>
-          </div>
+        <div className="mt-3 flex items-center gap-4 border-t border-outline-variant/60 pt-3 text-sm text-on-surface-variant">
+          <span className="flex items-center gap-1.5">
+            <span className="material-symbols-outlined text-base text-outline">
+              calendar_today
+            </span>
+            {formattedDate}
+          </span>
+          <span className="flex items-center gap-1.5">
+            <span className="material-symbols-outlined text-base text-outline">
+              schedule
+            </span>
+            {formattedTime}
+          </span>
+          <span className="flex items-center gap-1.5">
+            <span className="material-symbols-outlined text-base text-outline">
+              hourglass_empty
+            </span>
+            {service.duration}
+          </span>
         </div>
       </div>
+
+      {/* Payment options */}
+      {hasDeposit && (
+        <div className="mb-6">
+          <h3 className="mb-3 text-[12px] font-semibold uppercase tracking-caps text-outline">
+            Payment
+          </h3>
+          <div className="space-y-3">
+            <PaymentChoice
+              selected={paymentOption === "deposit"}
+              onSelect={() => setPaymentOption("deposit")}
+              title="Pay deposit now"
+              amount={formatPrice(depositAmount)}
+              subtitle={`${formatPrice(remaining)} paid in cash at your appointment`}
+            />
+            <PaymentChoice
+              selected={paymentOption === "full"}
+              onSelect={() => setPaymentOption("full")}
+              title="Pay in full"
+              amount={formatPrice(total)}
+              subtitle="Nothing left to pay on the day"
+            />
+          </div>
+
+          {/* Breakdown */}
+          <div className="mt-4 space-y-2 rounded-xl bg-surface-container-low p-4">
+            <div className="flex items-center justify-between text-sm text-on-surface-variant">
+              <span>Service total</span>
+              <span>{formatPrice(total)}</span>
+            </div>
+            <div className="flex items-center justify-between text-sm text-on-surface-variant">
+              <span>
+                {paymentOption === "deposit" ? "Deposit due now" : "Paying now"}
+              </span>
+              <span className="font-semibold text-primary">
+                {formatPrice(paymentOption === "deposit" ? depositAmount : total)}
+              </span>
+            </div>
+            <div className="flex items-center justify-between border-t border-outline-variant/60 pt-2 text-sm">
+              <span className="text-on-surface-variant">Remaining in cash on the day</span>
+              <span className="font-semibold text-primary">
+                {formatPrice(paymentOption === "deposit" ? remaining : 0)}
+              </span>
+            </div>
+          </div>
+        </div>
+      )}
 
       <form onSubmit={handleSubmit} className="space-y-4">
         <Input
@@ -158,11 +197,62 @@ export function CustomerForm({
 
         <div className="pt-2">
           <Button type="submit" fullWidth size="lg" disabled={loading}>
-            {loading ? "Confirming..." : "Confirm booking"}
+            {loading
+              ? "Confirming..."
+              : hasDeposit && paymentOption === "deposit"
+                ? `Confirm & pay ${formatPrice(depositAmount)} deposit`
+                : "Confirm booking"}
           </Button>
         </div>
       </form>
     </div>
+  );
+}
+
+function PaymentChoice({
+  selected,
+  onSelect,
+  title,
+  amount,
+  subtitle,
+}: {
+  selected: boolean;
+  onSelect: () => void;
+  title: string;
+  amount: string;
+  subtitle: string;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onSelect}
+      className={`flex w-full items-center gap-3 rounded-xl border p-4 text-left transition-colors ${
+        selected
+          ? "border-primary bg-secondary-fixed/40"
+          : "border-outline-variant bg-surface-container-lowest hover:border-outline"
+      }`}
+    >
+      <span
+        className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-full border-2 ${
+          selected ? "border-primary" : "border-outline-variant"
+        }`}
+      >
+        {selected && <span className="h-2.5 w-2.5 rounded-full bg-primary" />}
+      </span>
+      <span className="flex-1">
+        <span className="flex items-center justify-between">
+          <span className="font-display text-sm font-semibold text-primary">
+            {title}
+          </span>
+          <span className="font-display text-sm font-semibold text-primary">
+            {amount}
+          </span>
+        </span>
+        <span className="mt-0.5 block text-[13px] text-on-surface-variant">
+          {subtitle}
+        </span>
+      </span>
+    </button>
   );
 }
 

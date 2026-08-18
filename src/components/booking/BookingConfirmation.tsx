@@ -84,11 +84,35 @@ export function BookingConfirmation({
               {formattedTime} – {formattedEndTime}
             </span>
           </div>
-          {booking.servicePrice && (
+          <div className="flex items-center justify-between">
+            <span className="text-sm text-gray-500">Service total</span>
+            <span className="text-sm font-medium text-gray-900">
+              {formatPrice(booking.totalPrice || booking.servicePrice || 0)}
+            </span>
+          </div>
+          {booking.paymentOption === "deposit" && booking.depositAmount > 0 ? (
+            <>
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-gray-500">Deposit paid</span>
+                <span className="text-sm font-semibold text-green-600">
+                  {formatPrice(booking.depositAmount)}
+                </span>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-gray-500">Due in cash on the day</span>
+                <span className="text-sm font-semibold text-brand-600">
+                  {formatPrice(
+                    (booking.totalPrice || booking.servicePrice || 0) -
+                      booking.depositAmount
+                  )}
+                </span>
+              </div>
+            </>
+          ) : (
             <div className="flex items-center justify-between">
-              <span className="text-sm text-gray-500">Price</span>
-              <span className="text-sm font-semibold text-brand-600">
-                {formatPrice(booking.servicePrice)}
+              <span className="text-sm text-gray-500">Paid in full</span>
+              <span className="text-sm font-semibold text-green-600">
+                {formatPrice(booking.totalPrice || booking.servicePrice || 0)}
               </span>
             </div>
           )}
