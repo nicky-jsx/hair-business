@@ -1,4 +1,4 @@
--- Booking System Schema for Strand
+-- Booking System Schema for Hair Korter
 -- Run this in your Supabase SQL Editor after schema.sql
 
 -- Stylist availability (working hours per day of week)

@@ -20,13 +20,13 @@ const montserrat = Montserrat({
 });
 
 export const metadata: Metadata = {
-  title: "Strand — Find Your Professional in London",
+  title: "Hair Korter — Find Your Professional in London",
   description: "Discover talented hair and beauty professionals across London",
   manifest: "/manifest.json",
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
-    title: "Strand",
+    title: "Hair Korter",
   },
   formatDetection: {
     telephone: false,

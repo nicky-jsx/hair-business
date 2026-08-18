@@ -1,4 +1,4 @@
--- Supabase Schema for Strand - Stylist Discovery App
+-- Supabase Schema for Hair Korter - Stylist Discovery App
 -- Run this in your Supabase SQL Editor
 
 -- Enable UUID extension

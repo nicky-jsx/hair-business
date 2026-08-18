@@ -1,4 +1,4 @@
-# Strand — Stylist Discovery MVP
+# Hair Korter — Stylist Discovery MVP
 
 A mobile-first stylist discovery app for London, built with Next.js, TypeScript, and Tailwind CSS.
 

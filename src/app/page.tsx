@@ -36,9 +36,9 @@ export default async function HomePage() {
       {/* Hero headline */}
       <section className="mb-12">
         <h1 className="font-display text-[32px] font-bold leading-tight tracking-tight text-primary md:text-5xl">
-          Find your
+          What are you
           <br />
-          next stylist.
+          looking for?
         </h1>
       </section>
 
@@ -64,8 +64,39 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* Featured stylists */}
+      {/* Regions */}
       <section className="mb-14">
+        <h2 className="mb-1 font-display text-lg font-semibold text-primary">
+          Explore by area
+        </h2>
+        <p className="mb-4 text-[13px] text-on-surface-variant">
+          Browse professionals across London
+        </p>
+        <div className="grid grid-cols-2 gap-3">
+          {REGIONS.map((region) => (
+            <Link
+              key={region}
+              href={`/stylists?region=${region}`}
+              className="group flex items-center justify-between rounded-xl bg-surface-container-lowest px-5 py-5 shadow-ambient transition-colors hover:bg-secondary-fixed"
+            >
+              <span className="flex flex-col">
+                <span className="font-display text-base font-semibold text-primary">
+                  {region}
+                </span>
+                <span className="text-[12px] uppercase tracking-caps text-outline">
+                  London
+                </span>
+              </span>
+              <span className="material-symbols-outlined text-outline transition-transform group-hover:translate-x-0.5">
+                arrow_forward
+              </span>
+            </Link>
+          ))}
+        </div>
+      </section>
+
+      {/* Featured stylists */}
+      <section className="mb-4">
         <div className="mb-4 flex items-end justify-between">
           <h2 className="font-display text-lg font-semibold text-primary">
             Featured Stylists
@@ -80,29 +111,6 @@ export default async function HomePage() {
         <div className="flex gap-4 overflow-x-auto -mx-6 px-6 pb-4 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
           {featured.map((stylist) => (
             <StylistCard key={stylist.id} stylist={stylist} variant="featured" />
-          ))}
-        </div>
-      </section>
-
-      {/* Regions */}
-      <section className="mb-4">
-        <h2 className="mb-4 font-display text-lg font-semibold text-primary">
-          Explore by area
-        </h2>
-        <div className="grid grid-cols-2 gap-3">
-          {REGIONS.map((region) => (
-            <Link
-              key={region}
-              href={`/stylists?region=${region}`}
-              className="group flex items-center justify-between rounded-xl bg-surface-container-lowest px-5 py-5 shadow-ambient transition-colors hover:bg-secondary-fixed"
-            >
-              <span className="font-display text-base font-semibold text-primary">
-                {region}
-              </span>
-              <span className="material-symbols-outlined text-outline transition-transform group-hover:translate-x-0.5">
-                arrow_forward
-              </span>
-            </Link>
           ))}
         </div>
       </section>

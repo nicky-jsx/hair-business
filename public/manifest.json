@@ -1,11 +1,11 @@
 {
-  "name": "Strand",
-  "short_name": "Strand",
+  "name": "Hair Korter",
+  "short_name": "Hair Korter",
   "description": "Find hair and beauty professionals in London",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#faf9f7",
-  "theme_color": "#c43d30",
+  "background_color": "#fbf9f8",
+  "theme_color": "#fbf9f8",
   "orientation": "portrait-primary",
   "scope": "/",
   "icons": [

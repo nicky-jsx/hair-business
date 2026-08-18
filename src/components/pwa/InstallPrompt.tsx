@@ -52,11 +52,11 @@ export function InstallPrompt() {
     <div className="fixed bottom-24 left-4 right-4 z-50 mx-auto max-w-sm animate-in slide-in-from-bottom-4 duration-300">
       <div className="rounded-2xl border border-gray-100 bg-white p-4 shadow-lg">
         <div className="mb-3 flex items-start gap-3">
-          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-brand-600 text-lg font-bold text-white">
-            S
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-brand-600 text-sm font-bold text-white">
+            HK
           </div>
           <div>
-            <p className="font-semibold text-gray-900">Add Strand to Home Screen</p>
+            <p className="font-semibold text-gray-900">Add Hair Korter to Home Screen</p>
             <p className="text-sm text-gray-500">
               Install for quick access and a better experience.
             </p>

@@ -17,7 +17,7 @@ export function Header() {
           href="/"
           className="font-display text-2xl font-bold uppercase tracking-tight text-primary"
         >
-          Strand
+          Hair Korter
         </Link>
 
         <StylistNavLink />
