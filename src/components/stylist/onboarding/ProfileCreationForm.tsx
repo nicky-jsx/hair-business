@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { FormEvent, useState } from "react";
 import { Button } from "@/components/ui/Button";
 import { Input, Select, Textarea } from "@/components/ui/FormField";
+import { ImageUploader } from "@/components/stylist/ImageUploader";
 import { useAuth } from "@/context/AuthContext";
 import { createStylistProfile } from "@/lib/stylist-profile-db";
 import { linkStylistProfile } from "@/lib/auth-db";
@@ -312,24 +313,22 @@ export function ProfileCreationForm() {
         {step === 2 && (
           <>
             <p className="text-sm text-gray-500">
-              Add photo URLs for your profile. Leave blank to use defaults — you
-              can update these anytime.
+              Upload a profile photo and a banner. Leave blank to use defaults —
+              you can update these anytime.
             </p>
-            <Input
-              label="Profile photo URL"
-              name="avatar"
-              type="url"
-              placeholder="https://…"
+            <ImageUploader
+              kind="avatar"
+              label="Profile photo"
               value={avatar}
-              onChange={(e) => setAvatar(e.target.value)}
+              pathPrefix={account?.id ?? "onboarding"}
+              onChange={setAvatar}
             />
-            <Input
-              label="Cover photo URL"
-              name="coverImage"
-              type="url"
-              placeholder="https://…"
+            <ImageUploader
+              kind="cover"
+              label="Banner"
               value={coverImage}
-              onChange={(e) => setCoverImage(e.target.value)}
+              pathPrefix={account?.id ?? "onboarding"}
+              onChange={setCoverImage}
             />
           </>
         )}

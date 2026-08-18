@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { FormEvent, useState } from "react";
 import { Button } from "@/components/ui/Button";
 import { Input, Select, Textarea } from "@/components/ui/FormField";
+import { ImageUploader } from "@/components/stylist/ImageUploader";
 import { useAuth } from "@/context/AuthContext";
 import { updateStylistProfile } from "@/lib/stylist-profile-db";
 import {
@@ -142,6 +143,26 @@ export function ProfileEditForm({ profile }: ProfileEditFormProps) {
           Profile updated! Redirecting…
         </div>
       )}
+
+      <div className="rounded-xl border border-gray-100 bg-white p-4 shadow-sm">
+        <h2 className="mb-4 font-semibold text-gray-900">Photos</h2>
+        <div className="space-y-5">
+          <ImageUploader
+            kind="avatar"
+            label="Profile photo"
+            value={avatar}
+            pathPrefix={profile.id}
+            onChange={setAvatar}
+          />
+          <ImageUploader
+            kind="cover"
+            label="Banner"
+            value={coverImage}
+            pathPrefix={profile.id}
+            onChange={setCoverImage}
+          />
+        </div>
+      </div>
 
       <div className="rounded-xl border border-gray-100 bg-white p-4 shadow-sm">
         <h2 className="mb-4 font-semibold text-gray-900">Basic info</h2>
@@ -291,28 +312,6 @@ export function ProfileEditForm({ profile }: ProfileEditFormProps) {
         <p className="mt-1.5 text-xs text-gray-400">
           Leave blank to use the built-in booking system.
         </p>
-      </div>
-
-      <div className="rounded-xl border border-gray-100 bg-white p-4 shadow-sm">
-        <h2 className="mb-4 font-semibold text-gray-900">Photos</h2>
-        <div className="space-y-4">
-          <Input
-            label="Profile photo URL"
-            name="avatar"
-            type="url"
-            placeholder="https://…"
-            value={avatar}
-            onChange={(e) => setAvatar(e.target.value)}
-          />
-          <Input
-            label="Cover photo URL"
-            name="coverImage"
-            type="url"
-            placeholder="https://…"
-            value={coverImage}
-            onChange={(e) => setCoverImage(e.target.value)}
-          />
-        </div>
       </div>
 
       <div className="flex gap-3 pt-2">

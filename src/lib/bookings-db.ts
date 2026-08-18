@@ -99,7 +99,12 @@ export async function fetchReleasedDates(
     .order("date");
 
   if (error) {
-    console.error("Error fetching released dates:", error);
+    console.error("Error fetching released dates:", {
+      message: error.message,
+      details: error.details,
+      hint: error.hint,
+      code: error.code,
+    });
     return [];
   }
 
