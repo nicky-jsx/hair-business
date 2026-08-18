@@ -1,4 +1,5 @@
 import { getSupabase } from "./supabase";
+import { getSessionToken } from "./session";
 import type { Stylist, Specialty, Region } from "@/types/stylist";
 
 interface CreateProfileData {
@@ -18,6 +19,17 @@ interface UpdateProfileData extends Partial<CreateProfileData> {
   bookingUrl?: string | null;
 }
 
+function friendlyProfileError(message?: string): string {
+  if (!message) return "Failed to save profile. Please try again.";
+  if (message.includes("unauthorized"))
+    return "Your session has expired. Please sign in again.";
+  if (message.includes("forbidden"))
+    return "You don't have permission to edit this profile.";
+  if (message.includes("already_linked"))
+    return "This account already has a profile.";
+  return "Failed to save profile. Please try again.";
+}
+
 export async function createStylistProfile(
   data: CreateProfileData
 ): Promise<{ stylist?: Stylist; error?: string }> {
@@ -26,76 +38,48 @@ export async function createStylistProfile(
     return { error: "Database not configured" };
   }
 
-  // Insert stylist
+  const token = getSessionToken();
+  if (!token) return { error: "Your session has expired. Please sign in again." };
+
+  // The DB creates the stylist, its specialties/services/availability and
+  // links it to the calling account — all in one authorised transaction.
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const { data: stylistResult, error: stylistError } = await (supabase as any)
-    .from("stylists")
-    .insert({
-      name: data.name,
-      tagline: data.tagline,
-      bio: data.bio,
-      region: data.region,
-      years_experience: data.yearsExperience,
-      price_range: data.priceRange,
-      avatar_url: data.avatarUrl || "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400&h=400&fit=crop&crop=face",
-      cover_image_url: data.coverImageUrl || "https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?w=800&h=400&fit=crop",
-      featured: false,
-      booking_url: null,
-    })
-    .select()
-    .single();
+  const { data: stylistId, error } = await (supabase as any).rpc(
+    "create_stylist_profile",
+    {
+      p_token: token,
+      p_payload: {
+        name: data.name,
+        tagline: data.tagline,
+        bio: data.bio,
+        region: data.region,
+        yearsExperience: data.yearsExperience,
+        priceRange: data.priceRange,
+        specialties: data.specialties,
+        services: data.services,
+        avatarUrl: data.avatarUrl ?? "",
+        coverImageUrl: data.coverImageUrl ?? "",
+      },
+    }
+  );
 
-  if (stylistError) {
-    console.error("Error creating stylist:", stylistError);
-    return { error: "Failed to create profile. Please try again." };
+  if (error || !stylistId) {
+    console.error("Error creating stylist:", error?.message);
+    return { error: friendlyProfileError(error?.message) };
   }
-
-  const stylistId = stylistResult.id;
-
-  // Insert specialties
-  if (data.specialties.length > 0) {
-    const specialtyRows = data.specialties.map((specialty) => ({
-      stylist_id: stylistId,
-      specialty,
-    }));
-
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    await (supabase as any).from("stylist_specialties").insert(specialtyRows);
-  }
-
-  // Insert services
-  if (data.services.length > 0) {
-    const serviceRows = data.services.map((service) => ({
-      stylist_id: stylistId,
-      name: service.name,
-      price: service.price,
-      duration: service.duration,
-    }));
-
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    await (supabase as any).from("services").insert(serviceRows);
-  }
-
-  // Insert default availability (Mon-Sat 9am-9pm)
-  const availabilityRows = Array.from({ length: 7 }, (_, i) => ({
-    stylist_id: stylistId,
-    day_of_week: i,
-    start_time: "09:00",
-    end_time: "21:00",
-    is_available: i !== 0, // Sunday off
-  }));
-
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  await (supabase as any).from("stylist_availability").insert(availabilityRows);
 
   return {
     stylist: {
-      id: stylistId,
+      id: stylistId as string,
       name: data.name,
       tagline: data.tagline,
       bio: data.bio,
-      avatar: stylistResult.avatar_url,
-      coverImage: stylistResult.cover_image_url,
+      avatar:
+        data.avatarUrl ||
+        "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400&h=400&fit=crop&crop=face",
+      coverImage:
+        data.coverImageUrl ||
+        "https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?w=800&h=400&fit=crop",
       region: data.region,
       specialties: data.specialties,
       yearsExperience: data.yearsExperience,
@@ -119,71 +103,36 @@ export async function updateStylistProfile(
     return { error: "Database not configured" };
   }
 
-  // Update main stylist record
-  const updateData: Record<string, unknown> = {};
-  if (data.name !== undefined) updateData.name = data.name;
-  if (data.tagline !== undefined) updateData.tagline = data.tagline;
-  if (data.bio !== undefined) updateData.bio = data.bio;
-  if (data.region !== undefined) updateData.region = data.region;
-  if (data.yearsExperience !== undefined) updateData.years_experience = data.yearsExperience;
-  if (data.priceRange !== undefined) updateData.price_range = data.priceRange;
-  if (data.bookingUrl !== undefined) updateData.booking_url = data.bookingUrl;
-  if (data.avatarUrl !== undefined) updateData.avatar_url = data.avatarUrl;
-  if (data.coverImageUrl !== undefined) updateData.cover_image_url = data.coverImageUrl;
+  const token = getSessionToken();
+  if (!token) return { error: "Your session has expired. Please sign in again." };
 
-  if (Object.keys(updateData).length > 0) {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { error } = await (supabase as any)
-      .from("stylists")
-      .update(updateData)
-      .eq("id", stylistId);
+  // Only send keys that were actually provided; the DB verifies the token
+  // owns this stylist before applying anything.
+  const payload: Record<string, unknown> = {};
+  if (data.name !== undefined) payload.name = data.name;
+  if (data.tagline !== undefined) payload.tagline = data.tagline;
+  if (data.bio !== undefined) payload.bio = data.bio;
+  if (data.region !== undefined) payload.region = data.region;
+  if (data.yearsExperience !== undefined)
+    payload.yearsExperience = data.yearsExperience;
+  if (data.priceRange !== undefined) payload.priceRange = data.priceRange;
+  if (data.bookingUrl !== undefined) payload.bookingUrl = data.bookingUrl;
+  if (data.avatarUrl !== undefined) payload.avatarUrl = data.avatarUrl;
+  if (data.coverImageUrl !== undefined)
+    payload.coverImageUrl = data.coverImageUrl;
+  if (data.specialties !== undefined) payload.specialties = data.specialties;
+  if (data.services !== undefined) payload.services = data.services;
 
-    if (error) {
-      console.error("Error updating stylist:", error);
-      return { error: "Failed to update profile" };
-    }
-  }
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { error } = await (supabase as any).rpc("update_stylist_profile", {
+    p_token: token,
+    p_stylist_id: stylistId,
+    p_payload: payload,
+  });
 
-  // Update specialties if provided
-  if (data.specialties !== undefined) {
-    // Delete existing
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    await (supabase as any)
-      .from("stylist_specialties")
-      .delete()
-      .eq("stylist_id", stylistId);
-
-    // Insert new
-    if (data.specialties.length > 0) {
-      const specialtyRows = data.specialties.map((specialty) => ({
-        stylist_id: stylistId,
-        specialty,
-      }));
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      await (supabase as any).from("stylist_specialties").insert(specialtyRows);
-    }
-  }
-
-  // Update services if provided
-  if (data.services !== undefined) {
-    // Delete existing
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    await (supabase as any)
-      .from("services")
-      .delete()
-      .eq("stylist_id", stylistId);
-
-    // Insert new
-    if (data.services.length > 0) {
-      const serviceRows = data.services.map((service) => ({
-        stylist_id: stylistId,
-        name: service.name,
-        price: service.price,
-        duration: service.duration,
-      }));
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      await (supabase as any).from("services").insert(serviceRows);
-    }
+  if (error) {
+    console.error("Error updating stylist:", error.message);
+    return { error: friendlyProfileError(error.message) };
   }
 
   return {};

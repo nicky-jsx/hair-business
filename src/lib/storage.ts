@@ -24,11 +24,15 @@ export async function uploadProfileImage(
   }
 
   const ext = file.name.split(".").pop()?.toLowerCase() || "jpg";
-  const path = `${pathPrefix}/${kind}-${Date.now()}.${ext}`;
+  // Unique path (timestamp + random) so uploads never collide and we never
+  // need to overwrite an existing object — overwrites are disabled at the
+  // storage-policy level to stop anyone replacing someone else's image.
+  const unique = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+  const path = `${pathPrefix}/${kind}-${unique}.${ext}`;
 
   const { error: uploadError } = await supabase.storage
     .from(PROFILE_IMAGES_BUCKET)
-    .upload(path, file, { upsert: true, cacheControl: "3600" });
+    .upload(path, file, { upsert: false, cacheControl: "3600" });
 
   if (uploadError) {
     console.error("Error uploading image:", uploadError);

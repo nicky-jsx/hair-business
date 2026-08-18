@@ -1,4 +1,5 @@
 import { getSupabase } from "./supabase";
+import { setSessionToken, getSessionToken } from "./session";
 
 interface StylistAccount {
   id: string;
@@ -18,13 +19,28 @@ interface SignInData {
   password: string;
 }
 
-// Simple hash function (for demo - in production use bcrypt)
-async function hashPassword(password: string): Promise<string> {
-  const encoder = new TextEncoder();
-  const data = encoder.encode(password + "strand-salt-2024");
-  const hashBuffer = await crypto.subtle.digest("SHA-256", data);
-  const hashArray = Array.from(new Uint8Array(hashBuffer));
-  return hashArray.map((b) => b.toString(16).padStart(2, "0")).join("");
+const EMAIL_RE = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function mapAccountRow(row: any): StylistAccount {
+  return {
+    id: row.id,
+    email: row.email,
+    name: row.name,
+    stylistId: row.stylist_id ?? null,
+  };
+}
+
+// Map raw Postgres exception messages to friendly copy.
+function friendlyAuthError(message?: string): string {
+  if (!message) return "Something went wrong. Please try again.";
+  if (message.includes("email_taken"))
+    return "An account with this email already exists";
+  if (message.includes("weak_password"))
+    return "Password must be at least 8 characters";
+  if (message.includes("invalid_email")) return "Please enter a valid email";
+  if (message.includes("invalid_name")) return "Please enter your name";
+  return "Something went wrong. Please try again.";
 }
 
 export async function signUpStylist(
@@ -35,43 +51,32 @@ export async function signUpStylist(
     return { error: "Database not configured" };
   }
 
-  // Check if email already exists
-  const { data: existing } = await supabase
-    .from("stylist_accounts")
-    .select("id")
-    .eq("email", data.email.toLowerCase())
-    .single();
+  // Client-side validation (the DB re-validates these too).
+  const email = data.email.trim().toLowerCase();
+  const name = data.name.trim();
+  if (!EMAIL_RE.test(email)) return { error: "Please enter a valid email" };
+  if (data.password.length < 8)
+    return { error: "Password must be at least 8 characters" };
+  if (!name || name.length > 120) return { error: "Please enter your name" };
 
-  if (existing) {
-    return { error: "An account with this email already exists" };
-  }
-
-  const passwordHash = await hashPassword(data.password);
-
+  // Password is hashed with bcrypt inside Postgres; it never touches the client.
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const { data: result, error } = await (supabase as any)
-    .from("stylist_accounts")
-    .insert({
-      email: data.email.toLowerCase(),
-      password_hash: passwordHash,
-      name: data.name,
-    })
-    .select()
-    .single();
+  const { data: rows, error } = await (supabase as any).rpc("sign_up_stylist", {
+    p_email: email,
+    p_password: data.password,
+    p_name: name,
+  });
 
   if (error) {
-    console.error("Error creating account:", error);
-    return { error: "Failed to create account. Please try again." };
+    console.error("Error creating account:", error.message);
+    return { error: friendlyAuthError(error.message) };
   }
 
-  return {
-    account: {
-      id: result.id,
-      email: result.email,
-      name: result.name,
-      stylistId: result.stylist_id,
-    },
-  };
+  const row = Array.isArray(rows) ? rows[0] : rows;
+  if (!row) return { error: "Failed to create account. Please try again." };
+
+  setSessionToken(row.token ?? null);
+  return { account: mapAccountRow(row) };
 }
 
 export async function signInStylist(
@@ -82,72 +87,51 @@ export async function signInStylist(
     return { error: "Database not configured" };
   }
 
-  const passwordHash = await hashPassword(data.password);
+  const email = data.email.trim().toLowerCase();
 
+  // Verification is done in Postgres; no hashes are ever fetched to the client.
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const { data: result, error } = await (supabase as any)
-    .from("stylist_accounts")
-    .select("*")
-    .eq("email", data.email.toLowerCase())
-    .eq("password_hash", passwordHash)
-    .single();
+  const { data: rows, error } = await (supabase as any).rpc("sign_in_stylist", {
+    p_email: email,
+    p_password: data.password,
+  });
 
-  if (error || !result) {
+  if (error) {
+    console.error("Error signing in:", error.message);
     return { error: "Invalid email or password" };
   }
 
-  return {
-    account: {
-      id: result.id,
-      email: result.email,
-      name: result.name,
-      stylistId: result.stylist_id,
-    },
-  };
+  const row = Array.isArray(rows) ? rows[0] : rows;
+  if (!row) return { error: "Invalid email or password" };
+
+  setSessionToken(row.token ?? null);
+  return { account: mapAccountRow(row) };
 }
 
-export async function getAccountById(
-  id: string
-): Promise<StylistAccount | null> {
+// Restore a session from the stored token. Returns null (and clears the
+// token) if the token is missing, invalid, or expired.
+export async function getAccountFromSession(): Promise<StylistAccount | null> {
   const supabase = getSupabase();
   if (!supabase) return null;
 
+  const token = getSessionToken();
+  if (!token) return null;
+
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const { data, error } = await (supabase as any)
-    .from("stylist_accounts")
-    .select("*")
-    .eq("id", id)
-    .single();
+  const { data: rows, error } = await (supabase as any).rpc(
+    "get_account_by_token",
+    { p_token: token }
+  );
 
-  if (error || !data) return null;
-
-  return {
-    id: data.id,
-    email: data.email,
-    name: data.name,
-    stylistId: data.stylist_id,
-  };
+  if (error) return null;
+  const row = Array.isArray(rows) ? rows[0] : rows;
+  if (!row) {
+    setSessionToken(null);
+    return null;
+  }
+  return mapAccountRow(row);
 }
 
-export async function linkStylistProfile(
-  accountId: string,
-  stylistId: string
-): Promise<{ error?: string }> {
-  const supabase = getSupabase();
-  if (!supabase) {
-    return { error: "Database not configured" };
-  }
-
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const { error } = await (supabase as any)
-    .from("stylist_accounts")
-    .update({ stylist_id: stylistId })
-    .eq("id", accountId);
-
-  if (error) {
-    console.error("Error linking profile:", error);
-    return { error: "Failed to link profile" };
-  }
-
-  return {};
+export function clearSession(): void {
+  setSessionToken(null);
 }

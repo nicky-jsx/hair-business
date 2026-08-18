@@ -16,8 +16,7 @@ DROP POLICY IF EXISTS "Public upload profile images" ON storage.objects;
 CREATE POLICY "Public upload profile images" ON storage.objects
   FOR INSERT WITH CHECK (bucket_id = 'profile-images');
 
--- 4) Allow overwrites/upserts
+-- 4) Do NOT allow overwrites. The app uploads to unique, timestamped
+--    paths, so overwriting is unnecessary — and allowing it would let
+--    anyone replace another stylist's photo. Drop any such policy.
 DROP POLICY IF EXISTS "Public update profile images" ON storage.objects;
-CREATE POLICY "Public update profile images" ON storage.objects
-  FOR UPDATE USING (bucket_id = 'profile-images')
-  WITH CHECK (bucket_id = 'profile-images');

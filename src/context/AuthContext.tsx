@@ -8,7 +8,12 @@ import {
   useCallback,
   type ReactNode,
 } from "react";
-import { signUpStylist, signInStylist, getAccountById } from "@/lib/auth-db";
+import {
+  signUpStylist,
+  signInStylist,
+  getAccountFromSession,
+  clearSession,
+} from "@/lib/auth-db";
 import { fetchStylistById } from "@/lib/stylists-db";
 import type { Stylist } from "@/types/stylist";
 
@@ -39,31 +44,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [account, setAccount] = useState<StylistAccount | null>(null);
   const [profile, setProfile] = useState<Stylist | null>(null);
 
-  // Load account from localStorage on mount
+  // Restore the session from the stored token (validated by the DB).
   useEffect(() => {
-    const stored = localStorage.getItem(STORAGE_KEY);
-    if (stored) {
-      try {
-        const parsed = JSON.parse(stored);
-        // Verify account still exists in DB
-        getAccountById(parsed.id).then((acc) => {
-          if (acc) {
-            setAccount(acc);
-            if (acc.stylistId) {
-              fetchStylistById(acc.stylistId).then(setProfile);
-            }
-          } else {
-            localStorage.removeItem(STORAGE_KEY);
+    getAccountFromSession()
+      .then((acc) => {
+        if (acc) {
+          setAccount(acc);
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(acc));
+          if (acc.stylistId) {
+            return fetchStylistById(acc.stylistId).then(setProfile);
           }
-          setReady(true);
-        });
-      } catch {
-        localStorage.removeItem(STORAGE_KEY);
-        setReady(true);
-      }
-    } else {
-      setReady(true);
-    }
+        } else {
+          localStorage.removeItem(STORAGE_KEY);
+        }
+      })
+      .finally(() => setReady(true));
   }, []);
 
   const signUp = useCallback(
@@ -103,6 +98,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const signOut = useCallback(() => {
     setAccount(null);
     setProfile(null);
+    clearSession();
     localStorage.removeItem(STORAGE_KEY);
   }, []);
 

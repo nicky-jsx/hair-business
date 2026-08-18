@@ -1,4 +1,5 @@
 import { getSupabase, isSupabaseConfigured } from "./supabase";
+import { getSessionToken } from "./session";
 import { stylists as sampleStylists } from "@/data/stylists";
 import type { Stylist, Specialty, StylistFilters } from "@/types/stylist";
 import type {
@@ -220,17 +221,23 @@ export async function updateStylistDeposit(
     return { error: "Database not configured." };
   }
 
+  const token = getSessionToken();
+  if (!token) return { error: "Your session has expired. Please sign in again." };
+
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const { error } = await (supabase as any)
-    .from("stylists")
-    .update({
-      deposit_type: depositType,
-      deposit_value: depositType === "none" ? 0 : depositValue,
-    })
-    .eq("id", stylistId);
+  const { error } = await (supabase as any).rpc("update_stylist_deposit", {
+    p_token: token,
+    p_stylist_id: stylistId,
+    p_type: depositType,
+    p_value: depositType === "none" ? 0 : depositValue,
+  });
 
   if (error) {
-    console.error("Error updating deposit:", error);
+    console.error("Error updating deposit:", error.message);
+    if (error.message?.includes("unauthorized"))
+      return { error: "Your session has expired. Please sign in again." };
+    if (error.message?.includes("forbidden"))
+      return { error: "You don't have permission to change this." };
     return { error: "Failed to save deposit settings." };
   }
 

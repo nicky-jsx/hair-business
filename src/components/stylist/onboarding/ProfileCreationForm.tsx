@@ -7,7 +7,6 @@ import { Input, Select, Textarea } from "@/components/ui/FormField";
 import { ImageUploader } from "@/components/stylist/ImageUploader";
 import { useAuth } from "@/context/AuthContext";
 import { createStylistProfile } from "@/lib/stylist-profile-db";
-import { linkStylistProfile } from "@/lib/auth-db";
 import {
   REGIONS,
   type Region,
@@ -138,8 +137,8 @@ export function ProfileCreationForm() {
     }
 
     if (result.stylist) {
-      // Link the stylist profile to the account
-      await linkStylistProfile(account.id, result.stylist.id);
+      // The profile is already linked to the account inside the DB function;
+      // just sync local state so the UI reflects it immediately.
       setAccountStylistId(result.stylist.id);
       router.push(`/stylists/${result.stylist.id}`);
     }

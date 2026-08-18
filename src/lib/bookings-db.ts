@@ -1,4 +1,5 @@
 import { getSupabase } from "./supabase";
+import { getSessionToken } from "./session";
 import type {
   Booking,
   StylistAvailability,
@@ -16,6 +17,16 @@ import type {
   StylistAvailabilityRow,
   BlockedTimeRow,
 } from "@/types/database";
+
+// Turn raw Postgres exceptions from the authorised RPCs into friendly copy.
+function friendlyOwnerError(message: string | undefined, fallback: string): string {
+  if (!message) return fallback;
+  if (message.includes("unauthorized"))
+    return "Your session has expired. Please sign in again.";
+  if (message.includes("forbidden"))
+    return "You don't have permission to change this.";
+  return fallback;
+}
 
 // Fetch stylist availability for all days
 export async function fetchStylistAvailability(
@@ -144,23 +155,20 @@ export async function releaseDate(
   const supabase = getSupabase();
   if (!supabase) return { error: "Database not configured." };
 
+  const token = getSessionToken();
+  if (!token) return { error: "Your session has expired. Please sign in again." };
+
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const { error } = await (supabase as any)
-    .from("stylist_date_availability")
-    .upsert(
-      {
-        stylist_id: stylistId,
-        date,
-        slots,
-        is_open: true,
-        updated_at: new Date().toISOString(),
-      },
-      { onConflict: "stylist_id,date" }
-    );
+  const { error } = await (supabase as any).rpc("release_date", {
+    p_token: token,
+    p_stylist_id: stylistId,
+    p_date: date,
+    p_slots: slots,
+  });
 
   if (error) {
-    console.error("Error releasing date:", error);
-    return { error: error.message || "Failed to release date." };
+    console.error("Error releasing date:", error.message);
+    return { error: friendlyOwnerError(error.message, "Failed to release date.") };
   }
 
   return {};
@@ -174,83 +182,73 @@ export async function unreleaseDate(
   const supabase = getSupabase();
   if (!supabase) return { error: "Database not configured." };
 
+  const token = getSessionToken();
+  if (!token) return { error: "Your session has expired. Please sign in again." };
+
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const { error } = await (supabase as any)
-    .from("stylist_date_availability")
-    .delete()
-    .eq("stylist_id", stylistId)
-    .eq("date", date);
+  const { error } = await (supabase as any).rpc("unrelease_date", {
+    p_token: token,
+    p_stylist_id: stylistId,
+    p_date: date,
+  });
 
   if (error) {
-    console.error("Error un-releasing date:", error);
-    return { error: error.message || "Failed to close date." };
+    console.error("Error un-releasing date:", error.message);
+    return { error: friendlyOwnerError(error.message, "Failed to close date.") };
   }
 
   return {};
 }
 
-// Fetch bookings for a stylist on a specific date
-export async function fetchBookingsForDate(
+// Fetch only the booked start/end times for a date. This uses a
+// SECURITY DEFINER RPC that returns NO customer PII, so the public
+// booking page can grey out taken slots without exposing who booked.
+export async function fetchTakenSlots(
   stylistId: string,
   date: string
-): Promise<Booking[]> {
+): Promise<{ startTime: string; endTime: string }[]> {
   const supabase = getSupabase();
   if (!supabase) return [];
 
-  const { data, error } = await supabase
-    .from("bookings")
-    .select("*")
-    .eq("stylist_id", stylistId)
-    .eq("booking_date", date)
-    .neq("status", "cancelled");
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { data, error } = await (supabase as any).rpc("get_taken_slots", {
+    p_stylist_id: stylistId,
+    p_date: date,
+  });
 
   if (error) {
-    console.error("Error fetching bookings:", error);
+    console.error("Error fetching taken slots:", error.message);
     return [];
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  return (data ?? []).map((row: any) => ({
-    id: row.id,
-    stylistId: row.stylist_id,
-    serviceId: row.service_name,
-    customerName: row.customer_name,
-    customerEmail: row.customer_email,
-    customerPhone: row.customer_phone,
-    bookingDate: row.booking_date,
+  return ((data as any[]) ?? []).map((row) => ({
     startTime: row.start_time,
     endTime: row.end_time,
-    status: row.status,
-    notes: row.notes,
-    createdAt: row.created_at,
-    paymentOption: row.payment_option ?? "full",
-    depositAmount: row.deposit_amount ?? 0,
-    totalPrice: row.total_price ?? row.service_price ?? 0,
-    serviceName: row.service_name,
-    servicePrice: row.service_price,
   }));
 }
 
-// Fetch upcoming bookings for a stylist
+// Fetch upcoming bookings for a stylist's own dashboard.
+// Uses a per-stylist RPC instead of a blanket public read of the whole
+// bookings table.
 export async function fetchUpcomingBookings(
-  stylistId: string
+  _stylistId?: string
 ): Promise<Booking[]> {
   const supabase = getSupabase();
   if (!supabase) return [];
 
-  const today = new Date().toISOString().split("T")[0];
+  const token = getSessionToken();
+  if (!token) return [];
 
-  const { data, error } = await supabase
-    .from("bookings")
-    .select("*")
-    .eq("stylist_id", stylistId)
-    .gte("booking_date", today)
-    .neq("status", "cancelled")
-    .order("booking_date")
-    .order("start_time");
+  // The stylist is derived from the session token server-side, so a caller
+  // cannot read another stylist's bookings by passing a different id.
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { data, error } = await (supabase as any).rpc("get_stylist_bookings", {
+    p_token: token,
+  });
 
   if (error) {
-    console.error("Error fetching bookings:", error);
+    console.error("Error fetching bookings:", error.message);
     return [];
   }
 
@@ -337,8 +335,8 @@ export async function getAvailableSlots(
 
   const allSlots = [...candidateSlots].sort();
 
-  // Get existing bookings
-  const bookings = await fetchBookingsForDate(stylistId, date);
+  // Get existing bookings (times only — no customer PII)
+  const bookings = await fetchTakenSlots(stylistId, date);
   const blockedTimes = await fetchBlockedTimes(stylistId, date);
 
   // Check each slot
@@ -374,12 +372,6 @@ function timeToMinutes(time: string): number {
   return hours * 60 + minutes;
 }
 
-function minutesToTime(mins: number): string {
-  const hours = Math.floor(mins / 60);
-  const minutes = mins % 60;
-  return `${hours.toString().padStart(2, "0")}:${minutes.toString().padStart(2, "0")}`;
-}
-
 // Create a booking
 export async function createBooking(
   stylistId: string,
@@ -392,43 +384,42 @@ export async function createBooking(
   }
 
   const startTime = data.time;
-  const endTime = minutesToTime(timeToMinutes(startTime) + serviceDurationMins);
 
+  // The DB looks up the real service price, computes the deposit from the
+  // stylist's own settings, and verifies the slot is released and free.
+  // Client-supplied prices/deposits are ignored.
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const { data: result, error } = await (supabase as any)
-    .from("bookings")
-    .insert({
-      stylist_id: stylistId,
-      service_name: data.serviceId, // This is actually the service name
-      service_price: data.servicePrice,
-      customer_name: data.customerName,
-      customer_email: data.customerEmail,
-      customer_phone: data.customerPhone,
-      booking_date: data.date,
-      start_time: startTime,
-      end_time: endTime,
-      notes: data.notes,
-      status: "confirmed",
-      payment_option: data.paymentOption,
-      deposit_amount: data.depositAmount,
-      total_price: data.totalPrice,
-    })
-    .select()
-    .single();
+  const { data: rows, error } = await (supabase as any).rpc("create_booking", {
+    p_stylist_id: stylistId,
+    p_service_name: data.serviceId, // this is actually the service name
+    p_customer_name: data.customerName,
+    p_customer_email: data.customerEmail,
+    p_customer_phone: data.customerPhone,
+    p_date: data.date,
+    p_start: startTime,
+    p_duration_mins: serviceDurationMins,
+    p_payment_option: data.paymentOption,
+    p_notes: data.notes ?? null,
+  });
 
   if (error) {
-    console.error("Error creating booking:", {
-      message: error.message,
-      details: error.details,
-      hint: error.hint,
-      code: error.code,
-    });
-    return {
-      error:
-        error.message ||
-        "Failed to create booking. Please try again.",
-    };
+    console.error("Error creating booking:", error.message);
+    const msg = error.message || "";
+    if (msg.includes("slot_taken"))
+      return { error: "Sorry, that time was just booked. Please pick another." };
+    if (msg.includes("slot_unavailable"))
+      return { error: "That time isn't available. Please pick another." };
+    if (msg.includes("invalid_service"))
+      return { error: "That service is no longer available." };
+    if (msg.includes("invalid_email"))
+      return { error: "Please enter a valid email address." };
+    if (msg.includes("invalid_customer"))
+      return { error: "Please enter your name." };
+    return { error: "Failed to create booking. Please try again." };
   }
+
+  const result = Array.isArray(rows) ? rows[0] : rows;
+  if (!result) return { error: "Failed to create booking. Please try again." };
 
   return {
     booking: {
@@ -467,26 +458,21 @@ export async function updateAvailability(
     return { error: "Database not configured" };
   }
 
-  const updateData: Record<string, unknown> = {};
-  if (data.startTime !== undefined) updateData.start_time = data.startTime;
-  if (data.endTime !== undefined) updateData.end_time = data.endTime;
-  if (data.isAvailable !== undefined) updateData.is_available = data.isAvailable;
-  if (data.slots !== undefined) updateData.slots = data.slots;
+  const token = getSessionToken();
+  if (!token) return { error: "Your session has expired. Please sign in again." };
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const { error } = await (supabase as any)
-    .from("stylist_availability")
-    .upsert({
-      stylist_id: stylistId,
-      day_of_week: dayOfWeek,
-      ...updateData,
-    }, {
-      onConflict: "stylist_id,day_of_week",
-    });
+  const { error } = await (supabase as any).rpc("update_availability", {
+    p_token: token,
+    p_stylist_id: stylistId,
+    p_day: dayOfWeek,
+    p_is_available: data.isAvailable ?? null,
+    p_slots: data.slots ?? null,
+  });
 
   if (error) {
-    console.error("Error updating availability:", error);
-    return { error: "Failed to update availability" };
+    console.error("Error updating availability:", error.message);
+    return { error: friendlyOwnerError(error.message, "Failed to update availability") };
   }
 
   return {};
@@ -501,15 +487,18 @@ export async function cancelBooking(
     return { error: "Database not configured" };
   }
 
+  const token = getSessionToken();
+  if (!token) return { error: "Your session has expired. Please sign in again." };
+
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const { error } = await (supabase as any)
-    .from("bookings")
-    .update({ status: "cancelled" })
-    .eq("id", bookingId);
+  const { error } = await (supabase as any).rpc("cancel_booking", {
+    p_token: token,
+    p_booking_id: bookingId,
+  });
 
   if (error) {
-    console.error("Error cancelling booking:", error);
-    return { error: "Failed to cancel booking" };
+    console.error("Error cancelling booking:", error.message);
+    return { error: friendlyOwnerError(error.message, "Failed to cancel booking") };
   }
 
   return {};
