@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Inter, Playfair_Display } from "next/font/google";
+import { Inter, Montserrat } from "next/font/google";
 import { Header } from "@/components/layout/Header";
 import { BottomNav } from "@/components/layout/BottomNav";
 import { AuthProvider } from "@/context/AuthContext";
@@ -13,8 +13,9 @@ const inter = Inter({
   variable: "--font-geist-sans",
 });
 
-const playfair = Playfair_Display({
+const montserrat = Montserrat({
   subsets: ["latin"],
+  weight: ["600", "700"],
   variable: "--font-display",
 });
 
@@ -42,7 +43,7 @@ export const viewport: Viewport = {
   maximumScale: 1,
   userScalable: false,
   viewportFit: "cover",
-  themeColor: "#c43d30",
+  themeColor: "#fbf9f8",
 };
 
 export default function RootLayout({
@@ -52,13 +53,19 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
+      <head>
+        <link
+          href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap"
+          rel="stylesheet"
+        />
+      </head>
       <body
-        className={`${inter.variable} ${playfair.variable} font-sans min-h-dvh`}
+        className={`${inter.variable} ${montserrat.variable} font-sans min-h-dvh`}
       >
         <AuthProvider>
           <ServiceWorkerRegistration />
           <SplashScreen />
-          <div className="mx-auto flex min-h-dvh max-w-lg flex-col bg-surface lg:my-4 lg:min-h-[calc(100dvh-2rem)] lg:rounded-3xl lg:shadow-xl lg:ring-1 lg:ring-gray-200">
+          <div className="mx-auto flex min-h-dvh max-w-lg flex-col bg-background lg:my-4 lg:min-h-[calc(100dvh-2rem)] lg:rounded-3xl lg:shadow-xl lg:ring-1 lg:ring-gray-200">
             <Header />
             <main className="flex-1 pb-20">{children}</main>
             <BottomNav />

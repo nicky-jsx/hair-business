@@ -110,7 +110,23 @@ export async function fetchAllStylists(): Promise<Stylist[]> {
     services: servicesMap.get(s.id) ?? [],
     portfolio: portfolioMap.get(s.id) ?? [],
     bookingUrl: s.booking_url,
+    bookingPolicy: parseBookingPolicy(s),
   }));
+}
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function parseBookingPolicy(row: any): Stylist["bookingPolicy"] {
+  const policy = row?.booking_policy;
+  if (policy && typeof policy === "object") {
+    return {
+      deposit: policy.deposit ?? "",
+      cancellation: policy.cancellation ?? "",
+      lateness: policy.lateness ?? "",
+      noShow: policy.noShow ?? "",
+      additionalNotes: policy.additionalNotes ?? null,
+    };
+  }
+  return null;
 }
 
 export async function fetchStylistById(id: string): Promise<Stylist | null> {
@@ -178,6 +194,7 @@ export async function fetchStylistById(id: string): Promise<Stylist | null> {
     services,
     portfolio,
     bookingUrl: stylist.booking_url,
+    bookingPolicy: parseBookingPolicy(stylist),
   };
 }
 

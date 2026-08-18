@@ -2,8 +2,7 @@ import { notFound } from "next/navigation";
 import { Badge } from "@/components/ui/Badge";
 import { ProfileBookingBar } from "@/components/stylist/profile/ProfileBookingBar";
 import { ProfileHeader } from "@/components/stylist/profile/ProfileHeader";
-import { ProfilePortfolio } from "@/components/stylist/profile/ProfilePortfolio";
-import { ProfileServices } from "@/components/stylist/profile/ProfileServices";
+import { ProfileTabs } from "@/components/stylist/profile/ProfileTabs";
 import { fetchStylistById } from "@/lib/stylists-db";
 
 export const revalidate = 60;
@@ -26,14 +25,16 @@ export default async function StylistProfilePage({ params }: ProfilePageProps) {
 
       <div className="mt-6 space-y-8 px-5">
         <section>
-          <h2 className="mb-2 text-sm font-semibold uppercase tracking-wider text-gray-400">
+          <h2 className="mb-2 text-[12px] font-semibold uppercase tracking-caps text-outline">
             About
           </h2>
-          <p className="text-sm leading-relaxed text-gray-600">{stylist.bio}</p>
+          <p className="text-sm leading-relaxed text-on-surface-variant">
+            {stylist.bio}
+          </p>
         </section>
 
         <section>
-          <h2 className="mb-3 text-sm font-semibold uppercase tracking-wider text-gray-400">
+          <h2 className="mb-3 text-[12px] font-semibold uppercase tracking-caps text-outline">
             Specialties
           </h2>
           <div className="flex flex-wrap gap-2">
@@ -45,12 +46,7 @@ export default async function StylistProfilePage({ params }: ProfilePageProps) {
           </div>
         </section>
 
-        <ProfileServices services={stylist.services} />
-
-        <ProfilePortfolio
-          photos={stylist.portfolio}
-          stylistName={stylist.name}
-        />
+        <ProfileTabs stylist={stylist} />
       </div>
 
       {/* Sticky Book Now bar */}

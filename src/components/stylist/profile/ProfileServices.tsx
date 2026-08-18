@@ -7,26 +7,25 @@ interface ProfileServicesProps {
 
 export function ProfileServices({ services }: ProfileServicesProps) {
   return (
-    <section>
-      <h2 className="mb-3 text-sm font-semibold uppercase tracking-wider text-gray-400">
-        Services &amp; prices
-      </h2>
-      <div className="divide-y divide-gray-100 overflow-hidden rounded-2xl border border-gray-100 bg-white">
-        {services.map((service) => (
-          <div
-            key={service.name}
-            className="flex items-center justify-between gap-4 px-4 py-3.5"
-          >
-            <div>
-              <p className="font-medium text-gray-900">{service.name}</p>
-              <p className="text-xs text-gray-400">{service.duration}</p>
-            </div>
-            <p className="shrink-0 font-semibold text-brand-600">
-              {formatPrice(service.price)}
+    <div className="divide-y divide-outline-variant/60 overflow-hidden rounded-xl bg-surface-container-lowest shadow-ambient">
+      {services.map((service) => (
+        <div
+          key={service.name}
+          className="flex items-center justify-between gap-4 px-5 py-4"
+        >
+          <div>
+            <p className="font-display text-sm font-semibold text-primary">
+              {service.name}
+            </p>
+            <p className="mt-0.5 text-[12px] uppercase tracking-caps text-outline">
+              {service.duration}
             </p>
           </div>
-        ))}
-      </div>
-    </section>
+          <p className="shrink-0 font-display text-sm font-semibold text-secondary">
+            {formatPrice(service.price)}
+          </p>
+        </div>
+      ))}
+    </div>
   );
 }

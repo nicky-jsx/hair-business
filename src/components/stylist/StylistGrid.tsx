@@ -35,7 +35,7 @@ export function StylistGrid({
   }
 
   return (
-    <div className="grid gap-4">
+    <div className="grid grid-cols-2 gap-x-4 gap-y-8">
       {stylists.map((stylist) => (
         <StylistCard key={stylist.id} stylist={stylist} />
       ))}

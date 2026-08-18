@@ -8,22 +8,38 @@
   }
 
   body {
-    @apply bg-gray-100 text-gray-900 antialiased;
+    @apply bg-background text-on-surface antialiased;
   }
 
   /* PWA standalone mode adjustments */
   @media (display-mode: standalone) {
     body {
-      @apply bg-surface;
+      @apply bg-background;
     }
   }
 
   /* Desktop background */
   @media (min-width: 1024px) {
     body {
-      @apply bg-gray-100;
+      @apply bg-surface-container;
     }
   }
+}
+
+.material-symbols-outlined {
+  font-variation-settings:
+    "FILL" 0,
+    "wght" 300,
+    "GRAD" 0,
+    "opsz" 24;
+}
+
+.material-symbols-outlined.fill {
+  font-variation-settings:
+    "FILL" 1,
+    "wght" 400,
+    "GRAD" 0,
+    "opsz" 24;
 }
 
 @layer utilities {

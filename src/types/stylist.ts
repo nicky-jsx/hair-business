@@ -18,6 +18,26 @@ export interface Service {
   duration: string;
 }
 
+export interface BookingPolicy {
+  deposit: string;
+  cancellation: string;
+  lateness: string;
+  noShow: string;
+  additionalNotes: string | null;
+}
+
+export const DEFAULT_BOOKING_POLICY: BookingPolicy = {
+  deposit:
+    "A non-refundable deposit is required to secure your appointment. The balance is due on the day.",
+  cancellation:
+    "Please give at least 48 hours' notice to cancel or reschedule. Cancellations within 48 hours may forfeit the deposit.",
+  lateness:
+    "There is a 15-minute grace period. Arriving later than this may result in your appointment being shortened or rescheduled.",
+  noShow:
+    "No-shows will be charged 50% of the service price and may be asked to pay in full before future bookings.",
+  additionalNotes: null,
+};
+
 export interface Stylist {
   id: string;
   name: string;
@@ -35,6 +55,7 @@ export interface Stylist {
   services: Service[];
   portfolio: string[];
   bookingUrl: string | null;
+  bookingPolicy?: BookingPolicy | null;
 }
 
 export type PriceRange = "£" | "££" | "£££";

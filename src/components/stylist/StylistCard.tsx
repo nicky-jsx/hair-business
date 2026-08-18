@@ -1,33 +1,76 @@
 import Image from "next/image";
 import Link from "next/link";
-import { Badge } from "@/components/ui/Badge";
 import { formatRegion } from "@/types/stylist";
 import type { Stylist } from "@/types/stylist";
 
 interface StylistCardProps {
   stylist: Stylist;
-  variant?: "default" | "compact";
+  variant?: "default" | "compact" | "featured";
 }
 
 export function StylistCard({ stylist, variant = "default" }: StylistCardProps) {
+  if (variant === "featured") {
+    return (
+      <Link
+        href={`/stylists/${stylist.id}`}
+        className="group w-72 flex-shrink-0 cursor-pointer"
+      >
+        <div className="relative mb-4 aspect-[4/5] w-full overflow-hidden rounded-md bg-surface-container">
+          <Image
+            src={stylist.coverImage}
+            alt={stylist.name}
+            fill
+            className="object-cover transition-transform duration-700 ease-in-out group-hover:scale-105"
+            sizes="288px"
+          />
+          <span className="absolute right-4 top-4 flex h-8 w-8 items-center justify-center rounded-full bg-background/80 text-primary backdrop-blur-sm transition-colors group-hover:bg-background">
+            <span className="material-symbols-outlined text-lg">favorite</span>
+          </span>
+        </div>
+        <div className="flex items-start justify-between">
+          <div>
+            <h3 className="font-display text-base font-semibold text-primary">
+              {stylist.name}
+            </h3>
+            <p className="mt-1 text-[13px] text-on-surface-variant">
+              {stylist.tagline}
+            </p>
+          </div>
+          <div className="flex items-center gap-1">
+            <span className="material-symbols-outlined fill text-secondary text-base">
+              star
+            </span>
+            <span className="text-[12px] font-semibold text-primary">
+              {stylist.rating.toFixed(1)}
+            </span>
+          </div>
+        </div>
+      </Link>
+    );
+  }
+
   if (variant === "compact") {
     return (
       <Link
         href={`/stylists/${stylist.id}`}
-        className="group flex shrink-0 flex-col gap-3"
+        className="group flex w-40 shrink-0 flex-col gap-3"
       >
-        <div className="relative h-44 w-36 overflow-hidden rounded-2xl bg-gray-100 shadow-card transition-shadow group-hover:shadow-card-hover">
+        <div className="relative aspect-[4/5] w-full overflow-hidden rounded-md bg-surface-container">
           <Image
             src={stylist.avatar}
             alt={stylist.name}
             fill
-            className="object-cover transition-transform duration-300 group-hover:scale-105"
-            sizes="144px"
+            className="object-cover transition-transform duration-500 group-hover:scale-105"
+            sizes="160px"
           />
         </div>
         <div>
-          <h3 className="text-sm font-semibold text-gray-900">{stylist.name}</h3>
-          <p className="text-xs text-gray-500">{formatRegion(stylist.region)}</p>
+          <h3 className="font-display text-sm font-semibold text-primary">
+            {stylist.name}
+          </h3>
+          <p className="text-[12px] text-on-surface-variant">
+            {formatRegion(stylist.region)}
+          </p>
         </div>
       </Link>
     );
@@ -36,67 +79,39 @@ export function StylistCard({ stylist, variant = "default" }: StylistCardProps) 
   return (
     <Link
       href={`/stylists/${stylist.id}`}
-      className="group block overflow-hidden rounded-2xl bg-white shadow-card transition-all duration-200 hover:shadow-card-hover active:scale-[0.99]"
+      className="group block cursor-pointer"
     >
-      <div className="relative h-36 overflow-hidden bg-gray-100">
+      <div className="relative mb-3 aspect-[4/5] w-full overflow-hidden rounded-md bg-surface-container">
         <Image
           src={stylist.coverImage}
-          alt=""
+          alt={stylist.name}
           fill
-          className="object-cover transition-transform duration-300 group-hover:scale-105"
-          sizes="400px"
+          className="object-cover transition-transform duration-700 ease-in-out group-hover:scale-105"
+          sizes="(max-width: 512px) 50vw, 256px"
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
-        <div className="absolute bottom-3 left-3">
-          <div className="relative h-12 w-12 overflow-hidden rounded-full ring-2 ring-white">
-            <Image
-              src={stylist.avatar}
-              alt={stylist.name}
-              fill
-              className="object-cover"
-              sizes="48px"
-            />
-          </div>
-        </div>
-        <span className="absolute right-3 top-3 rounded-full bg-white/90 px-2 py-0.5 text-xs font-medium text-gray-700 backdrop-blur-sm">
-          {stylist.priceRange}
+        <span className="absolute right-3 top-3 flex h-8 w-8 items-center justify-center rounded-full bg-background/80 text-primary backdrop-blur-sm">
+          <span className="material-symbols-outlined text-lg">favorite</span>
         </span>
       </div>
-
-      <div className="p-4">
-        <div className="mb-1 flex items-start justify-between gap-2">
-          <h3 className="font-semibold text-gray-900">{stylist.name}</h3>
+      <div className="flex items-start justify-between gap-2">
+        <div className="min-w-0">
+          <h3 className="truncate font-display text-base font-semibold text-primary">
+            {stylist.name}
+          </h3>
+          <p className="mt-0.5 truncate text-[13px] text-on-surface-variant">
+            {stylist.tagline}
+          </p>
+          <p className="mt-1 text-[12px] uppercase tracking-caps text-outline">
+            {formatRegion(stylist.region)}
+          </p>
         </div>
-        <p className="mb-2 text-sm text-gray-500">{stylist.tagline}</p>
-        <div className="mb-2 flex items-center gap-2">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 20 20"
-            fill="currentColor"
-            className="h-3.5 w-3.5 text-amber-400"
-          >
-            <path
-              fillRule="evenodd"
-              d="M10.868 2.884c-.321-.772-1.415-.772-1.736 0l-1.83 4.401-4.753.381c-.833.067-1.171 1.107-.536 1.651l3.62 3.102-1.106 4.637c-.194.813.691 1.456 1.405 1.02L10 15.591l4.069 2.485c.713.436 1.598-.207 1.404-1.02l-1.106-4.637 3.62-3.102c.635-.544.297-1.584-.536-1.65l-4.752-.382-1.831-4.401Z"
-              clipRule="evenodd"
-            />
-          </svg>
-          <span className="text-xs font-medium text-gray-700">
+        <div className="flex shrink-0 items-center gap-1">
+          <span className="material-symbols-outlined fill text-secondary text-base">
+            star
+          </span>
+          <span className="text-[12px] font-semibold text-primary">
             {stylist.rating.toFixed(1)}
           </span>
-          <span className="text-xs text-gray-400">
-            ({stylist.reviewCount})
-          </span>
-        </div>
-        <p className="mb-3 text-xs text-gray-400">
-          {formatRegion(stylist.region)}
-        </p>
-        <div className="flex flex-wrap gap-1.5">
-          {stylist.specialties.slice(0, 3).map((specialty) => (
-            <Badge key={specialty} variant="brand">
-              {specialty}
-            </Badge>
-          ))}
         </div>
       </div>
     </Link>
