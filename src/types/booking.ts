@@ -29,6 +29,15 @@ export interface StylistAvailability {
   startTime: string;
   endTime: string;
   isAvailable: boolean;
+  slots: string[]; // Specific appointment start times, e.g. ["10:00", "13:00"]
+}
+
+export interface DateAvailability {
+  id: string;
+  stylistId: string;
+  date: string; // YYYY-MM-DD
+  slots: string[];
+  isOpen: boolean;
 }
 
 export interface BlockedTime {
@@ -70,7 +79,17 @@ export const DAYS_OF_WEEK = [
   "Saturday",
 ] as const;
 
-export const TIME_SLOT_INTERVAL = 3; // 3-hour intervals
+export const DEFAULT_SLOT_INTERVAL_MINUTES = 180; // 3-hour intervals
+
+// Options the stylist can choose from (label + minutes)
+export const SLOT_INTERVAL_OPTIONS: { label: string; minutes: number }[] = [
+  { label: "30 min", minutes: 30 },
+  { label: "1 hour", minutes: 60 },
+  { label: "1.5 hours", minutes: 90 },
+  { label: "2 hours", minutes: 120 },
+  { label: "3 hours", minutes: 180 },
+  { label: "4 hours", minutes: 240 },
+];
 
 export function formatTime(time: string): string {
   const [hours, minutes] = time.split(":");
@@ -83,14 +102,20 @@ export function formatTime(time: string): string {
 export function generateTimeSlots(
   startTime: string,
   endTime: string,
-  intervalHours: number = TIME_SLOT_INTERVAL
+  intervalMinutes: number = DEFAULT_SLOT_INTERVAL_MINUTES
 ): string[] {
   const slots: string[] = [];
-  const [startHour] = startTime.split(":").map(Number);
-  const [endHour] = endTime.split(":").map(Number);
+  const step = intervalMinutes > 0 ? intervalMinutes : DEFAULT_SLOT_INTERVAL_MINUTES;
 
-  for (let hour = startHour; hour < endHour; hour += intervalHours) {
-    slots.push(`${hour.toString().padStart(2, "0")}:00`);
+  const [startH, startM] = startTime.split(":").map(Number);
+  const [endH, endM] = endTime.split(":").map(Number);
+  const start = startH * 60 + (startM || 0);
+  const end = endH * 60 + (endM || 0);
+
+  for (let mins = start; mins < end; mins += step) {
+    const h = Math.floor(mins / 60);
+    const m = mins % 60;
+    slots.push(`${h.toString().padStart(2, "0")}:${m.toString().padStart(2, "0")}`);
   }
 
   return slots;

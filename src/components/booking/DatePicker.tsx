@@ -12,9 +12,14 @@ function formatDateStr(date: Date): string {
 interface DatePickerProps {
   selectedDate: string;
   onSelect: (date: string) => void;
+  allowedDates?: Set<string>;
 }
 
-export function DatePicker({ selectedDate, onSelect }: DatePickerProps) {
+export function DatePicker({
+  selectedDate,
+  onSelect,
+  allowedDates,
+}: DatePickerProps) {
   const [currentMonth, setCurrentMonth] = useState(() => {
     const now = new Date();
     return new Date(now.getFullYear(), now.getMonth(), 1);
@@ -73,7 +78,11 @@ export function DatePicker({ selectedDate, onSelect }: DatePickerProps) {
           Pick a date
         </h2>
         <p className="mt-1 text-sm text-gray-500">
-          Choose your preferred appointment date
+          {allowedDates && allowedDates.size === 0
+            ? "This stylist hasn't released any dates yet. Check back soon."
+            : allowedDates
+              ? "Highlighted dates are open for booking"
+              : "Choose your preferred appointment date"}
         </p>
       </div>
 
@@ -139,18 +148,20 @@ export function DatePicker({ selectedDate, onSelect }: DatePickerProps) {
 
             const dateStr = formatDateStr(date);
             const isPast = date < today;
+            const isReleased = allowedDates ? allowedDates.has(dateStr) : true;
+            const isSelectable = !isPast && isReleased;
             const isSelected = dateStr === selectedDate;
             const isToday = date.getTime() === today.getTime();
 
             return (
               <button
                 key={dateStr}
-                onClick={() => !isPast && onSelect(dateStr)}
-                disabled={isPast}
-                className={`flex h-10 w-full items-center justify-center rounded-lg text-sm font-medium transition-all ${
+                onClick={() => isSelectable && onSelect(dateStr)}
+                disabled={!isSelectable}
+                className={`relative flex h-10 w-full items-center justify-center rounded-lg text-sm font-medium transition-all ${
                   isSelected
                     ? "bg-brand-600 text-white shadow-sm"
-                    : isPast
+                    : !isSelectable
                       ? "cursor-not-allowed text-gray-200"
                       : isToday
                         ? "bg-brand-50 text-brand-700 hover:bg-brand-100"
@@ -158,6 +169,9 @@ export function DatePicker({ selectedDate, onSelect }: DatePickerProps) {
                 }`}
               >
                 {date.getDate()}
+                {isSelectable && !isSelected && allowedDates && (
+                  <span className="absolute bottom-1 h-1 w-1 rounded-full bg-brand-500" />
+                )}
               </button>
             );
           })}

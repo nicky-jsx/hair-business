@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { AvailabilityManager } from "@/components/stylist/dashboard/AvailabilityManager";
+import { ReleaseManager } from "@/components/stylist/dashboard/ReleaseManager";
 import { BookingsList } from "@/components/stylist/dashboard/BookingsList";
 import { DepositManager } from "@/components/stylist/dashboard/DepositManager";
 import { Button } from "@/components/ui/Button";
@@ -85,11 +86,27 @@ export default function StylistDashboardPage() {
             />
           </section>
 
-          {/* Availability section */}
+          {/* Release dates section */}
           <section>
-            <h2 className="mb-3 text-sm font-semibold uppercase tracking-wider text-gray-400">
-              Availability
+            <h2 className="mb-1 text-sm font-semibold uppercase tracking-wider text-gray-400">
+              Release dates
             </h2>
+            <p className="mb-3 text-xs text-gray-400">
+              Open specific dates for booking. Customers can only book dates
+              you&apos;ve released.
+            </p>
+            <ReleaseManager stylistId={profile.id} />
+          </section>
+
+          {/* Weekly default times */}
+          <section>
+            <h2 className="mb-1 text-sm font-semibold uppercase tracking-wider text-gray-400">
+              Default weekly times
+            </h2>
+            <p className="mb-3 text-xs text-gray-400">
+              Your usual times per day. These pre-fill new dates when you release
+              them.
+            </p>
             <AvailabilityManager stylistId={profile.id} />
           </section>
 

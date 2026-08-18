@@ -72,6 +72,7 @@ export interface Stylist {
   bookingPolicy?: BookingPolicy | null;
   depositType?: DepositType | null;
   depositValue?: number | null;
+  slotIntervalMinutes?: number | null;
 }
 
 export type PriceRange = "£" | "££" | "£££";

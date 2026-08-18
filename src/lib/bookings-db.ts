@@ -2,11 +2,16 @@ import { getSupabase } from "./supabase";
 import type {
   Booking,
   StylistAvailability,
+  DateAvailability,
   BlockedTime,
   TimeSlot,
   BookingFormData,
 } from "@/types/booking";
-import { generateTimeSlots, formatTime, TIME_SLOT_INTERVAL } from "@/types/booking";
+import {
+  generateTimeSlots,
+  formatTime,
+  DEFAULT_SLOT_INTERVAL_MINUTES,
+} from "@/types/booking";
 import type {
   StylistAvailabilityRow,
   BlockedTimeRow,
@@ -30,16 +35,24 @@ export async function fetchStylistAvailability(
     return getDefaultAvailability(stylistId);
   }
 
-  const rows = data as StylistAvailabilityRow[] | null;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const rows = data as any[] | null;
 
-  return (rows ?? []).map((row) => ({
-    id: row.id,
-    stylistId: row.stylist_id,
-    dayOfWeek: row.day_of_week,
-    startTime: row.start_time,
-    endTime: row.end_time,
-    isAvailable: row.is_available,
-  }));
+  return (rows ?? []).map((row) => {
+    const slots: string[] = Array.isArray(row.slots) ? row.slots : [];
+    return {
+      id: row.id,
+      stylistId: row.stylist_id,
+      dayOfWeek: row.day_of_week,
+      startTime: row.start_time,
+      endTime: row.end_time,
+      isAvailable: row.is_available,
+      // Fall back to sensible generated times if the stylist hasn't set any yet
+      slots: slots.length
+        ? slots
+        : generateTimeSlots(row.start_time, row.end_time, DEFAULT_SLOT_INTERVAL_MINUTES),
+    };
+  });
 }
 
 function getDefaultAvailability(stylistId: string): StylistAvailability[] {
@@ -50,7 +63,125 @@ function getDefaultAvailability(stylistId: string): StylistAvailability[] {
     startTime: "09:00",
     endTime: "21:00",
     isAvailable: i !== 0, // Sunday off
+    slots: generateTimeSlots("09:00", "21:00", DEFAULT_SLOT_INTERVAL_MINUTES),
   }));
+}
+
+// ---- Date-specific ("released") availability ----
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function mapDateAvailability(row: any): DateAvailability {
+  return {
+    id: row.id,
+    stylistId: row.stylist_id,
+    date: row.date,
+    slots: Array.isArray(row.slots) ? row.slots : [],
+    isOpen: row.is_open,
+  };
+}
+
+// All future released dates for a stylist (used by the customer date picker)
+export async function fetchReleasedDates(
+  stylistId: string
+): Promise<DateAvailability[]> {
+  const supabase = getSupabase();
+  if (!supabase) return [];
+
+  const today = new Date();
+  const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, "0")}-${String(today.getDate()).padStart(2, "0")}`;
+
+  const { data, error } = await supabase
+    .from("stylist_date_availability")
+    .select("*")
+    .eq("stylist_id", stylistId)
+    .eq("is_open", true)
+    .gte("date", todayStr)
+    .order("date");
+
+  if (error) {
+    console.error("Error fetching released dates:", error);
+    return [];
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return ((data as any[]) ?? []).map(mapDateAvailability);
+}
+
+// A single date's availability (null if the stylist hasn't released it)
+export async function fetchDateAvailability(
+  stylistId: string,
+  date: string
+): Promise<DateAvailability | null> {
+  const supabase = getSupabase();
+  if (!supabase) return null;
+
+  const { data, error } = await supabase
+    .from("stylist_date_availability")
+    .select("*")
+    .eq("stylist_id", stylistId)
+    .eq("date", date)
+    .maybeSingle();
+
+  if (error) {
+    console.error("Error fetching date availability:", error);
+    return null;
+  }
+
+  return data ? mapDateAvailability(data) : null;
+}
+
+// Release (open) a date with a set of times, or update an already-released date
+export async function releaseDate(
+  stylistId: string,
+  date: string,
+  slots: string[]
+): Promise<{ error?: string }> {
+  const supabase = getSupabase();
+  if (!supabase) return { error: "Database not configured." };
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { error } = await (supabase as any)
+    .from("stylist_date_availability")
+    .upsert(
+      {
+        stylist_id: stylistId,
+        date,
+        slots,
+        is_open: true,
+        updated_at: new Date().toISOString(),
+      },
+      { onConflict: "stylist_id,date" }
+    );
+
+  if (error) {
+    console.error("Error releasing date:", error);
+    return { error: error.message || "Failed to release date." };
+  }
+
+  return {};
+}
+
+// Close (un-release) a date so it's no longer bookable
+export async function unreleaseDate(
+  stylistId: string,
+  date: string
+): Promise<{ error?: string }> {
+  const supabase = getSupabase();
+  if (!supabase) return { error: "Database not configured." };
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { error } = await (supabase as any)
+    .from("stylist_date_availability")
+    .delete()
+    .eq("stylist_id", stylistId)
+    .eq("date", date);
+
+  if (error) {
+    console.error("Error un-releasing date:", error);
+    return { error: error.message || "Failed to close date." };
+  }
+
+  return {};
 }
 
 // Fetch bookings for a stylist on a specific date
@@ -177,23 +308,29 @@ export async function getAvailableSlots(
   date: string,
   serviceDurationMins: number
 ): Promise<TimeSlot[]> {
-  const dateObj = new Date(date);
-  const dayOfWeek = dateObj.getDay();
+  const supabase = getSupabase();
 
-  // Get availability for this day
-  const availability = await fetchStylistAvailability(stylistId);
-  const dayAvailability = availability.find((a) => a.dayOfWeek === dayOfWeek);
+  let candidateSlots: string[];
 
-  if (!dayAvailability || !dayAvailability.isAvailable) {
-    return [];
+  if (supabase) {
+    // Only dates the stylist has released are bookable
+    const dateAvailability = await fetchDateAvailability(stylistId, date);
+    if (!dateAvailability || !dateAvailability.isOpen) {
+      return [];
+    }
+    candidateSlots = dateAvailability.slots;
+  } else {
+    // Local/sample mode: fall back to the weekly template
+    const dayOfWeek = new Date(date).getDay();
+    const availability = await fetchStylistAvailability(stylistId);
+    const dayAvailability = availability.find((a) => a.dayOfWeek === dayOfWeek);
+    if (!dayAvailability || !dayAvailability.isAvailable) {
+      return [];
+    }
+    candidateSlots = dayAvailability.slots;
   }
 
-  // Generate all possible slots (3-hour intervals)
-  const allSlots = generateTimeSlots(
-    dayAvailability.startTime,
-    dayAvailability.endTime,
-    TIME_SLOT_INTERVAL
-  );
+  const allSlots = [...candidateSlots].sort();
 
   // Get existing bookings
   const bookings = await fetchBookingsForDate(stylistId, date);
@@ -203,12 +340,6 @@ export async function getAvailableSlots(
   return allSlots.map((slotTime) => {
     const slotStart = timeToMinutes(slotTime);
     const slotEnd = slotStart + serviceDurationMins;
-    const dayEnd = timeToMinutes(dayAvailability.endTime);
-
-    // Check if slot would extend past closing
-    if (slotEnd > dayEnd) {
-      return { time: slotTime, label: formatTime(slotTime), available: false };
-    }
 
     // Check if slot overlaps with any booking
     const hasBookingConflict = bookings.some((booking) => {
@@ -319,7 +450,12 @@ export async function createBooking(
 export async function updateAvailability(
   stylistId: string,
   dayOfWeek: number,
-  data: { startTime?: string; endTime?: string; isAvailable?: boolean }
+  data: {
+    startTime?: string;
+    endTime?: string;
+    isAvailable?: boolean;
+    slots?: string[];
+  }
 ): Promise<{ error?: string }> {
   const supabase = getSupabase();
   if (!supabase) {
@@ -330,6 +466,7 @@ export async function updateAvailability(
   if (data.startTime !== undefined) updateData.start_time = data.startTime;
   if (data.endTime !== undefined) updateData.end_time = data.endTime;
   if (data.isAvailable !== undefined) updateData.is_available = data.isAvailable;
+  if (data.slots !== undefined) updateData.slots = data.slots;
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const { error } = await (supabase as any)

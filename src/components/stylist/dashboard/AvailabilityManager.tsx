@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { fetchStylistAvailability, updateAvailability } from "@/lib/bookings-db";
-import { DAYS_OF_WEEK, type StylistAvailability } from "@/types/booking";
+import { DAYS_OF_WEEK, formatTime, type StylistAvailability } from "@/types/booking";
 
 interface AvailabilityManagerProps {
   stylistId: string;
@@ -23,29 +23,30 @@ export function AvailabilityManager({ stylistId }: AvailabilityManagerProps) {
   const handleToggle = async (dayOfWeek: number, isAvailable: boolean) => {
     setSaving(dayOfWeek);
     await updateAvailability(stylistId, dayOfWeek, { isAvailable });
-
     setAvailability((prev) =>
-      prev.map((a) =>
-        a.dayOfWeek === dayOfWeek ? { ...a, isAvailable } : a
-      )
+      prev.map((a) => (a.dayOfWeek === dayOfWeek ? { ...a, isAvailable } : a))
     );
     setSaving(null);
   };
 
-  const handleTimeChange = async (
-    dayOfWeek: number,
-    field: "startTime" | "endTime",
-    value: string
-  ) => {
+  const persistSlots = async (dayOfWeek: number, slots: string[]) => {
     setSaving(dayOfWeek);
-    await updateAvailability(stylistId, dayOfWeek, { [field]: value });
-
     setAvailability((prev) =>
-      prev.map((a) =>
-        a.dayOfWeek === dayOfWeek ? { ...a, [field]: value } : a
-      )
+      prev.map((a) => (a.dayOfWeek === dayOfWeek ? { ...a, slots } : a))
     );
+    await updateAvailability(stylistId, dayOfWeek, { slots });
     setSaving(null);
+  };
+
+  const handleAddSlot = (day: StylistAvailability, time: string) => {
+    if (!time || day.slots.includes(time)) return;
+    const next = [...day.slots, time].sort();
+    persistSlots(day.dayOfWeek, next);
+  };
+
+  const handleRemoveSlot = (day: StylistAvailability, time: string) => {
+    const next = day.slots.filter((t) => t !== time);
+    persistSlots(day.dayOfWeek, next);
   };
 
   if (loading) {
@@ -56,24 +57,26 @@ export function AvailabilityManager({ stylistId }: AvailabilityManagerProps) {
     );
   }
 
+  const timeOptions = generateTimeOptions();
+
   return (
-    <div className="rounded-xl border border-gray-100 bg-white shadow-sm">
-      <div className="divide-y divide-gray-50">
-        {availability
-          .sort((a, b) => a.dayOfWeek - b.dayOfWeek)
-          .map((day) => (
+    <div className="space-y-3">
+      {availability
+        .slice()
+        .sort((a, b) => a.dayOfWeek - b.dayOfWeek)
+        .map((day) => {
+          const remaining = timeOptions.filter((t) => !day.slots.includes(t));
+          return (
             <div
               key={day.dayOfWeek}
-              className={`flex items-center justify-between px-4 py-3.5 ${
-                !day.isAvailable ? "bg-gray-50/50" : ""
-              }`}
+              className="rounded-xl bg-surface-container-lowest p-4 shadow-ambient"
             >
               <div className="flex items-center gap-3">
                 <button
                   onClick={() => handleToggle(day.dayOfWeek, !day.isAvailable)}
                   disabled={saving === day.dayOfWeek}
                   className={`relative h-6 w-11 rounded-full transition-colors ${
-                    day.isAvailable ? "bg-brand-600" : "bg-gray-200"
+                    day.isAvailable ? "bg-primary" : "bg-outline-variant"
                   } ${saving === day.dayOfWeek ? "opacity-50" : ""}`}
                   role="switch"
                   aria-checked={day.isAvailable}
@@ -85,8 +88,8 @@ export function AvailabilityManager({ stylistId }: AvailabilityManagerProps) {
                   />
                 </button>
                 <span
-                  className={`text-sm font-medium ${
-                    day.isAvailable ? "text-gray-900" : "text-gray-400"
+                  className={`font-display text-sm font-semibold ${
+                    day.isAvailable ? "text-primary" : "text-on-surface-variant"
                   }`}
                 >
                   {DAYS_OF_WEEK[day.dayOfWeek]}
@@ -94,41 +97,56 @@ export function AvailabilityManager({ stylistId }: AvailabilityManagerProps) {
               </div>
 
               {day.isAvailable && (
-                <div className="flex items-center gap-2 text-sm">
-                  <select
-                    value={day.startTime}
-                    onChange={(e) =>
-                      handleTimeChange(day.dayOfWeek, "startTime", e.target.value)
-                    }
-                    disabled={saving === day.dayOfWeek}
-                    className="rounded-lg border border-gray-200 bg-white px-2 py-1.5 text-xs text-gray-700 transition-colors hover:border-gray-300 focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500"
-                  >
-                    {generateTimeOptions().map((time) => (
-                      <option key={time} value={time}>
-                        {formatTime(time)}
+                <div className="mt-3">
+                  {day.slots.length > 0 ? (
+                    <div className="flex flex-wrap gap-2">
+                      {day.slots.map((time) => (
+                        <span
+                          key={time}
+                          className="flex items-center gap-1 rounded-full bg-secondary-fixed/50 py-1 pl-3 pr-1 text-[13px] font-medium text-primary"
+                        >
+                          {formatTime(time)}
+                          <button
+                            onClick={() => handleRemoveSlot(day, time)}
+                            disabled={saving === day.dayOfWeek}
+                            aria-label={`Remove ${formatTime(time)}`}
+                            className="flex h-5 w-5 items-center justify-center rounded-full text-primary/70 hover:bg-primary/10 hover:text-primary"
+                          >
+                            <span className="material-symbols-outlined text-sm">
+                              close
+                            </span>
+                          </button>
+                        </span>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="text-[13px] text-on-surface-variant">
+                      No times yet — add the slots you want to offer.
+                    </p>
+                  )}
+
+                  <div className="mt-3">
+                    <select
+                      value=""
+                      onChange={(e) => handleAddSlot(day, e.target.value)}
+                      disabled={saving === day.dayOfWeek || remaining.length === 0}
+                      className="w-full rounded-lg border border-outline-variant bg-surface-container-lowest px-3 py-2 text-sm text-on-surface focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary disabled:opacity-50"
+                    >
+                      <option value="" disabled>
+                        {remaining.length === 0 ? "All times added" : "+ Add a time"}
                       </option>
-                    ))}
-                  </select>
-                  <span className="text-gray-300">–</span>
-                  <select
-                    value={day.endTime}
-                    onChange={(e) =>
-                      handleTimeChange(day.dayOfWeek, "endTime", e.target.value)
-                    }
-                    disabled={saving === day.dayOfWeek}
-                    className="rounded-lg border border-gray-200 bg-white px-2 py-1.5 text-xs text-gray-700 transition-colors hover:border-gray-300 focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500"
-                  >
-                    {generateTimeOptions().map((time) => (
-                      <option key={time} value={time}>
-                        {formatTime(time)}
-                      </option>
-                    ))}
-                  </select>
+                      {remaining.map((time) => (
+                        <option key={time} value={time}>
+                          {formatTime(time)}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
                 </div>
               )}
             </div>
-          ))}
-      </div>
+          );
+        })}
     </div>
   );
 }
@@ -137,14 +155,7 @@ function generateTimeOptions(): string[] {
   const times: string[] = [];
   for (let hour = 6; hour <= 22; hour++) {
     times.push(`${hour.toString().padStart(2, "0")}:00`);
+    times.push(`${hour.toString().padStart(2, "0")}:30`);
   }
   return times;
-}
-
-function formatTime(time: string): string {
-  const [hours] = time.split(":");
-  const hour = parseInt(hours, 10);
-  const ampm = hour >= 12 ? "PM" : "AM";
-  const displayHour = hour % 12 || 12;
-  return `${displayHour}:00 ${ampm}`;
 }

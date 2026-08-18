@@ -1,12 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { ServiceSelect } from "./ServiceSelect";
 import { DatePicker } from "./DatePicker";
 import { TimeSlotPicker } from "./TimeSlotPicker";
 import { CustomerForm } from "./CustomerForm";
 import { BookingConfirmation } from "./BookingConfirmation";
-import { createBooking } from "@/lib/bookings-db";
+import { createBooking, fetchReleasedDates } from "@/lib/bookings-db";
+import { isSupabaseConfigured } from "@/lib/supabase";
 import { calculateDepositAmount } from "@/types/stylist";
 import type { Stylist, Service } from "@/types/stylist";
 import type { Booking, BookingFormData, PaymentOption } from "@/types/booking";
@@ -26,6 +27,20 @@ export function BookingFlow({ stylist, onClose }: BookingFlowProps) {
   const [booking, setBooking] = useState<Booking | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [allowedDates, setAllowedDates] = useState<Set<string> | undefined>(
+    undefined
+  );
+
+  useEffect(() => {
+    // Only released dates are bookable when connected to the database
+    if (!isSupabaseConfigured()) {
+      setAllowedDates(undefined);
+      return;
+    }
+    fetchReleasedDates(stylist.id).then((dates) => {
+      setAllowedDates(new Set(dates.map((d) => d.date)));
+    });
+  }, [stylist.id]);
 
   const handleServiceSelect = (service: Service) => {
     setSelectedService(service);
@@ -202,6 +217,7 @@ export function BookingFlow({ stylist, onClose }: BookingFlowProps) {
           <DatePicker
             selectedDate={selectedDate}
             onSelect={handleDateSelect}
+            allowedDates={allowedDates}
           />
         )}
 
