@@ -7,6 +7,7 @@ import { TimeSlotPicker } from "./TimeSlotPicker";
 import { CustomerForm } from "./CustomerForm";
 import { BookingConfirmation } from "./BookingConfirmation";
 import { createBooking, fetchReleasedDates } from "@/lib/bookings-db";
+import { saveManagedBooking, manageBookingUrl } from "@/lib/customer-bookings";
 import { isSupabaseConfigured } from "@/lib/supabase";
 import { calculateDepositAmount } from "@/types/stylist";
 import type { Stylist, Service } from "@/types/stylist";
@@ -25,6 +26,7 @@ export function BookingFlow({ stylist, onClose }: BookingFlowProps) {
   const [selectedDate, setSelectedDate] = useState<string>("");
   const [selectedTime, setSelectedTime] = useState<string>("");
   const [booking, setBooking] = useState<Booking | null>(null);
+  const [manageUrl, setManageUrl] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [allowedDates, setAllowedDates] = useState<Set<string> | undefined>(
@@ -107,6 +109,14 @@ export function BookingFlow({ stylist, onClose }: BookingFlowProps) {
         servicePrice: selectedService.price,
         stylistName: stylist.name,
       });
+      if (result.manageToken) {
+        saveManagedBooking({
+          id: result.booking.id,
+          token: result.manageToken,
+          reference: result.booking.reference ?? "",
+        });
+        setManageUrl(manageBookingUrl(result.booking.id, result.manageToken));
+      }
       setStep("confirmation");
     }
   };
@@ -251,6 +261,7 @@ export function BookingFlow({ stylist, onClose }: BookingFlowProps) {
           <BookingConfirmation
             booking={booking}
             stylist={stylist}
+            manageUrl={manageUrl}
             onClose={onClose}
           />
         )}

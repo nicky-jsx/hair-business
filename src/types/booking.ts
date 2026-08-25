@@ -8,17 +8,22 @@ export interface Booking {
   bookingDate: string;
   startTime: string;
   endTime: string;
-  status: "confirmed" | "cancelled" | "completed";
+  status: BookingStatus;
   notes: string | null;
   createdAt: string;
   paymentOption: PaymentOption;
   depositAmount: number;
   totalPrice: number;
+  amountPaid?: number;
+  paidInFull?: boolean;
+  reference?: string;
   // Joined data
   serviceName?: string;
   servicePrice?: number;
   stylistName?: string;
 }
+
+export type BookingStatus = "confirmed" | "cancelled" | "completed" | "no_show";
 
 export type PaymentOption = "deposit" | "full";
 

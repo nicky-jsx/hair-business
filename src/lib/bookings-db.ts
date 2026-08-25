@@ -18,6 +18,32 @@ import type {
   BlockedTimeRow,
 } from "@/types/database";
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export function mapBookingRow(row: any): Booking {
+  return {
+    id: row.id,
+    stylistId: row.stylist_id,
+    serviceId: row.service_name,
+    customerName: row.customer_name,
+    customerEmail: row.customer_email,
+    customerPhone: row.customer_phone,
+    bookingDate: row.booking_date,
+    startTime: row.start_time,
+    endTime: row.end_time,
+    status: row.status,
+    notes: row.notes,
+    createdAt: row.created_at,
+    paymentOption: row.payment_option ?? "full",
+    depositAmount: row.deposit_amount ?? 0,
+    totalPrice: row.total_price ?? row.service_price ?? 0,
+    amountPaid: row.amount_paid ?? undefined,
+    paidInFull: row.paid_in_full ?? undefined,
+    reference: row.reference ?? undefined,
+    serviceName: row.service_name,
+    servicePrice: row.service_price,
+  };
+}
+
 // Turn raw Postgres exceptions from the authorised RPCs into friendly copy.
 function friendlyOwnerError(message: string | undefined, fallback: string): string {
   if (!message) return fallback;
@@ -253,25 +279,7 @@ export async function fetchUpcomingBookings(
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  return (data ?? []).map((row: any) => ({
-    id: row.id,
-    stylistId: row.stylist_id,
-    serviceId: row.service_name,
-    customerName: row.customer_name,
-    customerEmail: row.customer_email,
-    customerPhone: row.customer_phone,
-    bookingDate: row.booking_date,
-    startTime: row.start_time,
-    endTime: row.end_time,
-    status: row.status,
-    notes: row.notes,
-    createdAt: row.created_at,
-    paymentOption: row.payment_option ?? "full",
-    depositAmount: row.deposit_amount ?? 0,
-    totalPrice: row.total_price ?? row.service_price ?? 0,
-    serviceName: row.service_name,
-    servicePrice: row.service_price,
-  }));
+  return (data ?? []).map(mapBookingRow);
 }
 
 // Fetch blocked times for a date
@@ -377,7 +385,7 @@ export async function createBooking(
   stylistId: string,
   data: BookingFormData,
   serviceDurationMins: number
-): Promise<{ booking?: Booking; error?: string }> {
+): Promise<{ booking?: Booking; manageToken?: string; error?: string }> {
   const supabase = getSupabase();
   if (!supabase) {
     return { error: "Database not configured" };
@@ -421,25 +429,9 @@ export async function createBooking(
   const result = Array.isArray(rows) ? rows[0] : rows;
   if (!result) return { error: "Failed to create booking. Please try again." };
 
-  return {
-    booking: {
-      id: result.id,
-      stylistId: result.stylist_id,
-      serviceId: result.service_name,
-      customerName: result.customer_name,
-      customerEmail: result.customer_email,
-      customerPhone: result.customer_phone,
-      bookingDate: result.booking_date,
-      startTime: result.start_time,
-      endTime: result.end_time,
-      status: result.status,
-      notes: result.notes,
-      createdAt: result.created_at,
-      paymentOption: result.payment_option ?? data.paymentOption,
-      depositAmount: result.deposit_amount ?? data.depositAmount,
-      totalPrice: result.total_price ?? data.totalPrice,
-    },
-  };
+  const booking = mapBookingRow(result);
+  // The caller saves the manage link (id + token) in the browser.
+  return { booking, manageToken: result.manage_token as string | undefined };
 }
 
 // Update stylist availability
@@ -499,6 +491,32 @@ export async function cancelBooking(
   if (error) {
     console.error("Error cancelling booking:", error.message);
     return { error: friendlyOwnerError(error.message, "Failed to cancel booking") };
+  }
+
+  return {};
+}
+
+// Stylist marks an appointment completed / no-show (owner-checked in the DB)
+export async function setBookingStatus(
+  bookingId: string,
+  status: "completed" | "no_show" | "confirmed"
+): Promise<{ error?: string }> {
+  const supabase = getSupabase();
+  if (!supabase) return { error: "Database not configured" };
+
+  const token = getSessionToken();
+  if (!token) return { error: "Your session has expired. Please sign in again." };
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { error } = await (supabase as any).rpc("set_booking_status", {
+    p_token: token,
+    p_booking_id: bookingId,
+    p_status: status,
+  });
+
+  if (error) {
+    console.error("Error updating booking status:", error.message);
+    return { error: friendlyOwnerError(error.message, "Failed to update booking") };
   }
 
   return {};

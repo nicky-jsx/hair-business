@@ -1,7 +1,11 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { fetchUpcomingBookings, cancelBooking } from "@/lib/bookings-db";
+import {
+  fetchUpcomingBookings,
+  cancelBooking,
+  setBookingStatus,
+} from "@/lib/bookings-db";
 import { formatPrice } from "@/types/stylist";
 import type { Booking } from "@/types/booking";
 
@@ -9,10 +13,18 @@ interface BookingsListProps {
   stylistId: string;
 }
 
+const STATUS_LABEL: Record<Booking["status"], { label: string; cls: string }> = {
+  confirmed: { label: "Confirmed", cls: "bg-green-50 text-green-700" },
+  completed: { label: "Completed", cls: "bg-brand-50 text-brand-700" },
+  cancelled: { label: "Cancelled", cls: "bg-red-50 text-red-600" },
+  no_show: { label: "No-show", cls: "bg-gray-100 text-gray-500" },
+};
+
 export function BookingsList({ stylistId }: BookingsListProps) {
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [loading, setLoading] = useState(true);
   const [cancelling, setCancelling] = useState<string | null>(null);
+  const [working, setWorking] = useState<string | null>(null);
 
   useEffect(() => {
     fetchUpcomingBookings(stylistId).then((data) => {
@@ -31,6 +43,20 @@ export function BookingsList({ stylistId }: BookingsListProps) {
       setBookings((prev) => prev.filter((b) => b.id !== bookingId));
     }
     setCancelling(null);
+  };
+
+  const handleStatus = async (
+    bookingId: string,
+    status: "completed" | "no_show"
+  ) => {
+    setWorking(bookingId);
+    const result = await setBookingStatus(bookingId, status);
+    if (!result.error) {
+      setBookings((prev) =>
+        prev.map((b) => (b.id === bookingId ? { ...b, status } : b))
+      );
+    }
+    setWorking(null);
   };
 
   if (loading) {
@@ -147,30 +173,54 @@ export function BookingsList({ stylistId }: BookingsListProps) {
               </div>
             </div>
 
-            <div className="mt-3 flex items-center justify-between border-t border-gray-50 pt-3">
-              <div className="flex items-center gap-3 text-xs text-gray-400">
-                <a
-                  href={`mailto:${booking.customerEmail}`}
-                  className="hover:text-brand-600 hover:underline"
-                >
-                  {booking.customerEmail}
-                </a>
-                <span className="text-gray-200">·</span>
-                <a
-                  href={`tel:${booking.customerPhone}`}
-                  className="hover:text-brand-600 hover:underline"
-                >
-                  {booking.customerPhone}
-                </a>
-              </div>
-              <button
-                onClick={() => handleCancel(booking.id)}
-                disabled={cancelling === booking.id}
-                className="text-xs font-medium text-gray-400 transition-colors hover:text-red-500 disabled:opacity-50"
+            <div className="mt-3 flex items-center gap-3 border-t border-gray-50 pt-3 text-xs text-gray-400">
+              <a
+                href={`mailto:${booking.customerEmail}`}
+                className="hover:text-brand-600 hover:underline"
               >
-                {cancelling === booking.id ? "Cancelling..." : "Cancel"}
-              </button>
+                {booking.customerEmail}
+              </a>
+              <span className="text-gray-200">·</span>
+              <a
+                href={`tel:${booking.customerPhone}`}
+                className="hover:text-brand-600 hover:underline"
+              >
+                {booking.customerPhone}
+              </a>
+              <span
+                className={`ml-auto rounded-full px-2 py-0.5 text-[11px] font-semibold ${
+                  STATUS_LABEL[booking.status].cls
+                }`}
+              >
+                {STATUS_LABEL[booking.status].label}
+              </span>
             </div>
+
+            {booking.status === "confirmed" && (
+              <div className="mt-3 flex items-center gap-2">
+                <button
+                  onClick={() => handleStatus(booking.id, "completed")}
+                  disabled={working === booking.id}
+                  className="flex-1 rounded-lg bg-brand-50 py-2 text-xs font-semibold text-brand-700 transition-colors hover:bg-brand-100 disabled:opacity-50"
+                >
+                  {working === booking.id ? "Saving..." : "Mark completed"}
+                </button>
+                <button
+                  onClick={() => handleStatus(booking.id, "no_show")}
+                  disabled={working === booking.id}
+                  className="flex-1 rounded-lg border border-gray-200 py-2 text-xs font-semibold text-gray-500 transition-colors hover:bg-gray-50 disabled:opacity-50"
+                >
+                  No-show
+                </button>
+                <button
+                  onClick={() => handleCancel(booking.id)}
+                  disabled={cancelling === booking.id}
+                  className="rounded-lg border border-gray-200 px-3 py-2 text-xs font-medium text-gray-400 transition-colors hover:text-red-500 disabled:opacity-50"
+                >
+                  {cancelling === booking.id ? "..." : "Cancel"}
+                </button>
+              </div>
+            )}
           </div>
         );
       })}

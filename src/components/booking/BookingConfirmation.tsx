@@ -9,14 +9,17 @@ import type { Booking } from "@/types/booking";
 interface BookingConfirmationProps {
   booking: Booking;
   stylist: Stylist;
+  manageUrl?: string | null;
   onClose: () => void;
 }
 
 export function BookingConfirmation({
   booking,
   stylist,
+  manageUrl,
   onClose,
 }: BookingConfirmationProps) {
+  const reference = booking.reference || booking.id.slice(0, 8).toUpperCase();
   const formattedDate = new Date(booking.bookingDate).toLocaleDateString(
     "en-GB",
     {
@@ -122,10 +125,28 @@ export function BookingConfirmation({
         <div className="mt-4 rounded-lg bg-gray-50 px-3 py-2 text-center">
           <p className="text-xs text-gray-400">Booking reference</p>
           <p className="font-mono text-sm font-medium text-gray-700">
-            {booking.id.slice(0, 8).toUpperCase()}
+            {reference}
           </p>
         </div>
       </div>
+
+      {/* Manage booking */}
+      {manageUrl && (
+        <div className="mb-6 rounded-xl border border-brand-100 bg-brand-50/50 p-4">
+          <p className="text-sm font-medium text-gray-900">Need to make changes?</p>
+          <p className="mt-1 text-[13px] text-gray-500">
+            Cancel, reschedule, pay your balance or leave a review from your
+            booking page. We&apos;ve saved it on this device.
+          </p>
+          <Link
+            href={manageUrl}
+            className="mt-3 inline-flex items-center gap-1.5 text-sm font-semibold text-brand-600 hover:text-brand-700"
+          >
+            Manage booking
+            <span aria-hidden>→</span>
+          </Link>
+        </div>
+      )}
 
       {/* Actions */}
       <div className="space-y-3">

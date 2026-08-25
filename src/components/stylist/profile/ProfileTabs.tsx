@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { ProfileServices } from "@/components/stylist/profile/ProfileServices";
 import { ProfilePortfolio } from "@/components/stylist/profile/ProfilePortfolio";
+import { ProfileReviews } from "@/components/stylist/profile/ProfileReviews";
 import { ProfilePolicy } from "@/components/stylist/profile/ProfilePolicy";
 import type { Stylist } from "@/types/stylist";
 
@@ -10,12 +11,13 @@ interface ProfileTabsProps {
   stylist: Stylist;
 }
 
-type TabId = "services" | "portfolio" | "policy";
+type TabId = "services" | "portfolio" | "reviews" | "policy";
 
 const TABS: { id: TabId; label: string }[] = [
   { id: "services", label: "Services" },
   { id: "portfolio", label: "Portfolio" },
   { id: "policy", label: "Booking Policy" },
+  { id: "reviews", label: "Reviews" },
 ];
 
 export function ProfileTabs({ stylist }: ProfileTabsProps) {
@@ -25,14 +27,14 @@ export function ProfileTabs({ stylist }: ProfileTabsProps) {
     <section>
       {/* Tab bar */}
       <div className="sticky top-16 z-10 -mx-5 mb-6 border-b border-outline-variant bg-background/90 px-5 backdrop-blur-md">
-        <div className="flex gap-6">
+        <div className="flex gap-6 overflow-x-auto [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
           {TABS.map((tab) => {
             const isActive = active === tab.id;
             return (
               <button
                 key={tab.id}
                 onClick={() => setActive(tab.id)}
-                className={`relative -mb-px py-3 text-[12px] font-semibold uppercase tracking-caps transition-colors ${
+                className={`relative -mb-px shrink-0 whitespace-nowrap py-3 text-[12px] font-semibold uppercase tracking-caps transition-colors ${
                   isActive
                     ? "text-primary"
                     : "text-on-surface-variant hover:text-primary"
@@ -52,6 +54,13 @@ export function ProfileTabs({ stylist }: ProfileTabsProps) {
       {active === "services" && <ProfileServices services={stylist.services} />}
       {active === "portfolio" && (
         <ProfilePortfolio photos={stylist.portfolio} stylistName={stylist.name} />
+      )}
+      {active === "reviews" && (
+        <ProfileReviews
+          reviews={stylist.reviews}
+          rating={stylist.rating}
+          reviewCount={stylist.reviewCount}
+        />
       )}
       {active === "policy" && <ProfilePolicy policy={stylist.bookingPolicy} />}
     </section>

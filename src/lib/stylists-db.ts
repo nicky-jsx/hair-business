@@ -7,6 +7,7 @@ import type {
   ServiceRow,
   PortfolioPhotoRow,
   StylistRatingRow,
+  ReviewRow,
   SpecialtyType,
 } from "@/types/database";
 
@@ -155,7 +156,7 @@ export async function fetchStylistById(id: string): Promise<Stylist | null> {
     return null;
   }
 
-  const [specialtiesRes, servicesRes, portfolioRes, ratingsRes] =
+  const [specialtiesRes, servicesRes, portfolioRes, ratingsRes, reviewsRes] =
     await Promise.all([
       supabase
         .from("stylist_specialties")
@@ -168,12 +169,18 @@ export async function fetchStylistById(id: string): Promise<Stylist | null> {
         .eq("stylist_id", id)
         .order("sort_order"),
       supabase.from("stylist_ratings").select("*").eq("stylist_id", id),
+      supabase
+        .from("reviews")
+        .select("*")
+        .eq("stylist_id", id)
+        .order("created_at", { ascending: false }),
     ]);
 
   const specialtiesData = (specialtiesRes.data ?? []) as StylistSpecialtyRow[];
   const servicesData = (servicesRes.data ?? []) as ServiceRow[];
   const portfolioData = (portfolioRes.data ?? []) as PortfolioPhotoRow[];
   const ratingsData = (ratingsRes.data ?? []) as StylistRatingRow[];
+  const reviewsData = (reviewsRes.data ?? []) as ReviewRow[];
 
   const specialties = specialtiesData.map((s) => s.specialty as Specialty);
   const services = servicesData.map((s) => ({
@@ -182,6 +189,13 @@ export async function fetchStylistById(id: string): Promise<Stylist | null> {
     duration: s.duration,
   }));
   const portfolio = portfolioData.map((p) => p.photo_url);
+  const reviews = reviewsData.map((r) => ({
+    id: r.id,
+    reviewerName: r.reviewer_name,
+    rating: r.rating,
+    comment: r.comment,
+    createdAt: r.created_at,
+  }));
   const ratingData = ratingsData[0];
 
   return {
@@ -200,6 +214,7 @@ export async function fetchStylistById(id: string): Promise<Stylist | null> {
     reviewCount: ratingData ? Number(ratingData.review_count) : 0,
     services,
     portfolio,
+    reviews,
     bookingUrl: stylist.booking_url,
     bookingPolicy: parseBookingPolicy(stylist),
     // eslint-disable-next-line @typescript-eslint/no-explicit-any

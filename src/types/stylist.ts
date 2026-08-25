@@ -18,6 +18,14 @@ export interface Service {
   duration: string;
 }
 
+export interface Review {
+  id: string;
+  reviewerName: string;
+  rating: number;
+  comment: string | null;
+  createdAt: string;
+}
+
 export type DepositType = "percentage" | "fixed" | "none";
 
 export function calculateDepositAmount(
@@ -68,6 +76,7 @@ export interface Stylist {
   reviewCount: number;
   services: Service[];
   portfolio: string[];
+  reviews?: Review[];
   bookingUrl: string | null;
   bookingPolicy?: BookingPolicy | null;
   depositType?: DepositType | null;
