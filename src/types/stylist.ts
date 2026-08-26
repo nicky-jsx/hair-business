@@ -78,6 +78,8 @@ export interface Stylist {
   portfolio: string[];
   reviews?: Review[];
   bookingUrl: string | null;
+  instagramUrl?: string | null;
+  verified?: boolean;
   bookingPolicy?: BookingPolicy | null;
   depositType?: DepositType | null;
   depositValue?: number | null;
@@ -122,4 +124,17 @@ export function isValidBookingUrl(input: string): boolean {
   } catch {
     return false;
   }
+}
+
+// Accepts a full URL, an @handle, or a bare handle and returns a profile URL.
+export function normaliseInstagramUrl(
+  input: string | null | undefined
+): string | null {
+  if (!input) return null;
+  const trimmed = input.trim();
+  if (!trimmed) return null;
+  if (/^https?:\/\//i.test(trimmed)) return trimmed;
+  const handle = trimmed.replace(/^@/, "").replace(/^instagram\.com\//i, "");
+  if (!handle) return null;
+  return `https://instagram.com/${handle}`;
 }

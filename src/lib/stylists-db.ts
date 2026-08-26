@@ -112,6 +112,10 @@ export async function fetchAllStylists(): Promise<Stylist[]> {
     services: servicesMap.get(s.id) ?? [],
     portfolio: portfolioMap.get(s.id) ?? [],
     bookingUrl: s.booking_url,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    instagramUrl: (s as any).instagram_url ?? null,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    verified: (s as any).verified ?? false,
     bookingPolicy: parseBookingPolicy(s),
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     depositType: ((s as any).deposit_type ?? null) as Stylist["depositType"],
@@ -216,6 +220,10 @@ export async function fetchStylistById(id: string): Promise<Stylist | null> {
     portfolio,
     reviews,
     bookingUrl: stylist.booking_url,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    instagramUrl: (stylist as any).instagram_url ?? null,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    verified: (stylist as any).verified ?? false,
     bookingPolicy: parseBookingPolicy(stylist),
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     depositType: ((stylist as any).deposit_type ?? null) as Stylist["depositType"],

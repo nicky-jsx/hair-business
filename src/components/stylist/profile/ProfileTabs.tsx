@@ -40,7 +40,14 @@ export function ProfileTabs({ stylist }: ProfileTabsProps) {
                     : "text-on-surface-variant hover:text-primary"
                 }`}
               >
-                {tab.label}
+                <span className="inline-flex items-center gap-1">
+                  {tab.label}
+                  {tab.id === "reviews" && !stylist.verified && (
+                    <span className="material-symbols-outlined text-[14px] text-outline">
+                      lock
+                    </span>
+                  )}
+                </span>
                 {isActive && (
                   <span className="absolute inset-x-0 -bottom-px h-0.5 rounded-full bg-primary" />
                 )}
@@ -60,6 +67,8 @@ export function ProfileTabs({ stylist }: ProfileTabsProps) {
           reviews={stylist.reviews}
           rating={stylist.rating}
           reviewCount={stylist.reviewCount}
+          verified={stylist.verified}
+          stylistName={stylist.name}
         />
       )}
       {active === "policy" && <ProfilePolicy policy={stylist.bookingPolicy} />}

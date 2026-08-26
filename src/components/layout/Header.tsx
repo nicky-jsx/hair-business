@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { StylistNavLink } from "@/components/layout/StylistNavLink";
 
 export function Header() {
   return (
@@ -20,7 +19,9 @@ export function Header() {
           Hair Korter
         </Link>
 
-        <StylistNavLink />
+        {/* Spacer keeps the wordmark centred (professional login hidden in
+            directory mode). */}
+        <div className="h-6 w-6" />
       </div>
     </header>
   );

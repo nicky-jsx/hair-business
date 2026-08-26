@@ -4,6 +4,8 @@ interface ProfileReviewsProps {
   reviews?: Review[];
   rating: number;
   reviewCount: number;
+  verified?: boolean;
+  stylistName?: string;
 }
 
 function Stars({ rating }: { rating: number }) {
@@ -46,8 +48,39 @@ export function ProfileReviews({
   reviews,
   rating,
   reviewCount,
+  verified = false,
+  stylistName,
 }: ProfileReviewsProps) {
   const list = reviews ?? [];
+  const firstName = stylistName?.split(" ")[0];
+
+  // Locked teaser for unclaimed listings — reviews unlock once the
+  // professional joins Hair Korter.
+  if (!verified) {
+    return (
+      <div className="relative overflow-hidden rounded-xl border border-outline-variant bg-surface-container-lowest p-8 text-center">
+        <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-secondary-fixed">
+          <span className="material-symbols-outlined text-2xl text-primary">
+            lock
+          </span>
+        </div>
+        <p className="text-sm font-semibold text-on-surface">
+          Reviews locked
+        </p>
+        <p className="mx-auto mt-1.5 max-w-xs text-[13px] leading-relaxed text-on-surface-variant">
+          {firstName ? `${firstName} hasn't` : "This professional hasn't"} joined
+          Hair Korter yet. Once they claim their profile, verified client reviews
+          will appear here.
+        </p>
+        <span className="mt-4 inline-flex items-center gap-1 rounded-full bg-surface-container px-3 py-1 text-[11px] font-semibold uppercase tracking-caps text-outline">
+          <span className="material-symbols-outlined text-[14px]">
+            hourglass_empty
+          </span>
+          Awaiting verification
+        </span>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-4">
