@@ -65,8 +65,8 @@ export interface Stylist {
   name: string;
   tagline: string;
   bio: string;
-  avatar: string;
-  coverImage: string;
+  avatar: string | null;
+  coverImage: string | null;
   region: Region;
   specialties: Specialty[];
   yearsExperience: number;

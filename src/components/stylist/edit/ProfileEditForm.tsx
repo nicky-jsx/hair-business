@@ -49,8 +49,8 @@ export function ProfileEditForm({ profile }: ProfileEditFormProps) {
   const [services, setServices] = useState<Service[]>(profile.services);
   const [bookingUrl, setBookingUrl] = useState(profile.bookingUrl ?? "");
 
-  const [avatar, setAvatar] = useState(profile.avatar);
-  const [coverImage, setCoverImage] = useState(profile.coverImage);
+  const [avatar, setAvatar] = useState(profile.avatar ?? "");
+  const [coverImage, setCoverImage] = useState(profile.coverImage ?? "");
 
   function toggleSpecialty(specialty: Specialty) {
     setSpecialties((prev) =>

@@ -60,7 +60,11 @@ export function ProfileTabs({ stylist }: ProfileTabsProps) {
       {/* Tab content */}
       {active === "services" && <ProfileServices services={stylist.services} />}
       {active === "portfolio" && (
-        <ProfilePortfolio photos={stylist.portfolio} stylistName={stylist.name} />
+        <ProfilePortfolio
+          photos={stylist.portfolio}
+          stylistName={stylist.name}
+          instagramUrl={stylist.instagramUrl}
+        />
       )}
       {active === "reviews" && (
         <ProfileReviews

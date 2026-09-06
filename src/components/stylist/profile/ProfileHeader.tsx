@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { formatRegion } from "@/types/stylist";
 import type { Stylist } from "@/types/stylist";
+import { PlaceholderImage } from "@/components/ui/PlaceholderImage";
 
 interface ProfileHeaderProps {
   stylist: Stylist;
@@ -11,14 +12,18 @@ export function ProfileHeader({ stylist }: ProfileHeaderProps) {
   return (
     <>
       <div className="relative h-52 bg-gray-100">
-        <Image
-          src={stylist.coverImage}
-          alt=""
-          fill
-          className="object-cover"
-          priority
-          sizes="512px"
-        />
+        {stylist.coverImage ? (
+          <Image
+            src={stylist.coverImage}
+            alt=""
+            fill
+            className="object-cover"
+            priority
+            sizes="512px"
+          />
+        ) : (
+          <PlaceholderImage name={stylist.name} textClassName="text-7xl" />
+        )}
         <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-black/20" />
         <Link
           href="/stylists"
@@ -42,13 +47,17 @@ export function ProfileHeader({ stylist }: ProfileHeaderProps) {
       <div className="relative px-5">
         <div className="-mt-12 mb-4 flex items-end justify-between">
           <div className="relative h-24 w-24 overflow-hidden rounded-2xl bg-gray-100 ring-4 ring-surface shadow-card">
-            <Image
-              src={stylist.avatar}
-              alt={stylist.name}
-              fill
-              className="object-cover"
-              sizes="96px"
-            />
+            {stylist.avatar ? (
+              <Image
+                src={stylist.avatar}
+                alt={stylist.name}
+                fill
+                className="object-cover"
+                sizes="96px"
+              />
+            ) : (
+              <PlaceholderImage name={stylist.name} textClassName="text-3xl" />
+            )}
           </div>
           <span className="mb-1 rounded-full bg-white px-3 py-1 text-sm font-medium text-gray-700 shadow-sm">
             {stylist.priceRange}
@@ -62,7 +71,9 @@ export function ProfileHeader({ stylist }: ProfileHeaderProps) {
 
         <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-gray-500">
           <span>{formatRegion(stylist.region)}</span>
-          <span>{stylist.yearsExperience} yrs experience</span>
+          {stylist.yearsExperience > 0 && (
+            <span>{stylist.yearsExperience} yrs experience</span>
+          )}
         </div>
       </div>
     </>

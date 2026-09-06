@@ -61,6 +61,7 @@ export function StylistProfileView({ params }: StylistProfileViewProps) {
         <ProfilePortfolio
           photos={stylist.portfolio}
           stylistName={stylist.name}
+          instagramUrl={stylist.instagramUrl}
         />
       </div>
 

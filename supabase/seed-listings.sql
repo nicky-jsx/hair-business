@@ -8,7 +8,8 @@
 -- present, so re-running is safe and duplicates are dropped.
 --
 -- All rows are verified = false (unclaimed) and have no booking_url.
--- Images are placeholders (Unsplash) — swap per professional later.
+-- No photos are set — the app renders a clean fallback until a
+-- professional claims their profile and uploads their own images.
 -- Prices are indicative starting prices; services/bios are minimal.
 -- =====================================================================
 
@@ -276,8 +277,8 @@ ins as (
       || case when d.note is not null and d.note <> '' and d.note not in ('TBC','area','AREA')
               then ' · ' || d.note else '' end
       || ', ' || d.reg || ' London.',
-    'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=400&h=400&fit=crop',
-    'https://images.unsplash.com/photo-1487412947147-5cebf100ffc2?w=800&h=400&fit=crop',
+    null, -- avatar_url (no stock photos; real photos added when claimed)
+    null, -- cover_image_url
     d.reg::region,
     0,
     (case when d.price_num is null then '££'
@@ -415,8 +416,8 @@ ins as (
       || case when d.note is not null and d.note <> '' and d.note not in ('TBC','area','AREA')
               then ' · ' || d.note else '' end
       || ', ' || d.reg || ' London.',
-    'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400&h=400&fit=crop',
-    'https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?w=800&h=400&fit=crop',
+    null, -- avatar_url (no stock photos; real photos added when claimed)
+    null, -- cover_image_url
     d.reg::region,
     0,
     '££'::price_range,
@@ -532,8 +533,8 @@ ins as (
       || case when d.note is not null and d.note <> '' and d.note not in ('TBC','area','AREA')
               then ' · ' || d.note else '' end
       || ', ' || d.reg || ' London.',
-    'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400&h=400&fit=crop',
-    'https://images.unsplash.com/photo-1595476108010-b4d1f102b1f1?w=800&h=400&fit=crop',
+    null, -- avatar_url (no stock photos; real photos added when claimed)
+    null, -- cover_image_url
     d.reg::region,
     0,
     (case when d.price_num is null then '££'

@@ -2,10 +2,25 @@ import Image from "next/image";
 import Link from "next/link";
 import { formatRegion } from "@/types/stylist";
 import type { Stylist } from "@/types/stylist";
+import { PlaceholderImage } from "@/components/ui/PlaceholderImage";
 
 interface StylistCardProps {
   stylist: Stylist;
   variant?: "default" | "compact" | "featured";
+}
+
+function RatingBadge({ stylist }: { stylist: Stylist }) {
+  if (stylist.reviewCount <= 0) return null;
+  return (
+    <div className="flex shrink-0 items-center gap-1">
+      <span className="material-symbols-outlined fill text-secondary text-base">
+        star
+      </span>
+      <span className="text-[12px] font-semibold text-primary">
+        {stylist.rating.toFixed(1)}
+      </span>
+    </div>
+  );
 }
 
 export function StylistCard({ stylist, variant = "default" }: StylistCardProps) {
@@ -16,13 +31,17 @@ export function StylistCard({ stylist, variant = "default" }: StylistCardProps) 
         className="group w-72 flex-shrink-0 cursor-pointer"
       >
         <div className="relative mb-4 aspect-[4/5] w-full overflow-hidden rounded-md bg-surface-container">
-          <Image
-            src={stylist.coverImage}
-            alt={stylist.name}
-            fill
-            className="object-cover transition-transform duration-700 ease-in-out group-hover:scale-105"
-            sizes="288px"
-          />
+          {stylist.coverImage ? (
+            <Image
+              src={stylist.coverImage}
+              alt={stylist.name}
+              fill
+              className="object-cover transition-transform duration-700 ease-in-out group-hover:scale-105"
+              sizes="288px"
+            />
+          ) : (
+            <PlaceholderImage name={stylist.name} textClassName="text-5xl" />
+          )}
           <span className="absolute right-4 top-4 flex h-8 w-8 items-center justify-center rounded-full bg-background/80 text-primary backdrop-blur-sm transition-colors group-hover:bg-background">
             <span className="material-symbols-outlined text-lg">favorite</span>
           </span>
@@ -36,14 +55,7 @@ export function StylistCard({ stylist, variant = "default" }: StylistCardProps) 
               {stylist.tagline}
             </p>
           </div>
-          <div className="flex items-center gap-1">
-            <span className="material-symbols-outlined fill text-secondary text-base">
-              star
-            </span>
-            <span className="text-[12px] font-semibold text-primary">
-              {stylist.rating.toFixed(1)}
-            </span>
-          </div>
+          <RatingBadge stylist={stylist} />
         </div>
       </Link>
     );
@@ -56,13 +68,17 @@ export function StylistCard({ stylist, variant = "default" }: StylistCardProps) 
         className="group flex w-40 shrink-0 flex-col gap-3"
       >
         <div className="relative aspect-[4/5] w-full overflow-hidden rounded-md bg-surface-container">
-          <Image
-            src={stylist.avatar}
-            alt={stylist.name}
-            fill
-            className="object-cover transition-transform duration-500 group-hover:scale-105"
-            sizes="160px"
-          />
+          {stylist.avatar ? (
+            <Image
+              src={stylist.avatar}
+              alt={stylist.name}
+              fill
+              className="object-cover transition-transform duration-500 group-hover:scale-105"
+              sizes="160px"
+            />
+          ) : (
+            <PlaceholderImage name={stylist.name} textClassName="text-4xl" />
+          )}
         </div>
         <div>
           <h3 className="font-display text-sm font-semibold text-primary">
@@ -82,13 +98,17 @@ export function StylistCard({ stylist, variant = "default" }: StylistCardProps) 
       className="group block cursor-pointer"
     >
       <div className="relative mb-3 aspect-[4/5] w-full overflow-hidden rounded-md bg-surface-container">
-        <Image
-          src={stylist.coverImage}
-          alt={stylist.name}
-          fill
-          className="object-cover transition-transform duration-700 ease-in-out group-hover:scale-105"
-          sizes="(max-width: 512px) 50vw, 256px"
-        />
+        {stylist.coverImage ? (
+          <Image
+            src={stylist.coverImage}
+            alt={stylist.name}
+            fill
+            className="object-cover transition-transform duration-700 ease-in-out group-hover:scale-105"
+            sizes="(max-width: 512px) 50vw, 256px"
+          />
+        ) : (
+          <PlaceholderImage name={stylist.name} textClassName="text-5xl" />
+        )}
         <span className="absolute right-3 top-3 flex h-8 w-8 items-center justify-center rounded-full bg-background/80 text-primary backdrop-blur-sm">
           <span className="material-symbols-outlined text-lg">favorite</span>
         </span>
@@ -105,14 +125,7 @@ export function StylistCard({ stylist, variant = "default" }: StylistCardProps) 
             {formatRegion(stylist.region)}
           </p>
         </div>
-        <div className="flex shrink-0 items-center gap-1">
-          <span className="material-symbols-outlined fill text-secondary text-base">
-            star
-          </span>
-          <span className="text-[12px] font-semibold text-primary">
-            {stylist.rating.toFixed(1)}
-          </span>
-        </div>
+        <RatingBadge stylist={stylist} />
       </div>
     </Link>
   );
