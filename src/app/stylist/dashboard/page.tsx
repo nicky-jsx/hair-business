@@ -1,7 +1,8 @@
 "use client";
 
+import { Suspense } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { AvailabilityManager } from "@/components/stylist/dashboard/AvailabilityManager";
 import { ReleaseManager } from "@/components/stylist/dashboard/ReleaseManager";
 import { BookingsList } from "@/components/stylist/dashboard/BookingsList";
@@ -10,8 +11,10 @@ import { Button } from "@/components/ui/Button";
 import { useAuth } from "@/context/AuthContext";
 import { formatRegion } from "@/types/stylist";
 
-export default function StylistDashboardPage() {
+function DashboardContent() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const isClaimed = searchParams.get("claimed") === "true";
   const { ready, account, profile, signOut } = useAuth();
 
   if (!ready) {
@@ -49,6 +52,20 @@ export default function StylistDashboardPage() {
       <h1 className="font-display text-2xl font-semibold text-gray-900">
         Welcome, {account.name.split(" ")[0]}
       </h1>
+
+      {isClaimed && (
+        <div className="mt-4 rounded-2xl border border-secondary/30 bg-secondary-fixed/20 p-4 text-primary">
+          <div className="flex items-center gap-2 font-display font-semibold">
+            <span className="material-symbols-outlined text-secondary">
+              verified
+            </span>
+            Profile Successfully Claimed &amp; Unlocked!
+          </div>
+          <p className="mt-1 text-xs text-on-surface-variant leading-relaxed">
+            Your directory profile is now verified. Head over to <strong>Edit Profile</strong> to upload your high-resolution portfolio photos and update your services menu.
+          </p>
+        </div>
+      )}
 
       {profile ? (
         <div className="mt-6 space-y-6">
@@ -145,5 +162,19 @@ export default function StylistDashboardPage() {
         Sign out
       </button>
     </div>
+  );
+}
+
+export default function StylistDashboardPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="flex items-center justify-center py-20">
+          <div className="h-8 w-8 animate-spin rounded-full border-2 border-brand-200 border-t-brand-600" />
+        </div>
+      }
+    >
+      <DashboardContent />
+    </Suspense>
   );
 }

@@ -32,13 +32,14 @@ export async function fetchAllStylists(): Promise<Stylist[]> {
 
   if (stylistsError) {
     console.error("Error fetching stylists:", stylistsError);
-    return [];
+    console.log("Falling back to sample data");
+    return sampleStylists;
   }
 
   const stylists = data as StylistRow[] | null;
 
   if (!stylists || stylists.length === 0) {
-    return [];
+    return sampleStylists;
   }
 
   const stylistIds = stylists.map((s) => s.id);
@@ -157,7 +158,8 @@ export async function fetchStylistById(id: string): Promise<Stylist | null> {
 
   if (error || !stylist) {
     console.error("Error fetching stylist:", error);
-    return null;
+    console.log("Falling back to sample data for stylist:", id);
+    return sampleStylists.find((s) => s.id === id) ?? null;
   }
 
   const [specialtiesRes, servicesRes, portfolioRes, ratingsRes, reviewsRes] =
@@ -307,11 +309,27 @@ function getRatingThreshold(filter: string): number {
   return 0;
 }
 
+const STOPWORDS = new Set(["in", "at", "near", "for", "the", "and", "of", "london", "hair", "uk", "to"]);
+
+function getSpecialtySynonyms(specialties: Specialty[]): string[] {
+  const synonyms: string[] = [];
+  for (const s of specialties) {
+    if (s === "Wigs") synonyms.push("wig", "lace", "frontal", "closure", "glueless", "unit", "melt");
+    if (s === "Braids") synonyms.push("braid", "knotless", "cornrow", "cornrows", "box braids", "plaits");
+    if (s === "Locs") synonyms.push("loc", "locs", "dread", "dreads", "dreadlocks", "retwist", "starter locs");
+    if (s === "Eyelashes") synonyms.push("lash", "lashes", "eyelash", "brow", "brows", "lamination");
+    if (s === "Silk Press") synonyms.push("press", "blowout", "straight");
+    if (s === "Cuts") synonyms.push("cut", "fade", "barber", "shape up", "trim");
+    if (s === "Color") synonyms.push("colour", "balayage", "bleach", "highlights");
+  }
+  return synonyms;
+}
+
 export function filterStylistsLocal(
   stylists: Stylist[],
   filters: StylistFilters
 ): Stylist[] {
-  const query = filters.query.trim().toLowerCase();
+  const rawQuery = filters.query.trim().toLowerCase();
 
   return stylists.filter((stylist) => {
     const matchesSpecialty =
@@ -329,18 +347,35 @@ export function filterStylistsLocal(
     const baseMatch =
       matchesSpecialty && matchesRegion && matchesPrice && matchesRating;
 
-    if (!query) return baseMatch;
+    if (!baseMatch) return false;
+    if (!rawQuery) return true;
 
-    const searchable = [
-      stylist.name,
-      stylist.tagline,
-      stylist.region,
-      `${stylist.region} London`,
-      ...stylist.specialties,
-    ]
-      .join(" ")
-      .toLowerCase();
+    // Tokenize query and remove non-essential conversational stopwords
+    const rawTokens = rawQuery
+      .replace(/[^\w\s-]/g, " ")
+      .split(/\s+/)
+      .filter(Boolean);
 
-    return baseMatch && searchable.includes(query);
+    const meaningfulTokens = rawTokens.filter((t) => !STOPWORDS.has(t));
+    const tokens = meaningfulTokens.length > 0 ? meaningfulTokens : rawTokens;
+
+    // Build comprehensive search corpus for the stylist
+    const serviceNames = stylist.services.map((s) => s.name.toLowerCase());
+    const specialtySynonyms = getSpecialtySynonyms(stylist.specialties);
+
+    const searchCorpus = [
+      stylist.name.toLowerCase(),
+      stylist.tagline.toLowerCase(),
+      stylist.bio.toLowerCase(),
+      stylist.region.toLowerCase(),
+      `${stylist.region.toLowerCase()} london`,
+      stylist.instagramUrl ? stylist.instagramUrl.toLowerCase() : "",
+      ...stylist.specialties.map((s) => s.toLowerCase()),
+      ...serviceNames,
+      ...specialtySynonyms,
+    ].join(" ");
+
+    // Every token must match somewhere in the stylist's corpus
+    return tokens.every((token) => searchCorpus.includes(token));
   });
 }

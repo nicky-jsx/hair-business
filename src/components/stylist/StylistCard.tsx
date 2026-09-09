@@ -9,21 +9,30 @@ interface StylistCardProps {
   variant?: "default" | "compact" | "featured";
 }
 
-function RatingBadge({ stylist }: { stylist: Stylist }) {
-  if (stylist.reviewCount <= 0) return null;
+function StatusOrRating({ stylist }: { stylist: Stylist }) {
+  if (stylist.verified && stylist.reviewCount > 0) {
+    return (
+      <div className="flex shrink-0 items-center gap-1">
+        <span className="material-symbols-outlined fill text-secondary text-base">
+          star
+        </span>
+        <span className="text-[12px] font-semibold text-primary">
+          {stylist.rating.toFixed(1)}
+        </span>
+      </div>
+    );
+  }
+
   return (
-    <div className="flex shrink-0 items-center gap-1">
-      <span className="material-symbols-outlined fill text-secondary text-base">
-        star
-      </span>
-      <span className="text-[12px] font-semibold text-primary">
-        {stylist.rating.toFixed(1)}
-      </span>
-    </div>
+    <span className="shrink-0 rounded-full bg-surface-container px-2 py-0.5 text-[11px] font-medium text-on-surface-variant">
+      {stylist.priceRange}
+    </span>
   );
 }
 
 export function StylistCard({ stylist, variant = "default" }: StylistCardProps) {
+  const primarySpecialty = stylist.specialties?.[0] || formatRegion(stylist.region);
+
   if (variant === "featured") {
     return (
       <Link
@@ -40,22 +49,35 @@ export function StylistCard({ stylist, variant = "default" }: StylistCardProps) 
               sizes="288px"
             />
           ) : (
-            <PlaceholderImage name={stylist.name} textClassName="text-5xl" />
+            <PlaceholderImage
+              name={stylist.name}
+              textClassName="text-3xl"
+              subtitle={primarySpecialty}
+            />
           )}
+
+          {/* Curated status tag on top-left */}
+          <span className="absolute left-3 top-3 inline-flex items-center gap-1 rounded-full bg-black/60 px-2.5 py-1 text-[10px] font-medium tracking-wide text-[#e9e4dc] backdrop-blur-md">
+            <span className="material-symbols-outlined text-[12px] text-secondary-fixed">
+              {stylist.verified ? "verified" : "hotel_class"}
+            </span>
+            {stylist.verified ? "Verified" : "Curated"}
+          </span>
+
           <span className="absolute right-4 top-4 flex h-8 w-8 items-center justify-center rounded-full bg-background/80 text-primary backdrop-blur-sm transition-colors group-hover:bg-background">
             <span className="material-symbols-outlined text-lg">favorite</span>
           </span>
         </div>
-        <div className="flex items-start justify-between">
-          <div>
-            <h3 className="font-display text-base font-semibold text-primary">
+        <div className="flex items-start justify-between gap-2">
+          <div className="min-w-0">
+            <h3 className="font-display text-base font-semibold text-primary truncate">
               {stylist.name}
             </h3>
-            <p className="mt-1 text-[13px] text-on-surface-variant">
+            <p className="mt-1 text-[13px] text-on-surface-variant truncate">
               {stylist.tagline}
             </p>
           </div>
-          <RatingBadge stylist={stylist} />
+          <StatusOrRating stylist={stylist} />
         </div>
       </Link>
     );
@@ -77,11 +99,15 @@ export function StylistCard({ stylist, variant = "default" }: StylistCardProps) 
               sizes="160px"
             />
           ) : (
-            <PlaceholderImage name={stylist.name} textClassName="text-4xl" />
+            <PlaceholderImage
+              name={stylist.name}
+              textClassName="text-2xl"
+              subtitle={primarySpecialty}
+            />
           )}
         </div>
         <div>
-          <h3 className="font-display text-sm font-semibold text-primary">
+          <h3 className="font-display text-sm font-semibold text-primary truncate">
             {stylist.name}
           </h3>
           <p className="text-[12px] text-on-surface-variant">
@@ -107,8 +133,21 @@ export function StylistCard({ stylist, variant = "default" }: StylistCardProps) 
             sizes="(max-width: 512px) 50vw, 256px"
           />
         ) : (
-          <PlaceholderImage name={stylist.name} textClassName="text-5xl" />
+          <PlaceholderImage
+            name={stylist.name}
+            textClassName="text-3xl"
+            subtitle={primarySpecialty}
+          />
         )}
+
+        {/* Curated status tag on top-left */}
+        <span className="absolute left-3 top-3 inline-flex items-center gap-1 rounded-full bg-black/60 px-2 py-0.5 text-[10px] font-medium tracking-wide text-[#e9e4dc] backdrop-blur-md">
+          <span className="material-symbols-outlined text-[12px] text-secondary-fixed">
+            {stylist.verified ? "verified" : "hotel_class"}
+          </span>
+          {stylist.verified ? "Verified" : "Curated"}
+        </span>
+
         <span className="absolute right-3 top-3 flex h-8 w-8 items-center justify-center rounded-full bg-background/80 text-primary backdrop-blur-sm">
           <span className="material-symbols-outlined text-lg">favorite</span>
         </span>
@@ -121,11 +160,13 @@ export function StylistCard({ stylist, variant = "default" }: StylistCardProps) 
           <p className="mt-0.5 truncate text-[13px] text-on-surface-variant">
             {stylist.tagline}
           </p>
-          <p className="mt-1 text-[12px] uppercase tracking-caps text-outline">
-            {formatRegion(stylist.region)}
-          </p>
+          <div className="mt-1 flex items-center gap-1.5 text-[12px] uppercase tracking-caps text-outline">
+            <span>{formatRegion(stylist.region)}</span>
+            <span>•</span>
+            <span className="text-secondary">{primarySpecialty}</span>
+          </div>
         </div>
-        <RatingBadge stylist={stylist} />
+        <StatusOrRating stylist={stylist} />
       </div>
     </Link>
   );

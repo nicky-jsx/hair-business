@@ -14,7 +14,17 @@ import {
   type Specialty,
 } from "@/types/stylist";
 
-const ALL_SPECIALTIES: Specialty[] = ["Braids", "Wigs", "Locs", "Eyelashes"];
+const ALL_SPECIALTIES: Specialty[] = [
+  "Braids",
+  "Locs",
+  "Natural Hair",
+  "Silk Press",
+  "Color",
+  "Cuts",
+  "Extensions",
+  "Wigs",
+  "Eyelashes",
+];
 
 const STEPS = ["About you", "Services", "Photos"];
 

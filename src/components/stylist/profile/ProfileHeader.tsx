@@ -9,9 +9,11 @@ interface ProfileHeaderProps {
 }
 
 export function ProfileHeader({ stylist }: ProfileHeaderProps) {
+  const primarySpecialty = stylist.specialties?.[0] || formatRegion(stylist.region);
+
   return (
     <>
-      <div className="relative h-52 bg-gray-100">
+      <div className="relative h-56 bg-surface-container">
         {stylist.coverImage ? (
           <Image
             src={stylist.coverImage}
@@ -22,31 +24,38 @@ export function ProfileHeader({ stylist }: ProfileHeaderProps) {
             sizes="512px"
           />
         ) : (
-          <PlaceholderImage name={stylist.name} textClassName="text-7xl" />
+          <PlaceholderImage
+            name={stylist.name}
+            variant="cover"
+            subtitle={primarySpecialty}
+            textClassName="text-4xl"
+          />
         )}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-black/20" />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/30" />
+
+        {/* Back navigation */}
         <Link
-          href="/stylists"
-          className="absolute left-4 top-4 flex h-10 w-10 items-center justify-center rounded-full bg-white/90 text-gray-700 backdrop-blur-sm transition-colors hover:bg-white"
+          href="/"
+          aria-label="Back to directory"
+          className="absolute left-4 top-4 flex h-10 w-10 items-center justify-center rounded-full bg-black/40 text-white backdrop-blur-md transition-colors hover:bg-black/60"
         >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 20 20"
-            fill="currentColor"
-            className="h-5 w-5"
-          >
-            <path
-              fillRule="evenodd"
-              d="M17 10a.75.75 0 0 1-.75.75H5.612l4.158 3.96a.75.75 0 1 1-1.04 1.08l-5.5-5.25a.75.75 0 0 1 0-1.08l5.5-5.25a.75.75 0 1 1 1.04 1.08l-4.158 3.96H16.25A.75.75 0 0 1 17 10Z"
-              clipRule="evenodd"
-            />
-          </svg>
+          <span className="material-symbols-outlined text-xl">arrow_back</span>
         </Link>
+
+        {/* Curated status tag on cover */}
+        <div className="absolute right-4 top-4">
+          <span className="inline-flex items-center gap-1.5 rounded-full bg-black/50 px-3 py-1 text-[11px] font-medium tracking-wide text-[#fbf9f8] backdrop-blur-md">
+            <span className="material-symbols-outlined text-[14px] text-secondary-fixed">
+              {stylist.verified ? "verified" : "hotel_class"}
+            </span>
+            {stylist.verified ? "Verified Specialist" : "Curated Listing"}
+          </span>
+        </div>
       </div>
 
       <div className="relative px-5">
-        <div className="-mt-12 mb-4 flex items-end justify-between">
-          <div className="relative h-24 w-24 overflow-hidden rounded-2xl bg-gray-100 ring-4 ring-surface shadow-card">
+        <div className="-mt-14 mb-4 flex items-end justify-between">
+          <div className="relative h-24 w-24 overflow-hidden rounded-2xl bg-surface-container-high ring-4 ring-background shadow-card">
             {stylist.avatar ? (
               <Image
                 src={stylist.avatar}
@@ -56,24 +65,49 @@ export function ProfileHeader({ stylist }: ProfileHeaderProps) {
                 sizes="96px"
               />
             ) : (
-              <PlaceholderImage name={stylist.name} textClassName="text-3xl" />
+              <PlaceholderImage
+                name={stylist.name}
+                variant="avatar"
+                textClassName="text-3xl"
+              />
             )}
           </div>
-          <span className="mb-1 rounded-full bg-white px-3 py-1 text-sm font-medium text-gray-700 shadow-sm">
+          <span className="mb-1 rounded-full bg-surface-container-lowest px-3 py-1 text-xs font-semibold uppercase tracking-caps text-on-surface shadow-sm border border-outline-variant/30">
             {stylist.priceRange}
           </span>
         </div>
 
-        <h1 className="font-display text-2xl font-semibold text-gray-900">
-          {stylist.name}
-        </h1>
-        <p className="mt-1 text-base text-brand-600">{stylist.tagline}</p>
+        <div className="flex items-start justify-between gap-3">
+          <div>
+            <h1 className="font-display text-2xl font-bold text-primary">
+              {stylist.name}
+            </h1>
+            <p className="mt-1 text-sm font-medium text-secondary">
+              {stylist.tagline}
+            </p>
+          </div>
+        </div>
 
-        <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-gray-500">
-          <span>{formatRegion(stylist.region)}</span>
+        <div className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-on-surface-variant">
+          <span className="inline-flex items-center gap-1 font-medium">
+            <span className="material-symbols-outlined text-[14px] text-outline">
+              location_on
+            </span>
+            {formatRegion(stylist.region)}
+          </span>
           {stylist.yearsExperience > 0 && (
-            <span>{stylist.yearsExperience} yrs experience</span>
+            <>
+              <span className="text-outline-variant">•</span>
+              <span>{stylist.yearsExperience} yrs experience</span>
+            </>
           )}
+          <span className="text-outline-variant">•</span>
+          <span className="inline-flex items-center gap-1 text-outline">
+            <span className="material-symbols-outlined text-[13px]">
+              local_library
+            </span>
+            London Directory
+          </span>
         </div>
       </div>
     </>

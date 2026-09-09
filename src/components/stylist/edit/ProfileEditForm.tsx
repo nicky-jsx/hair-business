@@ -15,7 +15,17 @@ import {
   type Stylist,
 } from "@/types/stylist";
 
-const ALL_SPECIALTIES: Specialty[] = ["Braids", "Wigs", "Locs", "Eyelashes"];
+const ALL_SPECIALTIES: Specialty[] = [
+  "Braids",
+  "Locs",
+  "Natural Hair",
+  "Silk Press",
+  "Color",
+  "Cuts",
+  "Extensions",
+  "Wigs",
+  "Eyelashes",
+];
 
 function derivePriceRange(services: Service[]): "£" | "££" | "£££" {
   if (services.length === 0) return "££";

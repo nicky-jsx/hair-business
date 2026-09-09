@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import { Badge } from "@/components/ui/Badge";
+import { ClaimProfileBanner } from "@/components/stylist/profile/ClaimProfileBanner";
 import { ProfileBookingBar } from "@/components/stylist/profile/ProfileBookingBar";
 import { ProfileHeader } from "@/components/stylist/profile/ProfileHeader";
 import { ProfileTabs } from "@/components/stylist/profile/ProfileTabs";
@@ -24,6 +25,9 @@ export default async function StylistProfilePage({ params }: ProfilePageProps) {
       <ProfileHeader stylist={stylist} />
 
       <div className="mt-6 space-y-8 px-5">
+        {/* Marketing outreach claim banner */}
+        <ClaimProfileBanner stylist={stylist} />
+
         <section>
           <h2 className="mb-2 text-[12px] font-semibold uppercase tracking-caps text-outline">
             About

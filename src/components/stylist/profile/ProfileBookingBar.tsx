@@ -16,7 +16,7 @@ export function ProfileBookingBar({ stylist }: ProfileBookingBarProps) {
   const verified = Boolean(stylist.verified);
 
   return (
-    <div className="fixed bottom-0 left-1/2 z-40 w-full max-w-lg -translate-x-1/2 border-t border-gray-100 bg-white/95 px-5 py-4 backdrop-blur-md safe-bottom">
+    <div className="fixed bottom-0 left-1/2 z-40 w-full max-w-lg -translate-x-1/2 border-t border-outline-variant/40 bg-background/95 px-5 py-3.5 backdrop-blur-md safe-bottom shadow-lg">
       {/* Contact / external links */}
       {(bookingUrl || instagramUrl) && (
         <div className="mb-2 flex gap-2">
@@ -25,9 +25,9 @@ export function ProfileBookingBar({ stylist }: ProfileBookingBarProps) {
               href={bookingUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex flex-1 items-center justify-center gap-1.5 rounded-xl bg-brand-600 px-6 py-3 text-base font-medium text-white shadow-sm transition-all hover:bg-brand-700 active:bg-brand-800"
+              className="flex flex-1 items-center justify-center gap-1.5 rounded-xl bg-primary px-5 py-2.5 text-sm font-semibold uppercase tracking-caps text-background shadow-sm transition-opacity hover:opacity-90 active:scale-[0.99]"
             >
-              Book with {firstName}
+              <span>Book with {firstName}</span>
               <span className="material-symbols-outlined text-[18px]">
                 open_in_new
               </span>
@@ -39,40 +39,48 @@ export function ProfileBookingBar({ stylist }: ProfileBookingBarProps) {
               target="_blank"
               rel="noopener noreferrer"
               aria-label={`${firstName} on Instagram`}
-              className={`flex items-center justify-center gap-1.5 rounded-xl border border-gray-200 px-4 py-3 text-base font-medium text-gray-700 transition-colors hover:bg-gray-50 ${
+              className={`flex items-center justify-center gap-1.5 rounded-xl border border-outline-variant/70 bg-surface-container-lowest px-4 py-2.5 text-sm font-medium text-on-surface transition-colors hover:bg-surface-container-low ${
                 bookingUrl ? "" : "flex-1"
               }`}
             >
-              <span className="material-symbols-outlined text-[18px]">
+              <span className="material-symbols-outlined text-[18px] text-secondary">
                 photo_camera
               </span>
-              {!bookingUrl && "Instagram"}
+              <span>{!bookingUrl ? `View Instagram (@${firstName.toLowerCase()})` : "Instagram"}</span>
             </a>
           )}
         </div>
       )}
 
-      {/* In-app booking is disabled for now (directory mode). Kept greyed out
-          so we can re-enable it once professionals are onboarded. */}
-      <button
-        type="button"
-        disabled
-        aria-disabled="true"
-        title="In-app booking is coming soon"
-        className="flex w-full cursor-not-allowed items-center justify-center gap-1.5 rounded-xl bg-gray-100 px-6 py-3 text-base font-medium text-gray-400"
-      >
-        Book Now
-        <span className="rounded-full bg-gray-200 px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wide text-gray-500">
-          Coming soon
-        </span>
-      </button>
-
-      {!verified && (
-        <p className="mt-2 flex items-center justify-center gap-1 text-center text-[12px] leading-snug text-gray-400">
-          <span className="material-symbols-outlined text-[14px]">lock</span>
-          Not yet verified — in-app booking &amp; reviews unlock when {firstName}{" "}
-          joins Hair Korter
-        </p>
+      {/* Claim callout for unclaimed listings */}
+      {!verified ? (
+        <div className="mt-2 flex items-center justify-between rounded-xl bg-secondary-fixed/25 px-3 py-2 text-xs">
+          <div className="flex items-center gap-1.5 text-primary">
+            <span className="material-symbols-outlined text-sm text-secondary">
+              verified
+            </span>
+            <span className="font-medium">Is this your business?</span>
+          </div>
+          <a
+            href={`/stylist/claim?id=${stylist.id}`}
+            className="font-bold uppercase tracking-caps text-secondary underline hover:text-primary transition-colors"
+          >
+            Claim Profile &rarr;
+          </a>
+        </div>
+      ) : (
+        <button
+          type="button"
+          disabled
+          aria-disabled="true"
+          title="In-app booking is coming soon"
+          className="flex w-full cursor-not-allowed items-center justify-center gap-1.5 rounded-xl bg-surface-container px-6 py-2.5 text-sm font-medium text-outline"
+        >
+          Book Appointment
+          <span className="rounded-full bg-surface-container-high px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-on-surface-variant">
+            Direct
+          </span>
+        </button>
       )}
     </div>
   );

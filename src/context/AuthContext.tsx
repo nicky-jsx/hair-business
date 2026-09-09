@@ -14,6 +14,7 @@ import {
   getAccountFromSession,
   clearSession,
 } from "@/lib/auth-db";
+import { claimStylistProfile } from "@/lib/stylist-profile-db";
 import { fetchStylistById } from "@/lib/stylists-db";
 import type { Stylist } from "@/types/stylist";
 
@@ -33,6 +34,7 @@ interface AuthContextType {
   signOut: () => void;
   refreshProfile: () => Promise<void>;
   setAccountStylistId: (stylistId: string) => void;
+  claimProfile: (stylistId: string) => Promise<{ error?: string }>;
 }
 
 const AuthContext = createContext<AuthContextType | null>(null);
@@ -118,6 +120,24 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }, [account]);
 
+  const claimProfile = useCallback(
+    async (stylistId: string) => {
+      const result = await claimStylistProfile(stylistId);
+      if (result.error) {
+        return { error: result.error };
+      }
+      if (account) {
+        const updated = { ...account, stylistId };
+        setAccount(updated);
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
+        const stylist = await fetchStylistById(stylistId);
+        setProfile(stylist);
+      }
+      return {};
+    },
+    [account]
+  );
+
   return (
     <AuthContext.Provider
       value={{
@@ -129,6 +149,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         signOut,
         refreshProfile,
         setAccountStylistId,
+        claimProfile,
       }}
     >
       {children}

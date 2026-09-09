@@ -64,6 +64,8 @@ export function ProfileTabs({ stylist }: ProfileTabsProps) {
           photos={stylist.portfolio}
           stylistName={stylist.name}
           instagramUrl={stylist.instagramUrl}
+          stylistId={stylist.id}
+          verified={stylist.verified}
         />
       )}
       {active === "reviews" && (

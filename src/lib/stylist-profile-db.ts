@@ -27,6 +27,10 @@ function friendlyProfileError(message?: string): string {
     return "You don't have permission to edit this profile.";
   if (message.includes("already_linked"))
     return "This account already has a profile.";
+  if (message.includes("profile_already_claimed"))
+    return "This profile has already been claimed by another account.";
+  if (message.includes("stylist_not_found"))
+    return "The requested stylist profile was not found.";
   return "Failed to save profile. Please try again.";
 }
 
@@ -132,6 +136,32 @@ export async function updateStylistProfile(
 
   if (error) {
     console.error("Error updating stylist:", error.message);
+    return { error: friendlyProfileError(error.message) };
+  }
+
+  return {};
+}
+
+export async function claimStylistProfile(
+  stylistId: string
+): Promise<{ error?: string }> {
+  const supabase = getSupabase();
+  if (!supabase) {
+    // Local / sample fallback
+    return {};
+  }
+
+  const token = getSessionToken();
+  if (!token) return { error: "Your session has expired. Please sign in again." };
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { error } = await (supabase as any).rpc("claim_stylist_profile", {
+    p_token: token,
+    p_stylist_id: stylistId,
+  });
+
+  if (error) {
+    console.error("Error claiming stylist profile:", error.message);
     return { error: friendlyProfileError(error.message) };
   }
 

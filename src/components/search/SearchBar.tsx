@@ -27,7 +27,7 @@ export function SearchBar({
 
     if (navigateOnSubmit) {
       const params = trimmed ? `?q=${encodeURIComponent(trimmed)}` : "";
-      router.push(`/stylists${params}`);
+      router.push(`/${params}`);
       return;
     }
 

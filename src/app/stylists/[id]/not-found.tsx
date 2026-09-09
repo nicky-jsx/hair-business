@@ -10,10 +10,10 @@ export default function NotFound() {
         This profile doesn&apos;t exist or may have been removed.
       </p>
       <Link
-        href="/stylists"
-        className="mt-6 text-sm font-medium text-brand-600 hover:text-brand-700"
+        href="/"
+        className="mt-6 text-sm font-medium text-secondary hover:underline"
       >
-        Back to discover
+        Back to directory
       </Link>
     </div>
   );
