@@ -1,7 +1,12 @@
 import { getSupabase, isSupabaseConfigured } from "./supabase";
 import { getSessionToken } from "./session";
 import { stylists as sampleStylists } from "@/data/stylists";
-import type { Stylist, Specialty, StylistFilters } from "@/types/stylist";
+import {
+  SPECIALTY_SUB_SERVICES,
+  type Stylist,
+  type Specialty,
+  type StylistFilters,
+} from "@/types/stylist";
 import type {
   StylistRow,
   ServiceRow,
@@ -46,17 +51,13 @@ export async function fetchAllStylists(): Promise<Stylist[]> {
 
   const [specialtiesRes, servicesRes, portfolioRes, ratingsRes] =
     await Promise.all([
-      supabase
-        .from("stylist_specialties")
-        .select("*")
-        .in("stylist_id", stylistIds),
-      supabase.from("services").select("*").in("stylist_id", stylistIds),
+      supabase.from("stylist_specialties").select("*"),
+      supabase.from("services").select("*"),
       supabase
         .from("portfolio_photos")
         .select("*")
-        .in("stylist_id", stylistIds)
         .order("sort_order"),
-      supabase.from("stylist_ratings").select("*").in("stylist_id", stylistIds),
+      supabase.from("stylist_ratings").select("*"),
     ]);
 
   const specialtiesData = (specialtiesRes.data ?? []) as StylistSpecialtyRow[];
@@ -293,13 +294,26 @@ export async function updateSlotInterval(
 }
 
 export async function fetchFeaturedStylists(): Promise<Stylist[]> {
+  // Curated hair stylists (strictly hair, excluding lash technicians)
+  const hairStylists = sampleStylists.filter(
+    (s) => s.featured && !s.specialties.includes("Eyelashes")
+  );
+
   const supabase = getSupabase();
   if (!supabase) {
-    return sampleStylists.filter((s) => s.featured);
+    return hairStylists.slice(0, 6);
   }
 
   const allStylists = await fetchAllStylists();
-  return allStylists.filter((s) => s.featured);
+  const dbFeatured = allStylists.filter(
+    (s) => s.featured && !s.specialties.includes("Eyelashes")
+  );
+
+  if (dbFeatured.length >= 6) {
+    return dbFeatured.slice(0, 6);
+  }
+
+  return hairStylists.slice(0, 6);
 }
 
 function getRatingThreshold(filter: string): number {
@@ -325,13 +339,29 @@ function getSpecialtySynonyms(specialties: Specialty[]): string[] {
   return synonyms;
 }
 
+export function getStylistBasePrice(stylist: Stylist): number {
+  const bioMatch = stylist.bio?.match(/£(\d+)/);
+  if (bioMatch) {
+    const num = parseInt(bioMatch[1], 10);
+    if (!isNaN(num) && num > 0) return num;
+  }
+  if (stylist.services && stylist.services.length > 0) {
+    const prices = stylist.services.map((s) => s.price).filter((p) => p > 0);
+    if (prices.length > 0) return Math.min(...prices);
+  }
+  if (stylist.priceRange === "£") return 40;
+  if (stylist.priceRange === "££") return 75;
+  if (stylist.priceRange === "£££") return 120;
+  return 70;
+}
+
 export function filterStylistsLocal(
   stylists: Stylist[],
   filters: StylistFilters
 ): Stylist[] {
   const rawQuery = filters.query.trim().toLowerCase();
 
-  return stylists.filter((stylist) => {
+  const filtered = stylists.filter((stylist) => {
     const matchesSpecialty =
       !filters.specialty || stylist.specialties.includes(filters.specialty);
 
@@ -344,8 +374,65 @@ export function filterStylistsLocal(
     const matchesRating =
       !filters.rating || stylist.rating >= getRatingThreshold(filters.rating);
 
+    // Sub-category / Service type filter
+    let matchesServiceType = true;
+    if (filters.serviceType) {
+      const activeSpecialty = filters.specialty || "All";
+      const subCategoryList = [
+        ...(SPECIALTY_SUB_SERVICES[activeSpecialty] || []),
+        ...(SPECIALTY_SUB_SERVICES["All"] || []),
+      ];
+      const matchedFilter = subCategoryList.find((f) => f.value === filters.serviceType);
+      const keywords = matchedFilter
+        ? matchedFilter.keywords
+        : [filters.serviceType.toLowerCase().replace(/-/g, " ")];
+
+      const stylistText = [
+        stylist.tagline.toLowerCase(),
+        stylist.bio.toLowerCase(),
+        ...stylist.services.map((s) => s.name.toLowerCase()),
+        ...stylist.specialties.map((s) => s.toLowerCase()),
+      ].join(" ");
+
+      matchesServiceType = keywords.some((kw) => stylistText.includes(kw.toLowerCase()));
+    }
+
+    // Borough / Neighborhood filter
+    let matchesBorough = true;
+    if (filters.borough) {
+      const bLower = filters.borough.toLowerCase();
+      matchesBorough =
+        stylist.bio.toLowerCase().includes(bLower) ||
+        stylist.name.toLowerCase().includes(bLower);
+    }
+
+    // Budget Tier filter
+    let matchesBudget = true;
+    if (filters.budgetTier) {
+      const basePrice = getStylistBasePrice(stylist);
+      if (filters.budgetTier === "under-50") {
+        matchesBudget = basePrice <= 50;
+      } else if (filters.budgetTier === "50-80") {
+        matchesBudget = basePrice >= 50 && basePrice <= 80;
+      } else if (filters.budgetTier === "80-110") {
+        matchesBudget = basePrice >= 80 && basePrice <= 110;
+      } else if (filters.budgetTier === "110-plus") {
+        matchesBudget = basePrice >= 110;
+      }
+    }
+
+    // Verified Only filter
+    const matchesVerified = !filters.verifiedOnly || Boolean(stylist.verified);
+
     const baseMatch =
-      matchesSpecialty && matchesRegion && matchesPrice && matchesRating;
+      matchesSpecialty &&
+      matchesRegion &&
+      matchesPrice &&
+      matchesRating &&
+      matchesServiceType &&
+      matchesBorough &&
+      matchesBudget &&
+      matchesVerified;
 
     if (!baseMatch) return false;
     if (!rawQuery) return true;
@@ -378,4 +465,30 @@ export function filterStylistsLocal(
     // Every token must match somewhere in the stylist's corpus
     return tokens.every((token) => searchCorpus.includes(token));
   });
+
+  // Apply sorting
+  const sortBy = filters.sortBy || "popular";
+  if (sortBy === "price-asc") {
+    filtered.sort((a, b) => getStylistBasePrice(a) - getStylistBasePrice(b));
+  } else if (sortBy === "price-desc") {
+    filtered.sort((a, b) => getStylistBasePrice(b) - getStylistBasePrice(a));
+  } else if (sortBy === "rating") {
+    filtered.sort((a, b) => {
+      if (b.rating !== a.rating) return b.rating - a.rating;
+      return b.reviewCount - a.reviewCount;
+    });
+  } else if (sortBy === "name") {
+    filtered.sort((a, b) => a.name.localeCompare(b.name));
+  } else {
+    // Default: 'popular' -> featured first, then rating/reviews, then name
+    filtered.sort((a, b) => {
+      if (a.featured !== b.featured) return (b.featured ? 1 : 0) - (a.featured ? 1 : 0);
+      const scoreA = a.rating * (a.reviewCount || 1);
+      const scoreB = b.rating * (b.reviewCount || 1);
+      if (scoreA !== scoreB) return scoreB - scoreA;
+      return a.name.localeCompare(b.name);
+    });
+  }
+
+  return filtered;
 }

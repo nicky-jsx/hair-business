@@ -49,16 +49,32 @@ function pickPalette(seed: string) {
   return PALETTES[hash % PALETTES.length];
 }
 
+function getPlaceholderTitleStyle(name: string): string {
+  const hasSpaces = name.includes(" ");
+  const len = name.length;
+
+  if (!hasSpaces) {
+    // Single-word names/handles: keep together on one line, scale text so no letters trail
+    if (len <= 9) return "text-xs sm:text-sm tracking-normal whitespace-nowrap";
+    if (len <= 13) return "text-[11px] sm:text-xs tracking-tight whitespace-nowrap";
+    if (len <= 17) return "text-[10px] sm:text-[11px] tracking-tight whitespace-nowrap";
+    return "text-[9px] sm:text-[10px] tracking-tighter whitespace-nowrap";
+  }
+
+  // Multi-word names: break strictly between whole words with balanced lines
+  if (len <= 16) return "text-xs sm:text-sm leading-snug break-normal [text-wrap:balance]";
+  return "text-[11px] sm:text-xs leading-tight break-normal [text-wrap:balance]";
+}
+
 export function PlaceholderImage({
   name,
   className = "",
-  textClassName = "text-3xl",
   variant = "card",
   subtitle,
 }: PlaceholderImageProps) {
   const clean = name.replace(/^@/, "").trim();
-  const initial = (clean[0] ?? "K").toUpperCase();
   const palette = pickPalette(clean);
+  const titleStyle = getPlaceholderTitleStyle(clean);
 
   if (variant === "avatar") {
     return (
@@ -66,11 +82,9 @@ export function PlaceholderImage({
         aria-hidden="true"
         className={`relative flex h-full w-full items-center justify-center overflow-hidden bg-gradient-to-br ${palette.bg} ${className}`}
       >
-        <div className={`flex h-4/5 w-4/5 items-center justify-center rounded-full border ${palette.seal}`}>
-          <span className={`font-display italic font-semibold ${palette.accent} ${textClassName}`}>
-            {initial}
-          </span>
-        </div>
+        <span className="material-symbols-outlined text-2xl text-white/40">
+          person
+        </span>
       </div>
     );
   }
@@ -78,37 +92,27 @@ export function PlaceholderImage({
   return (
     <div
       aria-hidden="true"
-      className={`relative flex h-full w-full flex-col items-center justify-center overflow-hidden bg-gradient-to-br ${palette.bg} p-6 select-none ${className}`}
+      className={`relative flex h-full w-full flex-col items-center justify-center overflow-hidden bg-gradient-to-br ${palette.bg} px-2.5 py-4 select-none ${className}`}
     >
-      {/* Editorial geometric watermark rings */}
-      <div className={`absolute -right-12 -top-12 h-44 w-44 rounded-full border border-dashed ${palette.border} opacity-40`} />
-      <div className={`absolute -bottom-10 -left-10 h-36 w-36 rounded-full border ${palette.border} opacity-30`} />
-
-      {/* Directory Seal Emblem */}
-      <div className="relative z-10 flex flex-col items-center text-center">
-        <div className={`mb-3 flex h-16 w-16 items-center justify-center rounded-full border ${palette.seal} bg-black/20 backdrop-blur-sm shadow-inner`}>
-          <span className={`font-display font-medium italic ${palette.accent} ${textClassName}`}>
-            {initial}
-          </span>
-        </div>
-
-        <span className="font-display text-sm tracking-wide text-[#fbf9f8] font-medium max-w-[85%] truncate">
+      {/* Directory Atelier Information */}
+      <div className="relative z-10 flex flex-col items-center text-center w-full px-1">
+        <span className={`font-display font-bold text-[#fbf9f8] max-w-full text-center ${titleStyle}`}>
           {clean}
         </span>
 
         {subtitle ? (
-          <span className="mt-1 text-[11px] uppercase tracking-caps text-[#bcac93]">
+          <span className="mt-1 text-[10px] sm:text-[11px] uppercase tracking-caps text-[#bcac93] font-medium truncate max-w-full">
             {subtitle}
           </span>
         ) : (
-          <span className="mt-1 text-[10px] uppercase tracking-widest text-[#a8a49c]/80">
+          <span className="mt-1 text-[9px] sm:text-[10px] uppercase tracking-widest text-[#a8a49c]/80">
             London Directory
           </span>
         )}
       </div>
 
       {/* Bottom Directory Tag */}
-      <div className="absolute bottom-3 left-3 right-3 flex items-center justify-between border-t border-white/10 pt-2 text-[10px] uppercase tracking-caps text-white/50">
+      <div className="absolute bottom-2 left-2.5 right-2.5 flex items-center justify-between border-t border-white/10 pt-1 text-[9px] uppercase tracking-caps text-white/50">
         <span>Hair Korter</span>
         <span>Curated</span>
       </div>

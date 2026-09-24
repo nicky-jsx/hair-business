@@ -54,64 +54,36 @@ export function ProfileReviews({
   const list = reviews ?? [];
   const firstName = stylistName?.split(" ")[0];
 
-  // Locked teaser for unclaimed listings — reviews unlock once the
-  // professional joins Hair Korter.
-  if (!verified) {
+  if (list.length > 0) {
     return (
-      <div className="relative overflow-hidden rounded-xl border border-outline-variant bg-surface-container-lowest p-8 text-center">
-        <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-secondary-fixed">
-          <span className="material-symbols-outlined text-2xl text-primary">
-            lock
-          </span>
-        </div>
-        <p className="text-sm font-semibold text-on-surface">
-          Reviews locked
-        </p>
-        <p className="mx-auto mt-1.5 max-w-xs text-[13px] leading-relaxed text-on-surface-variant">
-          {firstName ? `${firstName} hasn't` : "This professional hasn't"} joined
-          Hair Korter yet. Once they claim their profile, verified client reviews
-          will appear here.
-        </p>
-        <span className="mt-4 inline-flex items-center gap-1 rounded-full bg-surface-container px-3 py-1 text-[11px] font-semibold uppercase tracking-caps text-outline">
-          <span className="material-symbols-outlined text-[14px]">
-            hourglass_empty
-          </span>
-          Awaiting verification
-        </span>
-      </div>
-    );
-  }
-
-  return (
-    <div className="space-y-4">
-      {/* Summary */}
-      <div className="flex items-center gap-4 rounded-xl bg-surface-container-lowest p-5 shadow-ambient">
-        <div className="text-center">
-          <p className="font-display text-3xl font-semibold text-primary">
-            {rating.toFixed(1)}
-          </p>
-          <div className="mt-1">
-            <Stars rating={rating} />
+      <div className="space-y-4">
+        {/* Summary */}
+        <div className="flex items-center gap-4 rounded-xl border border-outline-variant/50 bg-surface-container-lowest p-5 shadow-ambient">
+          <div className="text-center">
+            <p className="font-display text-3xl font-semibold text-primary">
+              {rating.toFixed(1)}
+            </p>
+            <div className="mt-1">
+              <Stars rating={rating} />
+            </div>
+          </div>
+          <div className="h-12 w-px bg-outline-variant" />
+          <div>
+            <p className="text-sm font-semibold text-on-surface">
+              {reviewCount || list.length} review{(reviewCount || list.length) !== 1 ? "s" : ""}
+            </p>
+            <p className="mt-0.5 text-[13px] text-on-surface-variant">
+              From verified appointments
+            </p>
           </div>
         </div>
-        <div className="h-12 w-px bg-outline-variant" />
-        <div>
-          <p className="text-sm font-semibold text-on-surface">
-            {reviewCount} review{reviewCount !== 1 ? "s" : ""}
-          </p>
-          <p className="mt-0.5 text-[13px] text-on-surface-variant">
-            From verified clients
-          </p>
-        </div>
-      </div>
 
-      {/* List */}
-      {list.length > 0 ? (
+        {/* List */}
         <div className="space-y-3">
           {list.map((review) => (
             <div
               key={review.id}
-              className="rounded-xl bg-surface-container-lowest p-4 shadow-ambient"
+              className="rounded-xl border border-outline-variant/40 bg-surface-container-lowest p-4 shadow-ambient"
             >
               <div className="flex items-center gap-3">
                 <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-secondary-fixed text-[13px] font-semibold text-primary">
@@ -139,19 +111,29 @@ export function ProfileReviews({
             </div>
           ))}
         </div>
-      ) : (
-        <div className="rounded-xl border border-outline-variant bg-transparent p-8 text-center">
-          <span className="material-symbols-outlined text-3xl text-outline">
-            reviews
-          </span>
-          <p className="mt-2 text-sm font-medium text-on-surface">
-            No reviews yet
-          </p>
-          <p className="mt-1 text-[13px] text-on-surface-variant">
-            Be the first to book and leave a review.
-          </p>
-        </div>
-      )}
+      </div>
+    );
+  }
+
+  return (
+    <div className="rounded-2xl border border-outline-variant/60 bg-surface-container-lowest p-8 text-center shadow-ambient">
+      <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-2xl bg-secondary-fixed text-primary">
+        <span className="material-symbols-outlined text-2xl">
+          rate_review
+        </span>
+      </div>
+      <h3 className="font-display text-base font-semibold text-primary">
+        Client Reviews
+      </h3>
+      <p className="mx-auto mt-1.5 max-w-sm text-[13px] leading-relaxed text-on-surface-variant">
+        No client reviews have been published on Hair Korter yet. Verified reviews will appear here once booked clients complete their appointments.
+      </p>
+      <div className="mt-4 inline-flex items-center gap-1.5 rounded-full bg-surface-container px-3.5 py-1 text-[11px] font-medium text-outline">
+        <span className="material-symbols-outlined text-[14px]">
+          verified
+        </span>
+        Hair Korter Verified Reviews
+      </div>
     </div>
   );
 }

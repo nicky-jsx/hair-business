@@ -18,10 +18,15 @@
     }
   }
 
-  /* Desktop background */
+  /* Desktop background: warm luxury studio ambience */
   @media (min-width: 1024px) {
     body {
-      @apply bg-surface-container;
+      background-color: #f4efe9;
+      background-image: 
+        radial-gradient(at 0% 0%, rgba(201, 168, 106, 0.12) 0px, transparent 50%),
+        radial-gradient(at 100% 100%, rgba(36, 33, 30, 0.06) 0px, transparent 50%),
+        radial-gradient(at 50% 50%, #faf7f2 0%, #ebe4d8 100%);
+      background-attachment: fixed;
     }
   }
 }

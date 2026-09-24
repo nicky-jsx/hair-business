@@ -6,6 +6,7 @@ import { AuthProvider } from "@/context/AuthContext";
 import { ServiceWorkerRegistration } from "@/components/pwa/ServiceWorkerRegistration";
 import { InstallPrompt } from "@/components/pwa/InstallPrompt";
 import { SplashScreen } from "@/components/pwa/SplashScreen";
+import { ExtensionErrorSuppressor } from "@/components/ui/ExtensionErrorSuppressor";
 import "./globals.css";
 
 const inter = Inter({
@@ -54,6 +55,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
+        <ExtensionErrorSuppressor />
         <link
           href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap"
           rel="stylesheet"
@@ -65,7 +67,7 @@ export default function RootLayout({
         <AuthProvider>
           <ServiceWorkerRegistration />
           <SplashScreen />
-          <div className="mx-auto flex min-h-dvh max-w-lg flex-col bg-background lg:my-4 lg:min-h-[calc(100dvh-2rem)] lg:rounded-3xl lg:shadow-xl lg:ring-1 lg:ring-gray-200">
+          <div className="mx-auto flex min-h-dvh max-w-md flex-col bg-background lg:my-6 lg:min-h-[calc(100dvh-3rem)] lg:rounded-3xl lg:shadow-2xl lg:ring-1 lg:ring-black/10 overflow-x-hidden">
             <Header />
             <main className="flex-1 pb-20">{children}</main>
             <BottomNav />

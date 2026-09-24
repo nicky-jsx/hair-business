@@ -16,7 +16,7 @@ export function ProfileBookingBar({ stylist }: ProfileBookingBarProps) {
   const verified = Boolean(stylist.verified);
 
   return (
-    <div className="fixed bottom-0 left-1/2 z-40 w-full max-w-lg -translate-x-1/2 border-t border-outline-variant/40 bg-background/95 px-5 py-3.5 backdrop-blur-md safe-bottom shadow-lg">
+    <div className="fixed bottom-0 left-1/2 z-40 w-full max-w-md -translate-x-1/2 border-t border-outline-variant/40 bg-background/95 px-5 py-3.5 backdrop-blur-md safe-bottom shadow-lg">
       {/* Contact / external links */}
       {(bookingUrl || instagramUrl) && (
         <div className="mb-2 flex gap-2">

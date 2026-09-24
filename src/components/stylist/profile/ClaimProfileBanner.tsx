@@ -29,9 +29,9 @@ export function ClaimProfileBanner({ stylist }: ClaimProfileBannerProps) {
           </h2>
 
           <p className="max-w-md text-[13px] leading-relaxed text-[#d7cebf]">
-            This profile is currently a curated listing. Claim and unlock your
-            profile to showcase your portfolio, manage your services &amp; pricing,
-            and collect verified client reviews.
+            This profile is currently unclaimed. Claim and unlock your profile
+            to showcase your portfolio, manage your services &amp; pricing, and
+            collect verified client reviews.
           </p>
         </div>
 

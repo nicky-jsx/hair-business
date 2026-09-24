@@ -4,9 +4,9 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 const navItems = [
-  { href: "/", label: "Directory", icon: "explore" },
-  { href: "/stylist/claim", label: "Claim Listing", icon: "verified" },
-  { href: "/stylist/dashboard", label: "Stylists", icon: "storefront" },
+  { href: "/", label: "Home", icon: "home" },
+  { href: "/stylists", label: "Directory", icon: "search" },
+  { href: "/stylist/claim", label: "Claim", icon: "verified" },
 ];
 
 export function BottomNav() {
@@ -18,12 +18,14 @@ export function BottomNav() {
   }
 
   return (
-    <nav className="fixed bottom-0 left-1/2 z-40 w-full max-w-lg -translate-x-1/2 bg-background/90 backdrop-blur-lg border-t border-outline-variant/30 safe-bottom">
+    <nav className="fixed bottom-0 left-1/2 z-40 w-full max-w-md -translate-x-1/2 bg-background/90 backdrop-blur-lg border-t border-outline-variant/30 safe-bottom">
       <div className="flex items-center justify-around px-4 h-16">
         {navItems.map((item) => {
           const active =
             item.href === "/"
-              ? pathname === "/" || pathname === "/stylists"
+              ? pathname === "/"
+              : item.href === "/stylists"
+              ? pathname === "/stylists"
               : pathname.startsWith(item.href);
 
           return (

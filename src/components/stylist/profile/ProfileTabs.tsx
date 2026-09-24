@@ -13,22 +13,31 @@ interface ProfileTabsProps {
 
 type TabId = "services" | "portfolio" | "reviews" | "policy";
 
-const TABS: { id: TabId; label: string }[] = [
-  { id: "services", label: "Services" },
-  { id: "portfolio", label: "Portfolio" },
-  { id: "policy", label: "Booking Policy" },
-  { id: "reviews", label: "Reviews" },
-];
-
 export function ProfileTabs({ stylist }: ProfileTabsProps) {
   const [active, setActive] = useState<TabId>("services");
+
+  const hasCustomPolicy = Boolean(
+    stylist.bookingPolicy &&
+      (stylist.bookingPolicy.deposit ||
+        stylist.bookingPolicy.cancellation ||
+        stylist.bookingPolicy.lateness ||
+        stylist.bookingPolicy.noShow ||
+        stylist.bookingPolicy.additionalNotes)
+  );
+
+  const tabs: { id: TabId; label: string }[] = [
+    { id: "services", label: "Services" },
+    { id: "portfolio", label: "Portfolio" },
+    ...(hasCustomPolicy ? [{ id: "policy" as TabId, label: "Booking Policy" }] : []),
+    { id: "reviews", label: "Reviews" },
+  ];
 
   return (
     <section>
       {/* Tab bar */}
       <div className="sticky top-16 z-10 -mx-5 mb-6 border-b border-outline-variant bg-background/90 px-5 backdrop-blur-md">
         <div className="flex gap-6 overflow-x-auto [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-          {TABS.map((tab) => {
+          {tabs.map((tab) => {
             const isActive = active === tab.id;
             return (
               <button
@@ -40,14 +49,7 @@ export function ProfileTabs({ stylist }: ProfileTabsProps) {
                     : "text-on-surface-variant hover:text-primary"
                 }`}
               >
-                <span className="inline-flex items-center gap-1">
-                  {tab.label}
-                  {tab.id === "reviews" && !stylist.verified && (
-                    <span className="material-symbols-outlined text-[14px] text-outline">
-                      lock
-                    </span>
-                  )}
-                </span>
+                <span>{tab.label}</span>
                 {isActive && (
                   <span className="absolute inset-x-0 -bottom-px h-0.5 rounded-full bg-primary" />
                 )}
@@ -58,7 +60,9 @@ export function ProfileTabs({ stylist }: ProfileTabsProps) {
       </div>
 
       {/* Tab content */}
-      {active === "services" && <ProfileServices services={stylist.services} />}
+      {active === "services" && (
+        <ProfileServices services={stylist.services} stylist={stylist} />
+      )}
       {active === "portfolio" && (
         <ProfilePortfolio
           photos={stylist.portfolio}

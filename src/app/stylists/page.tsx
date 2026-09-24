@@ -1,19 +1,7 @@
-import { redirect } from "next/navigation";
+import { DirectoryExplorer } from "@/components/stylist/DirectoryExplorer";
 
-interface StylistsPageProps {
-  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
-}
+export const revalidate = 60; // Revalidate every 60 seconds
 
-export default async function StylistsPage({ searchParams }: StylistsPageProps) {
-  const resolvedParams = await searchParams;
-  const sp = new URLSearchParams();
-  for (const [key, value] of Object.entries(resolvedParams)) {
-    if (typeof value === "string") {
-      sp.set(key, value);
-    } else if (Array.isArray(value)) {
-      for (const v of value) sp.append(key, v);
-    }
-  }
-  const queryString = sp.toString();
-  redirect(queryString ? `/?${queryString}` : "/");
+export default function StylistsDirectoryPage() {
+  return <DirectoryExplorer />;
 }

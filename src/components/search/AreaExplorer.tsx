@@ -5,20 +5,14 @@ import Link from "next/link";
 import { REGIONS, type Region, type Specialty } from "@/types/stylist";
 
 const SPECIALTIES: { label: string; value: Specialty | null }[] = [
-  { label: "All Styles", value: null },
+  { label: "All Services", value: null },
   { label: "Wigs", value: "Wigs" },
-  { label: "Braids", value: "Braids" },
-  { label: "Locs", value: "Locs" },
   { label: "Lashes", value: "Eyelashes" },
+  { label: "Dreadlocks", value: "Locs" },
 ];
 
 export function AreaExplorer() {
   const [selectedSpecialty, setSelectedSpecialty] = useState<Specialty | null>(null);
-
-  const specialtyLabel =
-    selectedSpecialty === "Eyelashes"
-      ? "Lash"
-      : selectedSpecialty || "Styles";
 
   return (
     <section className="mb-14">
@@ -28,7 +22,7 @@ export function AreaExplorer() {
         </h2>
         <p className="text-[13px] text-on-surface-variant">
           {selectedSpecialty
-            ? `Find curated ${specialtyLabel.toLowerCase()} specialists across London`
+            ? `Find curated ${selectedSpecialty.toLowerCase()} specialists across London`
             : "Browse professionals across London"}
         </p>
       </div>
@@ -61,7 +55,7 @@ export function AreaExplorer() {
           if (selectedSpecialty) {
             queryParams.set("specialty", selectedSpecialty);
           }
-          const href = `/stylists?${queryParams.toString()}`;
+          const href = `/?${queryParams.toString()}`;
 
           return (
             <Link

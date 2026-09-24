@@ -60,7 +60,7 @@ function ClaimPageContent() {
           Profile Not Found
         </h1>
         <p className="mt-2 text-sm text-on-surface-variant">
-          We couldn&apos;t find the directory listing you are trying to claim.
+          We couldn&apos;t find the stylist profile you are trying to claim.
         </p>
         <Link
           href="/"
@@ -87,7 +87,7 @@ function ClaimPageContent() {
         </p>
         <div className="mt-6 flex justify-center gap-3">
           <Link href={`/stylists/${stylist.id}`}>
-            <Button variant="secondary">View Public Listing</Button>
+            <Button variant="secondary">View Public Profile</Button>
           </Link>
           <Link href="/stylist/dashboard">
             <Button variant="primary">Go to Dashboard</Button>
@@ -191,9 +191,9 @@ function ClaimPageContent() {
           </div>
           <div className="min-w-0 flex-1">
             <span className="inline-flex items-center gap-1 rounded-full bg-secondary-fixed/20 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-caps text-secondary">
-              Curated Directory Listing
+              Curated Stylist Profile
             </span>
-            <h2 className="mt-1 font-display text-lg font-bold text-primary truncate">
+            <h2 className="mt-1 font-display text-lg font-bold text-primary break-words leading-snug">
               {stylist.name}
             </h2>
             <p className="text-xs text-on-surface-variant truncate">

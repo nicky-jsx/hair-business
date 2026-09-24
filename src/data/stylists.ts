@@ -157,7 +157,7 @@ export const stylists: Stylist[] = [
     specialties: ["Silk Press", "Natural Hair", "Extensions"],
     yearsExperience: 10,
     priceRange: "££",
-    featured: false,
+    featured: true,
     rating: 4.7,
     reviewCount: 156,
     services: [
@@ -185,7 +185,7 @@ export const stylists: Stylist[] = [
     specialties: ["Locs", "Natural Hair"],
     yearsExperience: 7,
     priceRange: "££",
-    featured: false,
+    featured: true,
     rating: 4.9,
     reviewCount: 94,
     services: [
@@ -294,7 +294,7 @@ export const stylists: Stylist[] = [
     specialties: ["Eyelashes"],
     yearsExperience: 6,
     priceRange: "££",
-    featured: true,
+    featured: false,
     rating: 4.8,
     reviewCount: 115,
     services: [
@@ -316,14 +316,14 @@ export const stylists: Stylist[] = [
     id: "10",
     name: "FS Hair UK",
     tagline: "Custom wig units & flawless lace installs",
-    bio: "Curated directory listing. Based in Abbey Wood, South London, offering glueless wig installs, custom lace melting, and luxury styling.",
+    bio: "Curated directory profile. Based in Abbey Wood, South London, offering glueless wig installs, custom lace melting, and luxury styling.",
     avatar: null,
     coverImage: null,
     region: "South",
     specialties: ["Wigs"],
     yearsExperience: 4,
     priceRange: "£",
-    featured: true,
+    featured: false,
     rating: 0,
     reviewCount: 0,
     services: [

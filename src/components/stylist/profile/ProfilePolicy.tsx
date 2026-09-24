@@ -13,7 +13,8 @@ const POLICY_ITEMS: { key: keyof BookingPolicy; label: string; icon: string }[] 
 ];
 
 export function ProfilePolicy({ policy }: ProfilePolicyProps) {
-  const resolved = policy ?? DEFAULT_BOOKING_POLICY;
+  if (!policy) return null;
+  const resolved = policy;
 
   return (
     <div className="space-y-3">

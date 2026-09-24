@@ -41,25 +41,21 @@ export function ProfilePortfolio({
                   <span className="h-1 w-1 rounded-full bg-outline-variant" />
                   <span className="text-[12px] text-outline">Instagram</span>
                 </div>
-                <h3 className="mt-0.5 font-display text-lg font-semibold text-primary">
-                  {igHandle || `@${firstName.toLowerCase()}`}
-                </h3>
-                <p className="mt-1 text-sm leading-relaxed text-on-surface-variant">
-                  {firstName}&apos;s full lookbook and latest client transformations
-                  are actively updated on Instagram.
-                </p>
-
                 <a
                   href={igUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="mt-4 inline-flex items-center gap-2 rounded-xl bg-primary px-5 py-2.5 text-xs font-semibold uppercase tracking-caps text-background transition-opacity hover:opacity-90 active:scale-[0.99]"
+                  className="mt-0.5 inline-flex items-center gap-1 font-display text-lg font-semibold text-primary hover:text-secondary transition-colors group"
                 >
-                  <span className="material-symbols-outlined text-base">
+                  <span>{igHandle || `@${firstName.toLowerCase()}`}</span>
+                  <span className="material-symbols-outlined text-base text-secondary transition-transform group-hover:translate-x-0.5">
                     open_in_new
                   </span>
-                  Explore Instagram Lookbook
                 </a>
+                <p className="mt-1 text-sm leading-relaxed text-on-surface-variant">
+                  {firstName}&apos;s full lookbook and latest client transformations
+                  are actively updated on Instagram.
+                </p>
               </div>
             </div>
           </div>
@@ -72,45 +68,8 @@ export function ProfilePortfolio({
               Portfolio In Curation
             </h3>
             <p className="mx-auto mt-1 max-w-sm text-sm text-on-surface-variant">
-              This listing is currently in our London directory registry.
+              This specialist&apos;s lookbook is currently in curation for the London directory.
             </p>
-          </div>
-        )}
-
-        {/* Locked In-App Gallery Preview */}
-        {!verified && (
-          <div className="relative overflow-hidden rounded-2xl border border-dashed border-outline-variant bg-surface-container-low/50 p-6 text-center">
-            {/* Background faux gallery tiles with blur */}
-            <div className="pointer-events-none mb-4 grid grid-cols-3 gap-2 opacity-25 filter blur-[1px]">
-              <div className="aspect-square rounded-lg bg-surface-container-high" />
-              <div className="aspect-square rounded-lg bg-surface-container" />
-              <div className="aspect-square rounded-lg bg-surface-container-high" />
-            </div>
-
-            <div className="relative z-10 flex flex-col items-center">
-              <div className="mb-2 flex h-10 w-10 items-center justify-center rounded-full bg-surface-container text-primary">
-                <span className="material-symbols-outlined text-xl">lock</span>
-              </div>
-              <p className="text-sm font-semibold text-primary">
-                Direct Portfolio Gallery
-              </p>
-              <p className="mt-1 max-w-xs text-xs leading-relaxed text-on-surface-variant">
-                High-definition in-app photo grids unlock once {firstName} claims
-                this profile and uploads client styles.
-              </p>
-
-              {stylistId && (
-                <Link
-                  href={`/stylist/claim?id=${stylistId}`}
-                  className="mt-3 inline-flex items-center gap-1.5 text-xs font-semibold text-secondary hover:underline"
-                >
-                  <span>Are you {firstName}? Unlock your gallery here</span>
-                  <span className="material-symbols-outlined text-sm">
-                    arrow_forward
-                  </span>
-                </Link>
-              )}
-            </div>
           </div>
         )}
       </div>

@@ -13,7 +13,7 @@ export function ProfileHeader({ stylist }: ProfileHeaderProps) {
 
   return (
     <>
-      <div className="relative h-56 bg-surface-container">
+      <div className="relative h-56 bg-surface-container overflow-hidden">
         {stylist.coverImage ? (
           <Image
             src={stylist.coverImage}
@@ -24,18 +24,15 @@ export function ProfileHeader({ stylist }: ProfileHeaderProps) {
             sizes="512px"
           />
         ) : (
-          <PlaceholderImage
-            name={stylist.name}
-            variant="cover"
-            subtitle={primarySpecialty}
-            textClassName="text-4xl"
-          />
+          <div className="relative h-full w-full bg-gradient-to-br from-[#1c1917] via-[#24201c] to-[#161412]">
+            <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-secondary-fixed/10 via-transparent to-transparent" />
+          </div>
         )}
         <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/30" />
 
         {/* Back navigation */}
         <Link
-          href="/"
+          href="/stylists"
           aria-label="Back to directory"
           className="absolute left-4 top-4 flex h-10 w-10 items-center justify-center rounded-full bg-black/40 text-white backdrop-blur-md transition-colors hover:bg-black/60"
         >
@@ -48,15 +45,15 @@ export function ProfileHeader({ stylist }: ProfileHeaderProps) {
             <span className="material-symbols-outlined text-[14px] text-secondary-fixed">
               {stylist.verified ? "verified" : "hotel_class"}
             </span>
-            {stylist.verified ? "Verified Specialist" : "Curated Listing"}
+            {stylist.verified ? "Verified Specialist" : "Curated Profile"}
           </span>
         </div>
       </div>
 
       <div className="relative px-5">
-        <div className="-mt-14 mb-4 flex items-end justify-between">
-          <div className="relative h-24 w-24 overflow-hidden rounded-2xl bg-surface-container-high ring-4 ring-background shadow-card">
-            {stylist.avatar ? (
+        <div className={`${stylist.avatar ? "-mt-14 mb-4" : "mt-3 mb-2"} flex items-end justify-between`}>
+          {stylist.avatar && (
+            <div className="relative h-24 w-24 overflow-hidden rounded-2xl bg-surface-container-high ring-4 ring-background shadow-card">
               <Image
                 src={stylist.avatar}
                 alt={stylist.name}
@@ -64,15 +61,9 @@ export function ProfileHeader({ stylist }: ProfileHeaderProps) {
                 className="object-cover"
                 sizes="96px"
               />
-            ) : (
-              <PlaceholderImage
-                name={stylist.name}
-                variant="avatar"
-                textClassName="text-3xl"
-              />
-            )}
-          </div>
-          <span className="mb-1 rounded-full bg-surface-container-lowest px-3 py-1 text-xs font-semibold uppercase tracking-caps text-on-surface shadow-sm border border-outline-variant/30">
+            </div>
+          )}
+          <span className="rounded-full bg-surface-container-lowest px-3 py-1 text-xs font-semibold uppercase tracking-caps text-on-surface shadow-sm border border-outline-variant/30 ml-auto">
             {stylist.priceRange}
           </span>
         </div>
