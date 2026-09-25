@@ -300,9 +300,12 @@ export async function fetchFeaturedStylists(): Promise<Stylist[]> {
 
   if (hairStylists.length === 0) return [];
 
-  // Find aleshalocdit specifically to ensure she is featured
+  // Find aleshalocdit and 38styles specifically to ensure they are featured
   const alesha = hairStylists.find(
     (s) => s.id === "fc60e331-845f-49bc-9dc7-a50ed040906a" || s.name.toLowerCase() === "aleshalocdit"
+  );
+  const thirtyEightStyles = hairStylists.find(
+    (s) => s.id === "3d6b9ed5-643d-430f-9684-7f2e50b1acc4" || s.name.toLowerCase() === "38styles"
   );
 
   // 1. Prioritize any explicitly marked featured in the database
@@ -313,6 +316,7 @@ export async function fetchFeaturedStylists(): Promise<Stylist[]> {
     (s) =>
       !explicitFeatured.some((ef) => ef.id === s.id) &&
       s.id !== alesha?.id &&
+      s.id !== thirtyEightStyles?.id &&
       s.name.toLowerCase() !== "nicky" &&
       Boolean(s.bio && s.bio.length > 10)
   );
@@ -323,11 +327,17 @@ export async function fetchFeaturedStylists(): Promise<Stylist[]> {
 
   const curated: Stylist[] = [];
 
-  // Always feature aleshalocdit with her thumbnail ONLY in the featured section
+  // Always feature aleshalocdit and 38styles with their thumbnails ONLY in the featured section
   if (alesha) {
     curated.push({
       ...alesha,
       coverImage: "/images/featured/aleshalocdit.jpg",
+    });
+  }
+  if (thirtyEightStyles) {
+    curated.push({
+      ...thirtyEightStyles,
+      coverImage: "/images/featured/38styles.jpg",
     });
   }
 
@@ -348,10 +358,13 @@ export async function fetchFeaturedStylists(): Promise<Stylist[]> {
 
   const result = [...explicitFeatured, ...curated].slice(0, 6);
 
-  // Ensure aleshalocdit has her custom thumbnail specifically in the featured section
+  // Ensure aleshalocdit and 38styles have their custom thumbnails specifically in the featured section
   return result.map((s) => {
     if (s.id === "fc60e331-845f-49bc-9dc7-a50ed040906a" || s.name.toLowerCase() === "aleshalocdit") {
       return { ...s, coverImage: "/images/featured/aleshalocdit.jpg" };
+    }
+    if (s.id === "3d6b9ed5-643d-430f-9684-7f2e50b1acc4" || s.name.toLowerCase() === "38styles") {
+      return { ...s, coverImage: "/images/featured/38styles.jpg" };
     }
     return s;
   });
