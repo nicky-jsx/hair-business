@@ -300,16 +300,19 @@ export async function fetchFeaturedStylists(): Promise<Stylist[]> {
 
   if (hairStylists.length === 0) return [];
 
+  // Find aleshalocdit specifically to ensure she is featured
+  const alesha = hairStylists.find(
+    (s) => s.id === "fc60e331-845f-49bc-9dc7-a50ed040906a" || s.name.toLowerCase() === "aleshalocdit"
+  );
+
   // 1. Prioritize any explicitly marked featured in the database
   const explicitFeatured = hairStylists.filter((s) => s.featured);
-  if (explicitFeatured.length >= 6) {
-    return explicitFeatured.slice(0, 6);
-  }
 
   // 2. Select authentic, prominent London hair specialists from the database
   const pool = hairStylists.filter(
     (s) =>
       !explicitFeatured.some((ef) => ef.id === s.id) &&
+      s.id !== alesha?.id &&
       s.name.toLowerCase() !== "nicky" &&
       Boolean(s.bio && s.bio.length > 10)
   );
@@ -319,6 +322,15 @@ export async function fetchFeaturedStylists(): Promise<Stylist[]> {
   const locs = pool.filter((s) => s.specialties.includes("Locs"));
 
   const curated: Stylist[] = [];
+
+  // Always feature aleshalocdit with her thumbnail ONLY in the featured section
+  if (alesha) {
+    curated.push({
+      ...alesha,
+      coverImage: "/images/featured/aleshalocdit.jpg",
+    });
+  }
+
   // Select top wig specialists across London
   for (const w of wigs) {
     if (curated.length < 4) curated.push(w);
@@ -329,12 +341,20 @@ export async function fetchFeaturedStylists(): Promise<Stylist[]> {
   }
   // Fill any remaining from the pool
   for (const p of pool) {
-    if (curated.length < (6 - explicitFeatured.length) && !curated.some((c) => c.id === p.id)) {
+    if (curated.length < 6 && !curated.some((c) => c.id === p.id)) {
       curated.push(p);
     }
   }
 
-  return [...explicitFeatured, ...curated];
+  const result = [...explicitFeatured, ...curated].slice(0, 6);
+
+  // Ensure aleshalocdit has her custom thumbnail specifically in the featured section
+  return result.map((s) => {
+    if (s.id === "fc60e331-845f-49bc-9dc7-a50ed040906a" || s.name.toLowerCase() === "aleshalocdit") {
+      return { ...s, coverImage: "/images/featured/aleshalocdit.jpg" };
+    }
+    return s;
+  });
 }
 
 function getRatingThreshold(filter: string): number {
