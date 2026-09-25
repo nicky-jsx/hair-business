@@ -1,12 +1,23 @@
 import Image from "next/image";
 import Link from "next/link";
 import { formatRegion } from "@/types/stylist";
-import type { Stylist } from "@/types/stylist";
+import type { Stylist, Specialty } from "@/types/stylist";
 import { PlaceholderImage } from "@/components/ui/PlaceholderImage";
 
 interface StylistCardProps {
   stylist: Stylist;
   variant?: "default" | "compact" | "featured";
+  activeFilter?: Specialty | null;
+}
+
+/**
+ * Reorder specialties so that the active filter appears first.
+ * This prevents confusion when e.g. a user filters by "Braids" but
+ * a multi-specialty stylist shows "Locs" as their primary tag.
+ */
+function prioritiseSpecialties(specialties: Specialty[], activeFilter?: Specialty | null): Specialty[] {
+  if (!activeFilter || !specialties.includes(activeFilter)) return specialties;
+  return [activeFilter, ...specialties.filter((s) => s !== activeFilter)];
 }
 
 function getStartingPrice(stylist: Stylist): string {
@@ -22,8 +33,9 @@ function getStartingPrice(stylist: Stylist): string {
   return stylist.priceRange || "££";
 }
 
-export function StylistCard({ stylist, variant = "default" }: StylistCardProps) {
-  const primarySpecialty = stylist.specialties?.[0] || formatRegion(stylist.region);
+export function StylistCard({ stylist, variant = "default", activeFilter }: StylistCardProps) {
+  const orderedSpecialties = prioritiseSpecialties(stylist.specialties, activeFilter);
+  const primarySpecialty = orderedSpecialties?.[0] || formatRegion(stylist.region);
   const startingPrice = getStartingPrice(stylist);
 
   if (variant === "featured") {
@@ -91,8 +103,8 @@ export function StylistCard({ stylist, variant = "default" }: StylistCardProps) 
               <span>{formatRegion(stylist.region)}</span>
               <span>•</span>
               <span className="text-secondary font-medium">
-                {stylist.specialties && stylist.specialties.length > 0
-                  ? stylist.specialties.slice(0, 2).join(" • ")
+                {orderedSpecialties && orderedSpecialties.length > 0
+                  ? orderedSpecialties.slice(0, 2).join(" • ")
                   : primarySpecialty}
               </span>
             </div>
@@ -210,17 +222,21 @@ export function StylistCard({ stylist, variant = "default" }: StylistCardProps) 
 
           {/* Specialty chips */}
           <div className="mt-2 flex flex-wrap gap-1">
-            {stylist.specialties.slice(0, 2).map((spec) => (
+            {orderedSpecialties.slice(0, 2).map((spec) => (
               <span
                 key={spec}
-                className="rounded-md bg-surface-container px-1.5 py-0.5 text-[9px] sm:text-[10px] font-medium text-on-surface-variant"
+                className={`rounded-md px-1.5 py-0.5 text-[9px] sm:text-[10px] font-medium ${
+                  activeFilter && spec === activeFilter
+                    ? "bg-secondary-fixed/50 text-secondary font-semibold"
+                    : "bg-surface-container text-on-surface-variant"
+                }`}
               >
                 {spec}
               </span>
             ))}
-            {stylist.specialties.length > 2 && (
+            {orderedSpecialties.length > 2 && (
               <span className="rounded-md bg-surface-container px-1 py-0.5 text-[9px] sm:text-[10px] font-medium text-outline">
-                +{stylist.specialties.length - 2}
+                +{orderedSpecialties.length - 2}
               </span>
             )}
           </div>

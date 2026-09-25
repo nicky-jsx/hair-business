@@ -868,7 +868,7 @@ function DirectoryExplorerContent() {
 
         {results.length > 0 ? (
           <>
-            <StylistGrid stylists={paginatedResults} />
+            <StylistGrid stylists={paginatedResults} activeFilter={specialty} />
             <Pagination
               currentPage={currentPage}
               totalPages={totalPages}

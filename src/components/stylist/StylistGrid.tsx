@@ -1,14 +1,16 @@
 import { StylistCard } from "@/components/stylist/StylistCard";
-import type { Stylist } from "@/types/stylist";
+import type { Stylist, Specialty } from "@/types/stylist";
 
 interface StylistGridProps {
   stylists: Stylist[];
   emptyMessage?: string;
+  activeFilter?: Specialty | null;
 }
 
 export function StylistGrid({
   stylists,
   emptyMessage = "No specialists found matching your search.",
+  activeFilter,
 }: StylistGridProps) {
   if (stylists.length === 0) {
     return (
@@ -31,7 +33,7 @@ export function StylistGrid({
   return (
     <div className="grid grid-cols-2 gap-3">
       {stylists.map((stylist) => (
-        <StylistCard key={stylist.id} stylist={stylist} />
+        <StylistCard key={stylist.id} stylist={stylist} activeFilter={activeFilter} />
       ))}
     </div>
   );
