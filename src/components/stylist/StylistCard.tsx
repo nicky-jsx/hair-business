@@ -14,6 +14,11 @@ function getStartingPrice(stylist: Stylist): string {
     const min = Math.min(...stylist.services.map((s) => s.price));
     if (min > 0) return `From £${min}`;
   }
+  const bioMatch = stylist.bio?.match(/£(\d+)/);
+  if (bioMatch) {
+    const num = parseInt(bioMatch[1], 10);
+    if (!isNaN(num) && num > 0) return `From £${num}`;
+  }
   return stylist.priceRange || "££";
 }
 

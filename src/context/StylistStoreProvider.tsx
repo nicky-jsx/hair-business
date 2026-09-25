@@ -8,7 +8,6 @@ import {
   useMemo,
   useState,
 } from "react";
-import { stylists as sampleStylists } from "@/data/stylists";
 import {
   getCurrentAccount,
   getCustomStylists,
@@ -60,7 +59,7 @@ export function StylistStoreProvider({
   }, [refresh]);
 
   const stylists = useMemo(
-    () => [...sampleStylists, ...customStylists],
+    () => customStylists,
     [customStylists]
   );
 

@@ -1,6 +1,5 @@
 import { getSupabase, isSupabaseConfigured } from "./supabase";
 import { getSessionToken } from "./session";
-import { stylists as sampleStylists } from "@/data/stylists";
 import {
   SPECIALTY_SUB_SERVICES,
   type Stylist,
@@ -25,8 +24,8 @@ interface StylistSpecialtyRow {
 export async function fetchAllStylists(): Promise<Stylist[]> {
   const supabase = getSupabase();
   if (!supabase) {
-    console.log("Supabase not configured, using sample data");
-    return sampleStylists;
+    console.log("Supabase not configured");
+    return [];
   }
 
   const { data, error: stylistsError } = await supabase
@@ -37,14 +36,13 @@ export async function fetchAllStylists(): Promise<Stylist[]> {
 
   if (stylistsError) {
     console.error("Error fetching stylists:", stylistsError);
-    console.log("Falling back to sample data");
-    return sampleStylists;
+    return [];
   }
 
   const stylists = data as StylistRow[] | null;
 
   if (!stylists || stylists.length === 0) {
-    return sampleStylists;
+    return [];
   }
 
   const stylistIds = stylists.map((s) => s.id);
@@ -146,7 +144,7 @@ function parseBookingPolicy(row: any): Stylist["bookingPolicy"] {
 export async function fetchStylistById(id: string): Promise<Stylist | null> {
   const supabase = getSupabase();
   if (!supabase) {
-    return sampleStylists.find((s) => s.id === id) ?? null;
+    return null;
   }
 
   const { data, error } = await supabase
@@ -159,8 +157,7 @@ export async function fetchStylistById(id: string): Promise<Stylist | null> {
 
   if (error || !stylist) {
     console.error("Error fetching stylist:", error);
-    console.log("Falling back to sample data for stylist:", id);
-    return sampleStylists.find((s) => s.id === id) ?? null;
+    return null;
   }
 
   const [specialtiesRes, servicesRes, portfolioRes, ratingsRes, reviewsRes] =
@@ -294,26 +291,50 @@ export async function updateSlotInterval(
 }
 
 export async function fetchFeaturedStylists(): Promise<Stylist[]> {
-  // Curated hair stylists (strictly hair, excluding lash technicians)
-  const hairStylists = sampleStylists.filter(
-    (s) => s.featured && !s.specialties.includes("Eyelashes")
-  );
-
-  const supabase = getSupabase();
-  if (!supabase) {
-    return hairStylists.slice(0, 6);
-  }
-
   const allStylists = await fetchAllStylists();
-  const dbFeatured = allStylists.filter(
-    (s) => s.featured && !s.specialties.includes("Eyelashes")
+
+  // Strictly hair specialists (exclude lash technicians)
+  const hairStylists = allStylists.filter(
+    (s) => !s.specialties.includes("Eyelashes") && s.specialties.length > 0
   );
 
-  if (dbFeatured.length >= 6) {
-    return dbFeatured.slice(0, 6);
+  if (hairStylists.length === 0) return [];
+
+  // 1. Prioritize any explicitly marked featured in the database
+  const explicitFeatured = hairStylists.filter((s) => s.featured);
+  if (explicitFeatured.length >= 6) {
+    return explicitFeatured.slice(0, 6);
   }
 
-  return hairStylists.slice(0, 6);
+  // 2. Select authentic, prominent London hair specialists from the database
+  const pool = hairStylists.filter(
+    (s) =>
+      !explicitFeatured.some((ef) => ef.id === s.id) &&
+      s.name.toLowerCase() !== "nicky" &&
+      Boolean(s.bio && s.bio.length > 10)
+  );
+
+  // Group by hair specialties to showcase a well-rounded mix of Wigs and Locs
+  const wigs = pool.filter((s) => s.specialties.includes("Wigs"));
+  const locs = pool.filter((s) => s.specialties.includes("Locs"));
+
+  const curated: Stylist[] = [];
+  // Select top wig specialists across London
+  for (const w of wigs) {
+    if (curated.length < 4) curated.push(w);
+  }
+  // Select top dreadlock / loc specialists across London
+  for (const l of locs) {
+    if (curated.length < 6) curated.push(l);
+  }
+  // Fill any remaining from the pool
+  for (const p of pool) {
+    if (curated.length < (6 - explicitFeatured.length) && !curated.some((c) => c.id === p.id)) {
+      curated.push(p);
+    }
+  }
+
+  return [...explicitFeatured, ...curated];
 }
 
 function getRatingThreshold(filter: string): number {
