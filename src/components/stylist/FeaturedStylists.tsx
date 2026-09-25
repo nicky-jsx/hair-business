@@ -134,6 +134,11 @@ export function FeaturedStylists({ stylists }: FeaturedStylistsProps) {
           ))}
         </div>
       )}
+
+      {/* Credit & Media Disclaimer */}
+      <p className="mt-2.5 text-center text-[10px] text-outline tracking-wide">
+        Artistry credited to respective specialists • Photos remain property of creators
+      </p>
     </section>
   );
 }

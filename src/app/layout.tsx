@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Inter, Montserrat } from "next/font/google";
 import { Header } from "@/components/layout/Header";
+import { Footer } from "@/components/layout/Footer";
 import { BottomNav } from "@/components/layout/BottomNav";
 import { AuthProvider } from "@/context/AuthContext";
 import { ServiceWorkerRegistration } from "@/components/pwa/ServiceWorkerRegistration";
@@ -69,7 +70,8 @@ export default function RootLayout({
           <SplashScreen />
           <div className="mx-auto flex min-h-dvh max-w-md flex-col bg-background lg:my-6 lg:min-h-[calc(100dvh-3rem)] lg:rounded-3xl lg:shadow-2xl lg:ring-1 lg:ring-black/10 overflow-x-hidden">
             <Header />
-            <main className="flex-1 pb-20">{children}</main>
+            <main className="flex-1">{children}</main>
+            <Footer />
             <BottomNav />
           </div>
           <InstallPrompt />
