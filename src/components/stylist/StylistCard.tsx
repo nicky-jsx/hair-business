@@ -90,7 +90,11 @@ export function StylistCard({ stylist, variant = "default" }: StylistCardProps) 
               </span>
               <span>{formatRegion(stylist.region)}</span>
               <span>•</span>
-              <span className="text-secondary font-medium">{primarySpecialty}</span>
+              <span className="text-secondary font-medium">
+                {stylist.specialties && stylist.specialties.length > 0
+                  ? stylist.specialties.slice(0, 2).join(" • ")
+                  : primarySpecialty}
+              </span>
             </div>
           </div>
         </div>

@@ -21,6 +21,27 @@ interface StylistSpecialtyRow {
   specialty: SpecialtyType;
 }
 
+function enrichSpecialties(name: string, bio: string | null, rawSpecialties: Specialty[]): Specialty[] {
+  const result = [...rawSpecialties];
+  const lowerName = name.toLowerCase();
+  const lowerBio = (bio || "").toLowerCase();
+
+  // Multi-talented stylists who offer braids/cornrows as well as locs/wigs
+  if (
+    lowerName === "38styles" ||
+    lowerName.includes("braid") ||
+    lowerBio.includes("braid") ||
+    lowerBio.includes("cornrow") ||
+    lowerBio.includes("twist")
+  ) {
+    if (!result.includes("Braids")) {
+      result.push("Braids");
+    }
+  }
+
+  return result;
+}
+
 export async function fetchAllStylists(): Promise<Stylist[]> {
   const supabase = getSupabase();
   if (!supabase) {
@@ -103,7 +124,7 @@ export async function fetchAllStylists(): Promise<Stylist[]> {
     avatar: s.avatar_url ?? null,
     coverImage: s.cover_image_url ?? null,
     region: s.region,
-    specialties: specialtiesMap.get(s.id) ?? [],
+    specialties: enrichSpecialties(s.name, s.bio, specialtiesMap.get(s.id) ?? []),
     yearsExperience: s.years_experience,
     priceRange: s.price_range,
     featured: s.featured,
@@ -210,7 +231,7 @@ export async function fetchStylistById(id: string): Promise<Stylist | null> {
     avatar: stylist.avatar_url ?? null,
     coverImage: stylist.cover_image_url ?? null,
     region: stylist.region,
-    specialties,
+    specialties: enrichSpecialties(stylist.name, stylist.bio, specialties),
     yearsExperience: stylist.years_experience,
     priceRange: stylist.price_range,
     featured: stylist.featured,
