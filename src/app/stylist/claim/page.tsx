@@ -10,10 +10,40 @@ import { useAuth } from "@/context/AuthContext";
 import { fetchStylistById } from "@/lib/stylists-db";
 import { formatRegion, type Stylist } from "@/types/stylist";
 
+/** Landing page shown when user visits /stylist/claim without a valid invite link */
+function ClaimLandingPage() {
+  return (
+    <div className="px-5 py-12 max-w-lg mx-auto text-center">
+      <span className="material-symbols-outlined text-5xl text-secondary mb-3 block">
+        lock
+      </span>
+      <h1 className="font-display text-2xl font-bold text-primary">
+        Invite-Only Claiming
+      </h1>
+      <p className="mt-3 text-sm text-on-surface-variant leading-relaxed max-w-sm mx-auto">
+        Profile claiming is invite-only. If you&apos;re a stylist listed on
+        Hair&nbsp;Korter, we&apos;ll send you a unique link to unlock and manage
+        your profile.
+      </p>
+      <p className="mt-4 text-xs text-outline">
+        Haven&apos;t received your link? DM us on Instagram or email us and
+        we&apos;ll get you set up.
+      </p>
+      <Link
+        href="/"
+        className="mt-6 inline-flex rounded-xl bg-primary px-5 py-2.5 text-xs font-semibold uppercase tracking-caps text-background"
+      >
+        Back to Home
+      </Link>
+    </div>
+  );
+}
+
 function ClaimPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const stylistId = searchParams.get("id");
+  const claimToken = searchParams.get("token");
 
   const { ready, account, profile, signUp, signIn, claimProfile } = useAuth();
 
@@ -50,7 +80,12 @@ function ClaimPageContent() {
     );
   }
 
-  if (!stylistId || !stylist) {
+  // No specific stylist ID or no invite token → show the invite-only landing page
+  if (!stylistId || !claimToken) {
+    return <ClaimLandingPage />;
+  }
+
+  if (!stylist) {
     return (
       <div className="px-5 py-12 text-center">
         <span className="material-symbols-outlined mb-2 text-4xl text-outline">
@@ -63,10 +98,10 @@ function ClaimPageContent() {
           We couldn&apos;t find the stylist profile you are trying to claim.
         </p>
         <Link
-          href="/"
+          href="/stylist/claim"
           className="mt-6 inline-flex rounded-xl bg-primary px-5 py-2.5 text-xs font-semibold uppercase tracking-caps text-background"
         >
-          Browse Directory
+          Search Profiles
         </Link>
       </div>
     );
@@ -101,7 +136,7 @@ function ClaimPageContent() {
     if (!stylist) return;
     setError("");
     setSubmitting(true);
-    const res = await claimProfile(stylist.id);
+    const res = await claimProfile(stylist.id, claimToken!);
     setSubmitting(false);
 
     if (res.error) {
@@ -156,7 +191,7 @@ function ClaimPageContent() {
     }
 
     // Now claim the stylist profile
-    const claimResult = await claimProfile(stylist.id);
+    const claimResult = await claimProfile(stylist.id, claimToken!);
     setSubmitting(false);
 
     if (claimResult.error) {

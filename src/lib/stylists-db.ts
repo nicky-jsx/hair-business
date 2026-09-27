@@ -42,6 +42,58 @@ function enrichSpecialties(name: string, bio: string | null, rawSpecialties: Spe
   return result;
 }
 
+/** Friendly display names used when building taglines from specialties */
+const SPECIALTY_TAGLINE_PHRASES: Record<string, string> = {
+  Locs: "Loc specialist",
+  Braids: "Braids & cornrows",
+  Wigs: "Wig install & styling",
+  Eyelashes: "Lash technician",
+  "Silk Press": "Silk press",
+  "Natural Hair": "Natural hair care",
+  Color: "Colour specialist",
+  Cuts: "Precision cuts",
+  Extensions: "Extensions",
+};
+
+/**
+ * If a stylist's stored tagline only references one specialty but they
+ * actually have multiple, generate a richer tagline that reflects all their
+ * skills. This avoids profiles that say "Loc maintenance & styling" for a
+ * stylist who also does braids / cornrows.
+ */
+function enrichTagline(tagline: string, specialties: Specialty[]): string {
+  if (specialties.length <= 1) return tagline;
+
+  const taglineLower = tagline.toLowerCase();
+
+  // Check how many of the stylist's specialties are already mentioned
+  const mentionedSpecialties = specialties.filter((spec) => {
+    const specLower = spec.toLowerCase();
+    if (taglineLower.includes(specLower)) return true;
+    // Also check common variations
+    if (spec === "Locs" && (taglineLower.includes("loc ") || taglineLower.includes("lock") || taglineLower.includes("dread"))) return true;
+    if (spec === "Braids" && (taglineLower.includes("braid") || taglineLower.includes("cornrow") || taglineLower.includes("plait"))) return true;
+    if (spec === "Wigs" && (taglineLower.includes("wig") || taglineLower.includes("install") || taglineLower.includes("frontal"))) return true;
+    if (spec === "Eyelashes" && (taglineLower.includes("lash") || taglineLower.includes("brow"))) return true;
+    if (spec === "Silk Press" && taglineLower.includes("press")) return true;
+    if (spec === "Color" && (taglineLower.includes("col") || taglineLower.includes("balayage"))) return true;
+    if (spec === "Cuts" && (taglineLower.includes("cut") || taglineLower.includes("fade") || taglineLower.includes("barber"))) return true;
+    if (spec === "Extensions" && taglineLower.includes("extension")) return true;
+    if (spec === "Natural Hair" && taglineLower.includes("natural")) return true;
+    return false;
+  });
+
+  // If the tagline already covers all specialties, keep it
+  if (mentionedSpecialties.length >= specialties.length) return tagline;
+
+  // Build a combined tagline from all specialties
+  const phrases = specialties
+    .map((s) => SPECIALTY_TAGLINE_PHRASES[s] || s)
+    .slice(0, 3); // max 3 to keep it concise
+
+  return phrases.join(" · ");
+}
+
 export async function fetchAllStylists(): Promise<Stylist[]> {
   const supabase = getSupabase();
   if (!supabase) {
@@ -119,7 +171,7 @@ export async function fetchAllStylists(): Promise<Stylist[]> {
   return stylists.map((s) => ({
     id: s.id,
     name: s.name,
-    tagline: s.tagline,
+    tagline: enrichTagline(s.tagline, enrichSpecialties(s.name, s.bio, specialtiesMap.get(s.id) ?? [])),
     bio: s.bio,
     avatar: s.avatar_url ?? null,
     coverImage: s.cover_image_url ?? null,
@@ -226,7 +278,7 @@ export async function fetchStylistById(id: string): Promise<Stylist | null> {
   return {
     id: stylist.id,
     name: stylist.name,
-    tagline: stylist.tagline,
+    tagline: enrichTagline(stylist.tagline, enrichSpecialties(stylist.name, stylist.bio, specialties)),
     bio: stylist.bio,
     avatar: stylist.avatar_url ?? null,
     coverImage: stylist.cover_image_url ?? null,

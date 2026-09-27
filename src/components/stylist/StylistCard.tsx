@@ -93,9 +93,6 @@ export function StylistCard({ stylist, variant = "default", activeFilter }: Styl
             <h3 className="font-display text-base font-bold text-primary transition-colors group-hover:text-secondary leading-snug break-normal [text-wrap:balance]">
               {stylist.name}
             </h3>
-            <p className="mt-0.5 text-[12px] text-on-surface-variant truncate">
-              {stylist.tagline}
-            </p>
             <div className="mt-1 flex items-center gap-1 text-[11px] text-outline">
               <span className="material-symbols-outlined text-[13px] text-secondary">
                 location_on

@@ -31,6 +31,8 @@ function friendlyProfileError(message?: string): string {
     return "This profile has already been claimed by another account.";
   if (message.includes("stylist_not_found"))
     return "The requested stylist profile was not found.";
+  if (message.includes("invalid_claim_token"))
+    return "Invalid or expired invite link. Please contact us for a valid link.";
   return "Failed to save profile. Please try again.";
 }
 
@@ -143,7 +145,8 @@ export async function updateStylistProfile(
 }
 
 export async function claimStylistProfile(
-  stylistId: string
+  stylistId: string,
+  claimToken: string
 ): Promise<{ error?: string }> {
   const supabase = getSupabase();
   if (!supabase) {
@@ -154,10 +157,13 @@ export async function claimStylistProfile(
   const token = getSessionToken();
   if (!token) return { error: "Your session has expired. Please sign in again." };
 
+  if (!claimToken) return { error: "Invalid or expired invite link. Please contact us for a valid link." };
+
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const { error } = await (supabase as any).rpc("claim_stylist_profile", {
     p_token: token,
     p_stylist_id: stylistId,
+    p_claim_token: claimToken,
   });
 
   if (error) {

@@ -34,7 +34,7 @@ interface AuthContextType {
   signOut: () => void;
   refreshProfile: () => Promise<void>;
   setAccountStylistId: (stylistId: string) => void;
-  claimProfile: (stylistId: string) => Promise<{ error?: string }>;
+  claimProfile: (stylistId: string, claimToken: string) => Promise<{ error?: string }>;
 }
 
 const AuthContext = createContext<AuthContextType | null>(null);
@@ -121,8 +121,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, [account]);
 
   const claimProfile = useCallback(
-    async (stylistId: string) => {
-      const result = await claimStylistProfile(stylistId);
+    async (stylistId: string, claimToken: string) => {
+      const result = await claimStylistProfile(stylistId, claimToken);
       if (result.error) {
         return { error: result.error };
       }
