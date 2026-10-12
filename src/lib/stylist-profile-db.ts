@@ -33,6 +33,17 @@ function friendlyProfileError(message?: string): string {
     return "The requested stylist profile was not found.";
   if (message.includes("invalid_claim_token"))
     return "Invalid or expired invite link. Please contact us for a valid link.";
+  if (message.includes("rate_limited"))
+    return "Too many attempts. Please wait a few minutes and try again.";
+  if (message.includes("invalid_url"))
+    return "One of the links isn't a valid web address (it must start with http:// or https://).";
+  if (message.includes("bio_too_long")) return "Your bio must be under 3,000 characters.";
+  if (message.includes("tagline_too_long")) return "Your tagline must be under 200 characters.";
+  if (message.includes("invalid_name")) return "Please enter a name (max 120 characters).";
+  if (message.includes("invalid_services"))
+    return "Please check your services: each needs a name (max 120 chars) and a price, up to 50 services.";
+  if (message.includes("invalid_specialties")) return "Please choose valid specialties.";
+  if (message.includes("invalid_experience")) return "Years of experience must be between 0 and 80.";
   return "Failed to save profile. Please try again.";
 }
 

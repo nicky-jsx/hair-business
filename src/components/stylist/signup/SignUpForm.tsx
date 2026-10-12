@@ -23,8 +23,8 @@ export function SignUpForm() {
     const email = form.get("email") as string;
     const password = form.get("password") as string;
 
-    if (password.length < 6) {
-      setError("Password must be at least 6 characters");
+    if (password.length < 8 || password.length > 72) {
+      setError("Password must be 8–72 characters");
       setLoading(false);
       return;
     }

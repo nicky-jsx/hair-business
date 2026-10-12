@@ -34,12 +34,16 @@ function mapAccountRow(row: any): StylistAccount {
 // Map raw Postgres exception messages to friendly copy.
 function friendlyAuthError(message?: string): string {
   if (!message) return "Something went wrong. Please try again.";
+  if (message.includes("rate_limited"))
+    return "Too many attempts. Please wait a few minutes and try again.";
   if (message.includes("email_taken"))
     return "An account with this email already exists";
   if (message.includes("weak_password"))
-    return "Password must be at least 8 characters";
+    return "Password must be 8–72 characters";
   if (message.includes("invalid_email")) return "Please enter a valid email";
   if (message.includes("invalid_name")) return "Please enter your name";
+  if (message.includes("invalid_reset_token"))
+    return "This reset link is invalid or has expired. Please ask us for a new one.";
   return "Something went wrong. Please try again.";
 }
 
@@ -55,8 +59,8 @@ export async function signUpStylist(
   const email = data.email.trim().toLowerCase();
   const name = data.name.trim();
   if (!EMAIL_RE.test(email)) return { error: "Please enter a valid email" };
-  if (data.password.length < 8)
-    return { error: "Password must be at least 8 characters" };
+  if (data.password.length < 8 || data.password.length > 72)
+    return { error: "Password must be 8–72 characters" };
   if (!name || name.length > 120) return { error: "Please enter your name" };
 
   // Password is hashed with bcrypt inside Postgres; it never touches the client.
@@ -98,6 +102,8 @@ export async function signInStylist(
 
   if (error) {
     console.error("Error signing in:", error.message);
+    if (error.message?.includes("rate_limited"))
+      return { error: friendlyAuthError(error.message) };
     return { error: "Invalid email or password" };
   }
 
@@ -132,6 +138,36 @@ export async function getAccountFromSession(): Promise<StylistAccount | null> {
   return mapAccountRow(row);
 }
 
-export function clearSession(): void {
+// Revokes the session server-side (so a copied token stops working),
+// then clears it locally. Local clear happens even if the network fails.
+export async function clearSession(): Promise<void> {
+  const token = getSessionToken();
   setSessionToken(null);
+  const supabase = getSupabase();
+  if (!supabase || !token) return;
+  try {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    await (supabase as any).rpc("sign_out_stylist", { p_token: token });
+  } catch {
+    // ignore — token is already gone from this device
+  }
+}
+
+// Completes an admin-issued password reset link.
+export async function resetPasswordWithToken(
+  resetToken: string,
+  newPassword: string
+): Promise<{ error?: string }> {
+  const supabase = getSupabase();
+  if (!supabase) return { error: "Database not configured" };
+  if (newPassword.length < 8 || newPassword.length > 72)
+    return { error: "Password must be 8–72 characters" };
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { error } = await (supabase as any).rpc("reset_password_with_token", {
+    p_token: resetToken,
+    p_new_password: newPassword,
+  });
+  if (error) return { error: friendlyAuthError(error.message) };
+  return {};
 }

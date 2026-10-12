@@ -60,6 +60,15 @@ export function SignInForm() {
         autoComplete="current-password"
       />
 
+      <div className="-mt-2 text-right">
+        <Link
+          href="/stylist/reset-password"
+          className="text-xs font-medium text-brand-600 hover:text-brand-700"
+        >
+          Forgot password?
+        </Link>
+      </div>
+
       <Button type="submit" fullWidth size="lg" disabled={loading}>
         {loading ? "Signing in..." : "Sign in"}
       </Button>

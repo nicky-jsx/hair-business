@@ -94,6 +94,26 @@ function enrichTagline(tagline: string, specialties: Specialty[]): string {
   return phrases.join(" · ");
 }
 
+/**
+ * PostgREST returns at most 1000 rows per request, so large tables would be
+ * silently truncated. Page through with a stable ordering until done.
+ */
+const PAGE_SIZE = 1000;
+async function fetchAllRows<T>(
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  query: (from: number, to: number) => PromiseLike<{ data: any; error: any }>
+): Promise<{ data: T[]; error: unknown }> {
+  const rows: T[] = [];
+  for (let from = 0; ; from += PAGE_SIZE) {
+    const { data, error } = await query(from, from + PAGE_SIZE - 1);
+    if (error) return { data: rows, error };
+    const page = (data ?? []) as T[];
+    rows.push(...page);
+    if (page.length < PAGE_SIZE) break;
+  }
+  return { data: rows, error: null };
+}
+
 export async function fetchAllStylists(): Promise<Stylist[]> {
   const supabase = getSupabase();
   if (!supabase) {
@@ -101,40 +121,53 @@ export async function fetchAllStylists(): Promise<Stylist[]> {
     return [];
   }
 
-  const { data, error: stylistsError } = await supabase
-    .from("stylists")
-    .select("*")
-    .order("featured", { ascending: false })
-    .order("name");
+  const { data, error: stylistsError } = await fetchAllRows<StylistRow>(
+    (from, to) =>
+      supabase
+        .from("stylists")
+        .select("*")
+        .order("featured", { ascending: false })
+        .order("name")
+        .order("id")
+        .range(from, to)
+  );
 
   if (stylistsError) {
     console.error("Error fetching stylists:", stylistsError);
     return [];
   }
 
-  const stylists = data as StylistRow[] | null;
+  const stylists = data;
 
   if (!stylists || stylists.length === 0) {
     return [];
   }
 
-  const stylistIds = stylists.map((s) => s.id);
-
   const [specialtiesRes, servicesRes, portfolioRes, ratingsRes] =
     await Promise.all([
-      supabase.from("stylist_specialties").select("*"),
-      supabase.from("services").select("*"),
-      supabase
-        .from("portfolio_photos")
-        .select("*")
-        .order("sort_order"),
-      supabase.from("stylist_ratings").select("*"),
+      fetchAllRows<StylistSpecialtyRow>((from, to) =>
+        supabase.from("stylist_specialties").select("*").order("id").range(from, to)
+      ),
+      fetchAllRows<ServiceRow>((from, to) =>
+        supabase.from("services").select("*").order("id").range(from, to)
+      ),
+      fetchAllRows<PortfolioPhotoRow>((from, to) =>
+        supabase
+          .from("portfolio_photos")
+          .select("*")
+          .order("sort_order")
+          .order("id")
+          .range(from, to)
+      ),
+      fetchAllRows<StylistRatingRow>((from, to) =>
+        supabase.from("stylist_ratings").select("*").order("stylist_id").range(from, to)
+      ),
     ]);
 
-  const specialtiesData = (specialtiesRes.data ?? []) as StylistSpecialtyRow[];
-  const servicesData = (servicesRes.data ?? []) as ServiceRow[];
-  const portfolioData = (portfolioRes.data ?? []) as PortfolioPhotoRow[];
-  const ratingsData = (ratingsRes.data ?? []) as StylistRatingRow[];
+  const specialtiesData = specialtiesRes.data;
+  const servicesData = servicesRes.data;
+  const portfolioData = portfolioRes.data;
+  const ratingsData = ratingsRes.data;
 
   const specialtiesMap = new Map<string, Specialty[]>();
   specialtiesData.forEach((s) => {
@@ -340,28 +373,6 @@ export async function updateStylistDeposit(
   return {};
 }
 
-export async function updateSlotInterval(
-  stylistId: string,
-  slotIntervalMinutes: number
-): Promise<{ error?: string }> {
-  const supabase = getSupabase();
-  if (!supabase) {
-    return { error: "Database not configured." };
-  }
-
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const { error } = await (supabase as any)
-    .from("stylists")
-    .update({ slot_interval_minutes: slotIntervalMinutes })
-    .eq("id", stylistId);
-
-  if (error) {
-    console.error("Error updating slot interval:", error);
-    return { error: "Failed to save slot spacing." };
-  }
-
-  return {};
-}
 
 export async function fetchFeaturedStylists(): Promise<Stylist[]> {
   const allStylists = await fetchAllStylists();

@@ -54,8 +54,8 @@ ALTER TABLE blocked_times ENABLE ROW LEVEL SECURITY;
 
 -- Public read access for availability (customers need to see available slots)
 CREATE POLICY "Public read access" ON stylist_availability FOR SELECT USING (true);
-CREATE POLICY "Public read access" ON bookings FOR SELECT USING (true);
-CREATE POLICY "Public insert access" ON bookings FOR INSERT WITH CHECK (true);
+-- SECURITY: bookings have NO public policies (customer PII). Access is via
+-- the create_booking / get_managed_booking / get_stylist_bookings RPCs.
 CREATE POLICY "Public read access" ON blocked_times FOR SELECT USING (true);
 
 -- Trigger for updated_at

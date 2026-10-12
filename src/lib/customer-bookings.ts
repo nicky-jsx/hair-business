@@ -57,6 +57,11 @@ function friendly(message: string | undefined, fallback: string): string {
   if (msg.includes("not_eligible"))
     return "You can leave a review once your appointment has taken place.";
   if (msg.includes("invalid_rating")) return "Please choose a star rating.";
+  if (msg.includes("rate_limited"))
+    return "Too many attempts. Please wait a few minutes and try again.";
+  if (msg.includes("slot_in_past")) return "Please pick a time in the future.";
+  if (msg.includes("comment_too_long"))
+    return "Please keep your review under 1,000 characters.";
   return fallback;
 }
 
@@ -134,20 +139,8 @@ export async function rescheduleMyBooking(
   return {};
 }
 
-export async function payMyBalance(
-  id: string,
-  token: string
-): Promise<{ error?: string }> {
-  const supabase = getSupabase();
-  if (!supabase) return { error: "Database not configured." };
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const { error } = await (supabase as any).rpc("pay_balance", {
-    p_booking_id: id,
-    p_token: token,
-  });
-  if (error) return { error: friendly(error.message, "Payment failed.") };
-  return {};
-}
+// NOTE: there is intentionally no "pay balance" call. No payment provider
+// is integrated, so payments are settled directly with the stylist.
 
 export async function submitReview(
   id: string,

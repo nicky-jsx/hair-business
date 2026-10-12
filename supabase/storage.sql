@@ -1,22 +1,22 @@
 -- Storage bucket for stylist profile photos & banners (Hair Korter)
 -- Run once in your Supabase SQL Editor.
 
--- 1) Create a public bucket
-INSERT INTO storage.buckets (id, name, public)
-VALUES ('profile-images', 'profile-images', true)
-ON CONFLICT (id) DO NOTHING;
+-- 1) Create a public (read-only) bucket with size + type limits
+INSERT INTO storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
+VALUES ('profile-images', 'profile-images', true, 5242880,
+        ARRAY['image/jpeg', 'image/png', 'image/webp', 'image/gif'])
+ON CONFLICT (id) DO UPDATE
+  SET file_size_limit = EXCLUDED.file_size_limit,
+      allowed_mime_types = EXCLUDED.allowed_mime_types;
 
 -- 2) Allow anyone to read images (bucket is public)
 DROP POLICY IF EXISTS "Public read profile images" ON storage.objects;
 CREATE POLICY "Public read profile images" ON storage.objects
   FOR SELECT USING (bucket_id = 'profile-images');
 
--- 3) Allow uploads to the bucket
+-- 3) NO anonymous uploads/updates/deletes. Uploads use signed upload URLs
+--    issued by the Next.js route /api/upload-url after verifying the
+--    stylist's session (needs SUPABASE_SERVICE_ROLE_KEY on the server).
 DROP POLICY IF EXISTS "Public upload profile images" ON storage.objects;
-CREATE POLICY "Public upload profile images" ON storage.objects
-  FOR INSERT WITH CHECK (bucket_id = 'profile-images');
-
--- 4) Do NOT allow overwrites. The app uploads to unique, timestamped
---    paths, so overwriting is unnecessary — and allowing it would let
---    anyone replace another stylist's photo. Drop any such policy.
 DROP POLICY IF EXISTS "Public update profile images" ON storage.objects;
+DROP POLICY IF EXISTS "Public delete profile images" ON storage.objects;

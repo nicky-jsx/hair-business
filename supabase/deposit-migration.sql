@@ -18,11 +18,8 @@ ALTER TABLE bookings
 ALTER TABLE stylist_availability
   ADD COLUMN IF NOT EXISTS slots JSONB NOT NULL DEFAULT '[]'::jsonb;
 
--- 4) Allow stylists to update their own deposit settings and availability slots
+-- 4) SECURITY: writes go through token-checked RPCs only
+--    (update_stylist_deposit / update_availability). Never add public
+--    UPDATE policies here — they let anyone edit any stylist.
 DROP POLICY IF EXISTS "Public update deposit" ON stylists;
-CREATE POLICY "Public update deposit" ON stylists
-  FOR UPDATE USING (true) WITH CHECK (true);
-
 DROP POLICY IF EXISTS "Public update availability" ON stylist_availability;
-CREATE POLICY "Public update availability" ON stylist_availability
-  FOR UPDATE USING (true) WITH CHECK (true);

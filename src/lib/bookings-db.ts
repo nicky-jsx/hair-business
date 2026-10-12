@@ -423,6 +423,14 @@ export async function createBooking(
       return { error: "Please enter a valid email address." };
     if (msg.includes("invalid_customer"))
       return { error: "Please enter your name." };
+    if (msg.includes("slot_in_past"))
+      return { error: "Please pick a time in the future." };
+    if (msg.includes("rate_limited"))
+      return { error: "Too many booking attempts. Please wait a while and try again." };
+    if (msg.includes("invalid_phone"))
+      return { error: "Please enter a valid phone number." };
+    if (msg.includes("notes_too_long"))
+      return { error: "Please keep notes under 1,000 characters." };
     return { error: "Failed to create booking. Please try again." };
   }
 

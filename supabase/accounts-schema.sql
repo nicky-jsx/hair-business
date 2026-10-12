@@ -18,10 +18,9 @@ CREATE INDEX idx_stylist_accounts_email ON stylist_accounts(email);
 -- Enable RLS
 ALTER TABLE stylist_accounts ENABLE ROW LEVEL SECURITY;
 
--- Policies - allow public insert for sign-up, select for sign-in
-CREATE POLICY "Allow public insert" ON stylist_accounts FOR INSERT WITH CHECK (true);
-CREATE POLICY "Allow public select" ON stylist_accounts FOR SELECT USING (true);
-CREATE POLICY "Allow public update" ON stylist_accounts FOR UPDATE USING (true);
+-- SECURITY: NO policies. Accounts are only touched by SECURITY DEFINER
+-- RPCs (sign_up_stylist / sign_in_stylist / ...). Public policies here
+-- would expose every password hash.
 
 -- Trigger for updated_at
 CREATE TRIGGER stylist_accounts_updated_at

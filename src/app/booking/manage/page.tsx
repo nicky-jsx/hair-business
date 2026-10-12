@@ -12,7 +12,6 @@ import {
   recoverBooking,
   cancelMyBooking,
   rescheduleMyBooking,
-  payMyBalance,
   submitReview,
 } from "@/lib/customer-bookings";
 import { formatTime } from "@/types/booking";
@@ -214,17 +213,6 @@ function ManageInner() {
         setNotice("Your appointment has been cancelled.");
         refresh();
       }}
-      onPay={async () => {
-        setBusy(true);
-        const result = await payMyBalance(booking.id, token);
-        setBusy(false);
-        if (result.error) {
-          setError(result.error);
-          return;
-        }
-        setNotice("Balance paid in full. Thank you!");
-        refresh();
-      }}
     />
   );
 }
@@ -306,7 +294,6 @@ function BookingView({
   onReschedule,
   onReview,
   onCancel,
-  onPay,
 }: {
   booking: Booking;
   notice: string;
@@ -315,17 +302,16 @@ function BookingView({
   onReschedule: () => void;
   onReview: () => void;
   onCancel: () => void;
-  onPay: () => void;
 }) {
   const date = new Date(`${booking.bookingDate}T${booking.startTime}`);
   const isPast = date.getTime() < Date.now();
   const total = booking.totalPrice || booking.servicePrice || 0;
-  const paid = booking.amountPaid ?? booking.depositAmount ?? 0;
-  const remaining = Math.max(0, total - paid);
+  // No online payments: deposits/balances are settled directly with the stylist.
+  const depositDue =
+    booking.paymentOption === "deposit" ? booking.depositAmount ?? 0 : 0;
 
   const isActive = booking.status === "confirmed";
   const canManage = isActive && !isPast;
-  const hasBalance = remaining > 0 && !booking.paidInFull && booking.status !== "cancelled";
   const canReview =
     booking.status === "completed" ||
     (isPast && booking.status !== "cancelled" && booking.status !== "no_show");
@@ -367,17 +353,18 @@ function BookingView({
             {formatTime(booking.startTime)} – {formatTime(booking.endTime)}
           </Row>
           <Row label="Service total">{formatPrice(total)}</Row>
-          <Row label="Paid so far">
-            <span className="text-green-600">{formatPrice(paid)}</span>
-          </Row>
-          {remaining > 0 && (
-            <Row label={booking.paidInFull ? "Remaining" : "Remaining balance"}>
+          {depositDue > 0 && (
+            <Row label="Deposit (pay stylist directly)">
               <span className="font-semibold text-brand-600">
-                {formatPrice(remaining)}
+                {formatPrice(depositDue)}
               </span>
             </Row>
           )}
         </div>
+        <p className="mt-3 text-xs text-gray-400">
+          Payment isn&apos;t taken online. Your stylist will confirm how to pay
+          any deposit and the balance.
+        </p>
         <div className="mt-4 rounded-lg bg-gray-50 px-3 py-2 text-center">
           <p className="text-xs text-gray-400">Booking reference</p>
           <p className="font-mono text-sm font-medium text-gray-700">
@@ -388,15 +375,6 @@ function BookingView({
 
       {/* Actions */}
       <div className="mt-5 space-y-3">
-        {hasBalance && (
-          <button
-            onClick={onPay}
-            disabled={busy}
-            className="w-full rounded-xl bg-primary py-3 text-sm font-semibold text-white transition-opacity hover:opacity-90 disabled:opacity-50"
-          >
-            Pay remaining {formatPrice(remaining)} in full online
-          </button>
-        )}
 
         {canManage && (
           <div className="grid grid-cols-2 gap-3">

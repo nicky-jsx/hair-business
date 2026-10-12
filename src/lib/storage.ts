@@ -1,12 +1,16 @@
 import { getSupabase } from "./supabase";
+import { getSessionToken } from "./session";
 
 export const PROFILE_IMAGES_BUCKET = "profile-images";
 
 const MAX_SIZE_BYTES = 5 * 1024 * 1024; // 5 MB
 const ALLOWED_TYPES = ["image/jpeg", "image/png", "image/webp", "image/gif"];
 
+// Uploads go through a one-time signed URL from /api/upload-url, which
+// verifies the stylist's session and picks the storage path server-side.
+// Anonymous uploads are disabled at the storage-policy level.
 export async function uploadProfileImage(
-  pathPrefix: string,
+  _pathPrefix: string,
   file: File,
   kind: "avatar" | "cover"
 ): Promise<{ url?: string; error?: string }> {
@@ -23,29 +27,44 @@ export async function uploadProfileImage(
     return { error: "Image must be under 5 MB." };
   }
 
-  const ext = file.name.split(".").pop()?.toLowerCase() || "jpg";
-  // Unique path (timestamp + random) so uploads never collide and we never
-  // need to overwrite an existing object — overwrites are disabled at the
-  // storage-policy level to stop anyone replacing someone else's image.
-  const unique = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
-  const path = `${pathPrefix}/${kind}-${unique}.${ext}`;
+  const token = getSessionToken();
+  if (!token) {
+    return { error: "Your session has expired. Please sign in again." };
+  }
+
+  let signed: { path?: string; token?: string; publicUrl?: string; error?: string };
+  try {
+    const res = await fetch("/api/upload-url", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({ kind, contentType: file.type, size: file.size }),
+    });
+    signed = await res.json().catch(() => ({}));
+    if (!res.ok) {
+      return { error: signed.error || "Failed to upload image." };
+    }
+  } catch {
+    return { error: "Network error. Please try again." };
+  }
+
+  if (!signed.path || !signed.token || !signed.publicUrl) {
+    return { error: "Failed to upload image." };
+  }
 
   const { error: uploadError } = await supabase.storage
     .from(PROFILE_IMAGES_BUCKET)
-    .upload(path, file, { upsert: false, cacheControl: "3600" });
+    .uploadToSignedUrl(signed.path, signed.token, file, {
+      contentType: file.type,
+      cacheControl: "3600",
+    });
 
   if (uploadError) {
     console.error("Error uploading image:", uploadError);
-    return {
-      error:
-        uploadError.message ||
-        "Failed to upload image. Make sure the storage bucket exists.",
-    };
+    return { error: "Failed to upload image. Please try again." };
   }
 
-  const { data } = supabase.storage
-    .from(PROFILE_IMAGES_BUCKET)
-    .getPublicUrl(path);
-
-  return { url: data.publicUrl };
+  return { url: signed.publicUrl };
 }

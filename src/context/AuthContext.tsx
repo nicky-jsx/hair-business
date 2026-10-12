@@ -100,7 +100,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const signOut = useCallback(() => {
     setAccount(null);
     setProfile(null);
-    clearSession();
+    void clearSession();
     localStorage.removeItem(STORAGE_KEY);
   }, []);
 

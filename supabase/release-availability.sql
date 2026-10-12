@@ -22,14 +22,8 @@ DROP POLICY IF EXISTS "Public read date availability" ON stylist_date_availabili
 CREATE POLICY "Public read date availability" ON stylist_date_availability
   FOR SELECT USING (true);
 
+-- SECURITY: writes go through the token-checked release_date /
+-- unrelease_date RPCs only. Never add public write policies here.
 DROP POLICY IF EXISTS "Public insert date availability" ON stylist_date_availability;
-CREATE POLICY "Public insert date availability" ON stylist_date_availability
-  FOR INSERT WITH CHECK (true);
-
 DROP POLICY IF EXISTS "Public update date availability" ON stylist_date_availability;
-CREATE POLICY "Public update date availability" ON stylist_date_availability
-  FOR UPDATE USING (true) WITH CHECK (true);
-
 DROP POLICY IF EXISTS "Public delete date availability" ON stylist_date_availability;
-CREATE POLICY "Public delete date availability" ON stylist_date_availability
-  FOR DELETE USING (true);
