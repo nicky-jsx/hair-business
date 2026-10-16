@@ -33,7 +33,7 @@ export function BookingConfirmation({
   const formattedTime = formatTimeDisplay(booking.startTime);
   const formattedEndTime = formatTimeDisplay(booking.endTime);
 
-  const calendarUrl = generateCalendarUrl(booking, stylist);
+  const calendarUrl = generateCalendarUrl(booking, stylist, reference);
 
   return (
     <div className="flex flex-col p-5">
@@ -57,8 +57,12 @@ export function BookingConfirmation({
           You&apos;re all booked!
         </h2>
         <p className="mt-2 text-sm text-gray-500">
-          A confirmation has been sent to<br />
-          <span className="font-medium text-gray-700">{booking.customerEmail}</span>
+          Keep your booking reference and the link below to manage your
+          appointment.
+          <br />
+          <span className="text-xs text-gray-400">
+            We don&apos;t send booking emails yet, so please save this page.
+          </span>
         </p>
       </div>
 
@@ -121,7 +125,7 @@ export function BookingConfirmation({
         <div className="mb-6 rounded-xl border border-brand-100 bg-brand-50/50 p-4">
           <p className="text-sm font-medium text-gray-900">Need to make changes?</p>
           <p className="mt-1 text-[13px] text-gray-500">
-            Cancel, reschedule, pay your balance or leave a review from your
+            Cancel, reschedule or leave a review from your
             booking page. We&apos;ve saved it on this device.
           </p>
           <Link
@@ -176,7 +180,11 @@ function formatTimeDisplay(time: string): string {
   return `${displayHour}:${minutes} ${ampm}`;
 }
 
-function generateCalendarUrl(booking: Booking, stylist: Stylist): string {
+function generateCalendarUrl(
+  booking: Booking,
+  stylist: Stylist,
+  reference: string
+): string {
   const startDate = new Date(`${booking.bookingDate}T${booking.startTime}`);
   const endDate = new Date(`${booking.bookingDate}T${booking.endTime}`);
 
@@ -185,9 +193,7 @@ function generateCalendarUrl(booking: Booking, stylist: Stylist): string {
   };
 
   const title = encodeURIComponent(`${booking.serviceName} with ${stylist.name}`);
-  const details = encodeURIComponent(
-    `Booking reference: ${booking.id.slice(0, 8).toUpperCase()}`
-  );
+  const details = encodeURIComponent(`Booking reference: ${reference}`);
 
   return `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${title}&dates=${formatForCalendar(startDate)}/${formatForCalendar(endDate)}&details=${details}`;
 }

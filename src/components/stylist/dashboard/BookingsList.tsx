@@ -129,12 +129,12 @@ export function BookingsList({ stylistId }: BookingsListProps) {
                 </span>
                 {booking.paymentOption === "deposit" && booking.depositAmount > 0 && (
                   <span className="mt-0.5 block text-[11px] text-gray-400">
-                    {formatPrice(booking.depositAmount)} deposit paid ·{" "}
+                    {formatPrice(booking.depositAmount)} deposit to collect ·{" "}
                     {formatPrice(
                       (booking.totalPrice || booking.servicePrice || 0) -
                         booking.depositAmount
                     )}{" "}
-                    due
+                    on the day
                   </span>
                 )}
               </div>

@@ -70,7 +70,8 @@ export function CustomerForm({
           Your details
         </h2>
         <p className="mt-1 text-sm text-on-surface-variant">
-          We&apos;ll send your confirmation here
+          Your stylist will see these details. Keep your booking reference
+          after you confirm.
         </p>
       </div>
 
@@ -110,21 +111,25 @@ export function CustomerForm({
       {/* Payment options */}
       {hasDeposit && (
         <div className="mb-6">
-          <h3 className="mb-3 text-[12px] font-semibold uppercase tracking-caps text-outline">
+          <h3 className="mb-1 text-[12px] font-semibold uppercase tracking-caps text-outline">
             Payment
           </h3>
+          <p className="mb-3 text-xs text-on-surface-variant">
+            Nothing is charged online. You pay your stylist directly — they&apos;ll
+            confirm how.
+          </p>
           <div className="space-y-3">
             <PaymentChoice
               selected={paymentOption === "deposit"}
               onSelect={() => setPaymentOption("deposit")}
-              title="Pay deposit now"
+              title="Pay a deposit to secure the booking"
               amount={formatPrice(depositAmount)}
-              subtitle={`${formatPrice(remaining)} paid in cash at your appointment`}
+              subtitle={`${formatPrice(remaining)} paid at your appointment`}
             />
             <PaymentChoice
               selected={paymentOption === "full"}
               onSelect={() => setPaymentOption("full")}
-              title="Pay in full"
+              title="Pay in full in advance"
               amount={formatPrice(total)}
               subtitle="Nothing left to pay on the day"
             />
@@ -138,14 +143,14 @@ export function CustomerForm({
             </div>
             <div className="flex items-center justify-between text-sm text-on-surface-variant">
               <span>
-                {paymentOption === "deposit" ? "Deposit due now" : "Paying now"}
+                {paymentOption === "deposit" ? "Deposit to pay stylist" : "To pay stylist in advance"}
               </span>
               <span className="font-semibold text-primary">
                 {formatPrice(paymentOption === "deposit" ? depositAmount : total)}
               </span>
             </div>
             <div className="flex items-center justify-between border-t border-outline-variant/60 pt-2 text-sm">
-              <span className="text-on-surface-variant">Remaining in cash on the day</span>
+              <span className="text-on-surface-variant">Remaining on the day</span>
               <span className="font-semibold text-primary">
                 {formatPrice(paymentOption === "deposit" ? remaining : 0)}
               </span>
@@ -213,9 +218,7 @@ export function CustomerForm({
           <Button type="submit" fullWidth size="lg" disabled={loading}>
             {loading
               ? "Confirming..."
-              : hasDeposit && paymentOption === "deposit"
-                ? `Confirm & pay ${formatPrice(depositAmount)} deposit`
-                : "Confirm booking"}
+              : "Confirm booking"}
           </Button>
         </div>
 

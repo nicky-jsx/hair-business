@@ -294,7 +294,7 @@ function ClaimPageContent() {
             </span>
             <span>
               <strong>Direct client bookings:</strong> Release appointment dates,
-              collect deposits, and fill your schedule.
+              set your deposit, and fill your schedule.
             </span>
           </li>
         </ul>

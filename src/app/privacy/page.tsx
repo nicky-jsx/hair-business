@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { CONTACT_EMAILS } from "@/lib/site-config";
 
 export const metadata: Metadata = {
   title: "Privacy Policy — Hair Korter",
@@ -35,7 +36,7 @@ export default function PrivacyPage() {
           </p>
           <p className="text-xs">
             Contact email for privacy and data requests:{" "}
-            <span className="font-semibold text-primary">privacy@hairkorter.com</span>.
+            <span className="font-semibold text-primary">{CONTACT_EMAILS.privacy}</span>.
           </p>
         </section>
 
@@ -54,7 +55,10 @@ export default function PrivacyPage() {
               <strong>Directory Listings (Unclaimed):</strong> To operate an accurate London artisan directory, our catalog includes publicly accessible professional details such as business trading name, Instagram handle, London borough, and styling specialties.
             </li>
             <li>
-              <strong>Technical &amp; Session Data:</strong> We store session tokens in your browser&apos;s local storage to keep you securely signed in. We do not sell tracking data or utilize invasive cross-site advertising cookies.
+              <strong>Technical &amp; Session Data:</strong> We store a session token in your browser&apos;s local storage to keep stylists signed in, and (for clients) a private link to each booking you make so you can manage it later on the same device. We do not sell tracking data or use cross-site advertising cookies.
+            </li>
+            <li>
+              <strong>Removal &amp; Report Requests:</strong> If you submit a removal, copyright or report request, we store the name, email address and details you provide so we can action and respond to it.
             </li>
           </ul>
         </section>
@@ -88,7 +92,7 @@ export default function PrivacyPage() {
               <strong>With Your Chosen Stylist:</strong> When a client books an appointment, client contact details (name, email, phone) are transmitted to the chosen stylist to fulfill the appointment.
             </li>
             <li>
-              <strong>Infrastructure Providers:</strong> Our database and storage infrastructure is hosted by Supabase (PostgreSQL with strict Row Level Security) and modern cloud hosting in the UK/EU.
+              <strong>Infrastructure Providers:</strong> Our database and file storage are hosted by Supabase (PostgreSQL with Row Level Security) and our website is served by Vercel. Fonts and icons are loaded from Google Fonts, which means your IP address is shared with Google when a page loads. These providers process data on our behalf and may do so outside the UK under appropriate safeguards.
             </li>
           </ul>
         </section>
@@ -107,11 +111,11 @@ export default function PrivacyPage() {
             <li><strong>Right to Object:</strong> If you are a stylist listed in our public directory and wish to be removed, you can object at any time.</li>
           </ul>
           <p className="text-xs pt-1">
-            Stylists wishing to remove their listing can use our dedicated{" "}
+            Stylists can permanently delete their account (and linked profile) at any time from the bottom of their dashboard. Stylists wishing to remove only their directory listing, or anyone wishing to report content, can use our dedicated{" "}
             <Link href="/takedown" className="text-secondary font-semibold underline">
               Directory Removal &amp; Opt-Out Portal
             </Link>{" "}
-            for immediate removal without dispute.
+            .
           </p>
         </section>
 
@@ -129,7 +133,7 @@ export default function PrivacyPage() {
             7. Complaints &amp; The ICO
           </h2>
           <p className="text-xs">
-            If you have concerns about our data practices, we ask that you contact us first at <span className="font-semibold text-primary">privacy@hairkorter.com</span> so we can resolve the matter immediately. You also have the right to lodge a complaint with the UK supervisory authority, the <strong>Information Commissioner&apos;s Office (ICO)</strong> at{" "}
+            If you have concerns about our data practices, we ask that you contact us first at <span className="font-semibold text-primary">{CONTACT_EMAILS.privacy}</span> so we can resolve the matter immediately. You also have the right to lodge a complaint with the UK supervisory authority, the <strong>Information Commissioner&apos;s Office (ICO)</strong> at{" "}
             <a
               href="https://ico.org.uk"
               target="_blank"

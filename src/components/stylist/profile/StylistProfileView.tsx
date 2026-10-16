@@ -2,6 +2,7 @@
 
 import { notFound } from "next/navigation";
 import { use } from "react";
+import Link from "next/link";
 import { Badge } from "@/components/ui/Badge";
 import { ProfileBookingBar } from "@/components/stylist/profile/ProfileBookingBar";
 import { ProfileHeader } from "@/components/stylist/profile/ProfileHeader";
@@ -63,6 +64,15 @@ export function StylistProfileView({ params }: StylistProfileViewProps) {
           stylistName={stylist.name}
           instagramUrl={stylist.instagramUrl}
         />
+
+        <p className="text-center text-xs text-gray-400">
+          <Link
+            href={`/takedown?profile=${encodeURIComponent(stylist.id)}&reason=report`}
+            className="underline hover:text-gray-600"
+          >
+            Report this profile
+          </Link>
+        </p>
       </div>
 
       {/* Sticky Book Now bar */}

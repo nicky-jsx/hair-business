@@ -42,10 +42,10 @@ export function DepositManager({
 
   const preview =
     type === "none"
-      ? "Clients pay the full amount when booking."
+      ? "No deposit. Clients pay you the full amount directly."
       : type === "percentage"
-        ? `Clients pay ${value || 0}% upfront, the rest on the day.`
-        : `Clients pay £${value || 0} upfront, the rest on the day.`;
+        ? `Clients owe you a ${value || 0}% deposit, the rest on the day. You collect it directly — nothing is charged through the app.`
+        : `Clients owe you a £${value || 0} deposit, the rest on the day. You collect it directly — nothing is charged through the app.`;
 
   return (
     <div className="rounded-xl bg-surface-container-lowest p-5 shadow-ambient">

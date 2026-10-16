@@ -44,19 +44,32 @@ functions.
   double-booking.
 
 ## Secrets
-`.env.local` holds only the anon URL/key (public by design) and is git-ignored.
-No `service_role` key exists in the codebase. ✅
+`.env.local` holds the public anon URL/key and is git-ignored. The
+`SUPABASE_SERVICE_ROLE_KEY` is used **only** by the server route
+`/api/upload-url` (to mint signed upload URLs after verifying the session).
+It must be set as a server-only env var and never prefixed `NEXT_PUBLIC_`.
+
+## Added by `launch-hardening.sql`
+- Rate limiting on sign-in, sign-up, claims, bookings, resets and takedowns.
+- Multi-device sessions with real server-side sign-out.
+- Claim tokens stored **hashed** in a private table; minting is SQL-Editor-only.
+- Input validation on profiles, availability and bookings.
+- Storage: size/MIME limits and no anonymous uploads.
+- Function grants are deny-by-default with an allow-list and a self-check.
+
+## Added by `launch-extras.sql`
+- `takedown_requests` (private) fed by the rate-limited `/takedown` form.
+- `delete_my_account` for self-service erasure.
 
 ## Residual risks (accepted for MVP)
 - **Token in `localStorage`** → vulnerable to XSS. Keep the app free of
-  injected HTML/`dangerouslySetInnerHTML`; consider an httpOnly cookie + server
-  route if this grows.
-- **No rate limiting** on sign-in / booking RPCs (brute-force / spam). Add
-  Supabase edge rate limits or a captcha before scaling.
-- **No admin tooling** — intentionally. Any future admin surface must have its
-  own authorization, not rely on client checks.
+  injected HTML; consider an httpOnly cookie + server route if this grows.
+- **No Content-Security-Policy** yet (baseline security headers are set in
+  `next.config.ts`). A nonce-based CSP should be added and tested.
+- **No CAPTCHA** — rate limits are per IP/email; add a captcha if abused.
+- **No admin UI** — intentional; admin actions are SQL Editor only.
 
 ## To apply
-Run `supabase/security-hardening.sql` in the Supabase SQL Editor. It is
-idempotent. Existing accounts created under the old SHA-256 scheme must
-re-register (their hashes aren't bcrypt).
+Run, in the Supabase SQL Editor, `security-hardening.sql`, then
+`launch-hardening.sql`, then `launch-extras.sql`. See `LAUNCH_CHECKLIST.md`.
+Existing accounts created under the old SHA-256 scheme must re-register.

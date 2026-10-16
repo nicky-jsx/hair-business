@@ -1,4 +1,6 @@
-const CACHE_NAME = 'strand-v1';
+const CACHE_NAME = 'hair-korter-v2';
+// Routes that contain per-user data or tokens: never cache these.
+const NO_CACHE_PREFIXES = ['/api/', '/booking/', '/stylist/'];
 const STATIC_ASSETS = [
   '/',
   '/stylists',
@@ -38,14 +40,19 @@ self.addEventListener('fetch', (event) => {
   // Skip cross-origin requests
   if (!event.request.url.startsWith(self.location.origin)) return;
 
+  const { pathname } = new URL(event.request.url);
+  if (NO_CACHE_PREFIXES.some((prefix) => pathname.startsWith(prefix))) return;
+
   event.respondWith(
     fetch(event.request)
       .then((response) => {
-        // Clone the response before caching
-        const responseClone = response.clone();
-        caches.open(CACHE_NAME).then((cache) => {
-          cache.put(event.request, responseClone);
-        });
+        // Only cache successful, same-origin responses
+        if (response.ok && response.type === 'basic') {
+          const responseClone = response.clone();
+          caches.open(CACHE_NAME).then((cache) => {
+            cache.put(event.request, responseClone);
+          });
+        }
         return response;
       })
       .catch(() => {

@@ -13,6 +13,7 @@ import {
   signInStylist,
   getAccountFromSession,
   clearSession,
+  deleteMyAccount,
 } from "@/lib/auth-db";
 import { claimStylistProfile } from "@/lib/stylist-profile-db";
 import { fetchStylistById } from "@/lib/stylists-db";
@@ -35,6 +36,7 @@ interface AuthContextType {
   refreshProfile: () => Promise<void>;
   setAccountStylistId: (stylistId: string) => void;
   claimProfile: (stylistId: string, claimToken: string) => Promise<{ error?: string }>;
+  deleteAccount: () => Promise<{ error?: string }>;
 }
 
 const AuthContext = createContext<AuthContextType | null>(null);
@@ -138,6 +140,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     [account]
   );
 
+  const deleteAccount = useCallback(async () => {
+    const result = await deleteMyAccount();
+    if (result.error) return { error: result.error };
+    setAccount(null);
+    setProfile(null);
+    localStorage.removeItem(STORAGE_KEY);
+    return {};
+  }, []);
+
   return (
     <AuthContext.Provider
       value={{
@@ -150,6 +161,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         refreshProfile,
         setAccountStylistId,
         claimProfile,
+        deleteAccount,
       }}
     >
       {children}

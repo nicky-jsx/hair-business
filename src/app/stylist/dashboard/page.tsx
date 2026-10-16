@@ -7,6 +7,7 @@ import { AvailabilityManager } from "@/components/stylist/dashboard/Availability
 import { ReleaseManager } from "@/components/stylist/dashboard/ReleaseManager";
 import { BookingsList } from "@/components/stylist/dashboard/BookingsList";
 import { DepositManager } from "@/components/stylist/dashboard/DepositManager";
+import { DeleteAccountSection } from "@/components/stylist/dashboard/DeleteAccountSection";
 import { Button } from "@/components/ui/Button";
 import { useAuth } from "@/context/AuthContext";
 import { formatRegion } from "@/types/stylist";
@@ -161,6 +162,8 @@ function DashboardContent() {
       >
         Sign out
       </button>
+
+      <DeleteAccountSection hasProfile={Boolean(profile)} />
     </div>
   );
 }

@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { CONTACT_EMAILS } from "@/lib/site-config";
 
 export const metadata: Metadata = {
   title: "Terms of Service — Hair Korter",
@@ -129,7 +130,7 @@ export default function TermsPage() {
             <Link href="/takedown" className="text-secondary font-semibold underline">
               Directory Removal Portal
             </Link>{" "}
-            for immediate processing.
+            and we will review it promptly.
           </p>
         </section>
 
@@ -157,7 +158,7 @@ export default function TermsPage() {
           </h2>
           <p className="text-xs">
             For legal inquiries, terms questions, or formal notices, contact us at:{" "}
-            <span className="font-semibold text-primary">legal@hairkorter.com</span>.
+            <span className="font-semibold text-primary">{CONTACT_EMAILS.legal}</span>.
           </p>
         </section>
       </div>

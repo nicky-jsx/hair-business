@@ -8,6 +8,7 @@ import { ServiceWorkerRegistration } from "@/components/pwa/ServiceWorkerRegistr
 import { InstallPrompt } from "@/components/pwa/InstallPrompt";
 import { SplashScreen } from "@/components/pwa/SplashScreen";
 import { ExtensionErrorSuppressor } from "@/components/ui/ExtensionErrorSuppressor";
+import { SITE_URL } from "@/lib/site-config";
 import "./globals.css";
 
 const inter = Inter({
@@ -22,9 +23,28 @@ const montserrat = Montserrat({
 });
 
 export const metadata: Metadata = {
-  title: "Hair Korter — Find Your Professional in London",
+  metadataBase: new URL(SITE_URL),
+  title: {
+    default: "Hair Korter — Find Your Professional in London",
+    template: "%s",
+  },
   description: "Discover talented hair and beauty professionals across London",
   manifest: "/manifest.json",
+  applicationName: "Hair Korter",
+  openGraph: {
+    type: "website",
+    siteName: "Hair Korter",
+    title: "Hair Korter — Find Your Professional in London",
+    description: "Discover talented hair and beauty professionals across London",
+    locale: "en_GB",
+    images: [{ url: "/icons/icon-512x512.png", width: 512, height: 512 }],
+  },
+  twitter: {
+    card: "summary",
+    title: "Hair Korter — Find Your Professional in London",
+    description: "Discover talented hair and beauty professionals across London",
+    images: ["/icons/icon-512x512.png"],
+  },
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
@@ -42,8 +62,6 @@ export const metadata: Metadata = {
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
-  maximumScale: 1,
-  userScalable: false,
   viewportFit: "cover",
   themeColor: "#fbf9f8",
 };
@@ -56,7 +74,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
-        <ExtensionErrorSuppressor />
+        {process.env.NODE_ENV !== "production" && <ExtensionErrorSuppressor />}
         <link
           href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap"
           rel="stylesheet"

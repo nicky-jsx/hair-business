@@ -44,6 +44,8 @@ function friendlyAuthError(message?: string): string {
   if (message.includes("invalid_name")) return "Please enter your name";
   if (message.includes("invalid_reset_token"))
     return "This reset link is invalid or has expired. Please ask us for a new one.";
+  if (message.includes("has_upcoming_bookings"))
+    return "You still have upcoming confirmed bookings. Please cancel them first so your clients aren't left waiting, then delete your account.";
   return "Something went wrong. Please try again.";
 }
 
@@ -169,5 +171,28 @@ export async function resetPasswordWithToken(
     p_new_password: newPassword,
   });
   if (error) return { error: friendlyAuthError(error.message) };
+  return {};
+}
+
+// Permanently deletes the signed-in account (and its profile). The DB
+// refuses while upcoming confirmed bookings exist.
+export async function deleteMyAccount(): Promise<{ error?: string }> {
+  const supabase = getSupabase();
+  if (!supabase) return { error: "Database not configured" };
+
+  const token = getSessionToken();
+  if (!token) return { error: "Your session has expired. Please sign in again." };
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { error } = await (supabase as any).rpc("delete_my_account", {
+    p_token: token,
+  });
+  if (error) {
+    if (error.message?.includes("unauthorized"))
+      return { error: "Your session has expired. Please sign in again." };
+    return { error: friendlyAuthError(error.message) };
+  }
+
+  setSessionToken(null);
   return {};
 }
