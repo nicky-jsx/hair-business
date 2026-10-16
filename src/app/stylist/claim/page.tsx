@@ -414,10 +414,20 @@ function ClaimPageContent() {
               </Button>
             </form>
 
-            <p className="mt-4 text-center text-[11px] text-outline">
+            <p className="mt-4 text-center text-[11px] text-on-surface-variant leading-relaxed">
               By claiming this profile, you confirm you are the owner or authorized
-              representative of this hair &amp; beauty business.
+              representative of this business, warrant you hold appropriate professional qualifications
+              and insurance, and agree to our{" "}
+              <Link href="/terms" className="text-secondary font-semibold underline">
+                Terms of Service
+              </Link>{" "}
+              and{" "}
+              <Link href="/privacy" className="text-secondary font-semibold underline">
+                Privacy Policy
+              </Link>
+              .
             </p>
+
           </div>
         )}
       </div>

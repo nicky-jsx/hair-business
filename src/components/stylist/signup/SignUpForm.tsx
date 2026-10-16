@@ -76,9 +76,22 @@ export function SignUpForm() {
         autoComplete="new-password"
       />
 
+      <p className="text-[11px] text-on-surface-variant leading-relaxed">
+        By creating an account, you agree to our{" "}
+        <Link href="/terms" className="text-secondary font-semibold underline">
+          Terms of Service
+        </Link>{" "}
+        and{" "}
+        <Link href="/privacy" className="text-secondary font-semibold underline">
+          Privacy Policy
+        </Link>
+        , and confirm you own the rights to all portfolio media you upload.
+      </p>
+
       <Button type="submit" fullWidth size="lg" disabled={loading}>
         {loading ? "Creating account..." : "Create account"}
       </Button>
+
 
       <p className="text-center text-sm text-gray-500">
         Already have an account?{" "}

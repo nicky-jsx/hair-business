@@ -22,26 +22,34 @@ export function Footer() {
           </Link>
         </div>
 
-        {/* Media & Copyright Notice */}
+        {/* Marketplace Disclaimer & Content Notice */}
         <div className="rounded-xl border border-outline-variant/60 bg-surface-container/50 p-4 text-[11px] leading-relaxed text-on-surface-variant">
           <div className="flex items-center gap-1.5 font-semibold text-primary mb-1">
             <span className="material-symbols-outlined text-sm text-secondary">
-              verified_user
+              gavel
             </span>
-            <span>Content &amp; Image Notice</span>
+            <span>Platform Disclaimer</span>
           </div>
           <p>
-            Hair Korter is an independent directory celebrating London hair and beauty artisans. All featured styling imagery, photos, and creative work remain the exclusive intellectual property and copyright of their respective creators and are credited to their official profiles. Hair Korter does not claim ownership of any third-party portfolio content.
+            Hair Korter is an independent introductory directory connecting clients with London hair and beauty artisans. Hair Korter is not a salon, employer, contractor, or agent of any listed stylist. All services, treatments, and payments are arranged directly with independent professionals.
           </p>
-          <p className="mt-2 text-[11px] font-medium text-primary">
-            Want to update, change, or remove a photo or listing? Direct message us on Instagram or submit via the profile claim portal for immediate removal.
-          </p>
+          <div className="mt-2.5 pt-2 border-t border-outline-variant/40 flex flex-wrap gap-x-4 gap-y-1 text-[11px] font-semibold text-secondary">
+            <Link href="/terms" className="hover:text-primary transition-colors underline">
+              Terms of Service
+            </Link>
+            <Link href="/privacy" className="hover:text-primary transition-colors underline">
+              Privacy Policy
+            </Link>
+            <Link href="/takedown" className="hover:text-primary transition-colors underline">
+              Request Profile Removal / Opt-Out
+            </Link>
+          </div>
         </div>
 
         {/* Bottom copyright */}
         <div className="flex flex-col sm:flex-row items-center justify-between gap-2 pt-2 text-[10px] text-outline">
-          <p>© {new Date().getFullYear()} Hair Korter. Curated for London.</p>
-          <p>All creative media property of respective artists.</p>
+          <p>© {new Date().getFullYear()} Hair Korter. All rights reserved.</p>
+          <p>Independent directory for London, UK.</p>
         </div>
       </div>
     </footer>

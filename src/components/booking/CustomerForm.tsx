@@ -1,7 +1,9 @@
 "use client";
 
 import { FormEvent, useState } from "react";
+import Link from "next/link";
 import { Button } from "@/components/ui/Button";
+
 import { Input, Textarea } from "@/components/ui/FormField";
 import { formatPrice } from "@/types/stylist";
 import type { Service } from "@/types/stylist";
@@ -195,6 +197,18 @@ export function CustomerForm({
           rows={3}
         />
 
+        <p className="text-[11px] text-on-surface-variant leading-relaxed pt-1">
+          By confirming, you agree to our{" "}
+          <Link href="/terms" target="_blank" className="text-secondary font-semibold underline">
+            Terms of Service
+          </Link>{" "}
+          and{" "}
+          <Link href="/privacy" target="_blank" className="text-secondary font-semibold underline">
+            Privacy Policy
+          </Link>
+          , and acknowledge that service appointments and payments are settled directly with the independent professional.
+        </p>
+
         <div className="pt-2">
           <Button type="submit" fullWidth size="lg" disabled={loading}>
             {loading
@@ -204,6 +218,7 @@ export function CustomerForm({
                 : "Confirm booking"}
           </Button>
         </div>
+
       </form>
     </div>
   );

@@ -411,19 +411,15 @@ export async function fetchFeaturedStylists(): Promise<Stylist[]> {
 
   const curated: Stylist[] = [];
 
-  // Always feature aleshalocdit and 38styles with their thumbnails ONLY in the featured section
+  // Always feature aleshalocdit and 38styles if present in the catalog
   if (alesha) {
-    curated.push({
-      ...alesha,
-      coverImage: "/images/featured/aleshalocdit.jpg",
-    });
+    curated.push(alesha);
   }
+
   if (thirtyEightStyles) {
-    curated.push({
-      ...thirtyEightStyles,
-      coverImage: "/images/featured/38styles.jpg",
-    });
+    curated.push(thirtyEightStyles);
   }
+
 
   // Select top wig specialists across London
   for (const w of wigs) {
@@ -440,19 +436,9 @@ export async function fetchFeaturedStylists(): Promise<Stylist[]> {
     }
   }
 
-  const result = [...explicitFeatured, ...curated].slice(0, 6);
-
-  // Ensure aleshalocdit and 38styles have their custom thumbnails specifically in the featured section
-  return result.map((s) => {
-    if (s.id === "fc60e331-845f-49bc-9dc7-a50ed040906a" || s.name.toLowerCase() === "aleshalocdit") {
-      return { ...s, coverImage: "/images/featured/aleshalocdit.jpg" };
-    }
-    if (s.id === "3d6b9ed5-643d-430f-9684-7f2e50b1acc4" || s.name.toLowerCase() === "38styles") {
-      return { ...s, coverImage: "/images/featured/38styles.jpg" };
-    }
-    return s;
-  });
+  return [...explicitFeatured, ...curated].slice(0, 6);
 }
+
 
 function getRatingThreshold(filter: string): number {
   if (filter === "5") return 5;
