@@ -46,9 +46,9 @@ export function Footer() {
           </div>
         </div>
 
-        {/* Bottom copyright */}
+        {/* Bottom footer notice */}
         <div className="flex flex-col sm:flex-row items-center justify-between gap-2 pt-2 text-[10px] text-outline">
-          <p>© {new Date().getFullYear()} Hair Korter. All rights reserved.</p>
+          <p>Hair Korter</p>
           <p>Independent directory for London, UK.</p>
         </div>
       </div>
