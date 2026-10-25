@@ -13,7 +13,7 @@ function ResetPasswordContent() {
   const [done, setDone] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  // No token: explain how to get a reset link (issued by the Hair Korter team).
+  // No token: explain how to get a reset link (issued by the SP Korter team).
   if (!token) {
     return (
       <div className="px-5 pb-8 pt-6">

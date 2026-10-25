@@ -1,4 +1,4 @@
--- Storage bucket for stylist profile photos & banners (Hair Korter)
+-- Storage bucket for stylist profile photos & banners (SP Korter)
 -- Run once in your Supabase SQL Editor.
 
 -- 1) Create a public (read-only) bucket with size + type limits

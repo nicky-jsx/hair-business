@@ -3,8 +3,8 @@ import Link from "next/link";
 import { CONTACT_EMAILS } from "@/lib/site-config";
 
 export const metadata: Metadata = {
-  title: "Terms of Service — Hair Korter",
-  description: "Terms and conditions governing the use of the Hair Korter directory and discovery platform.",
+  title: "Terms of Service — SP Korter",
+  description: "Terms and conditions governing the use of the SP Korter (Service Providers) directory and discovery platform.",
 };
 
 export default function TermsPage() {
@@ -32,7 +32,7 @@ export default function TermsPage() {
           <strong className="block font-display font-bold text-sm mb-1">
             Important Summary
           </strong>
-          Hair Korter is an independent directory and booking discovery platform. We do not provide hairdressing or beauty services, we are not an employer or agent of any listed stylist, and we do not collect or hold client funds. All appointments and treatments are conducted strictly between clients and independent professionals.
+          SP Korter (Service Providers) is an independent directory and booking discovery platform. We do not provide hairdressing or beauty services, we are not an employer or agent of any listed stylist, and we do not collect or hold client funds. All appointments and treatments are conducted strictly between clients and independent professionals.
         </div>
 
         <section className="space-y-2">
@@ -40,7 +40,7 @@ export default function TermsPage() {
             1. Introduction &amp; Acceptance
           </h2>
           <p>
-            Welcome to Hair Korter (&ldquo;we&rdquo;, &ldquo;our&rdquo;, or &ldquo;us&rdquo;). By accessing our website, browsing our directory, claiming a profile, or booking an appointment through our platform, you agree to be bound by these Terms of Service. If you do not agree, you must discontinue using the platform.
+            Welcome to SP Korter (&ldquo;Service Providers Korter&rdquo;, &ldquo;we&rdquo;, &ldquo;our&rdquo;, or &ldquo;us&rdquo;). By accessing our website, browsing our directory, claiming a profile, or booking an appointment through our platform, you agree to be bound by these Terms of Service. If you do not agree, you must discontinue using the platform.
           </p>
         </section>
 
@@ -49,14 +49,14 @@ export default function TermsPage() {
             2. Platform Status — Introductory Directory Only
           </h2>
           <p>
-            Hair Korter operates solely as an introductory venue and technology intermediary:
+            SP Korter operates solely as an introductory venue and technology intermediary:
           </p>
           <ul className="list-disc pl-5 space-y-1 text-xs">
             <li>
-              <strong>Independent Professionals:</strong> All stylists, salons, and beauty practitioners listed on Hair Korter are independent third-party operators. Hair Korter is not a hair salon and does not employ, contract, or direct any stylist.
+              <strong>Independent Professionals:</strong> All stylists, salons, and beauty practitioners listed on SP Korter are independent third-party operators. SP Korter is not a hair salon and does not employ, contract, or direct any stylist.
             </li>
             <li>
-              <strong>Direct Contract:</strong> Any appointment, service booking, consultation, or commercial transaction is formed directly and solely between the client and the respective stylist. Hair Korter is not a party to that agreement.
+              <strong>Direct Contract:</strong> Any appointment, service booking, consultation, or commercial transaction is formed directly and solely between the client and the respective stylist. SP Korter is not a party to that agreement.
             </li>
             <li>
               <strong>No Quality Guarantee:</strong> While we aim to highlight reputable artisans across London, we do not inspect premises, verify insurance, or guarantee the skill, hygiene, chemical products, or safety of any stylist.
@@ -73,13 +73,13 @@ export default function TermsPage() {
           </p>
           <ul className="list-disc pl-5 space-y-1 text-xs">
             <li>
-              Hair Korter disclaims all liability for any personal injury, scalp or hair damage, allergic reactions, burns, infections, physical distress, or dissatisfaction arising out of services rendered by any stylist.
+              SP Korter disclaims all liability for any personal injury, scalp or hair damage, allergic reactions, burns, infections, physical distress, or dissatisfaction arising out of services rendered by any stylist.
             </li>
             <li>
               Clients are solely responsible for discussing health conditions, patch tests, hair history, and service expectations directly with their chosen practitioner prior to treatment.
             </li>
             <li>
-              In no event shall Hair Korter be liable for any indirect, special, incidental, punitive, or consequential damages, or any loss of profits or appointments.
+              In no event shall SP Korter be liable for any indirect, special, incidental, punitive, or consequential damages, or any loss of profits or appointments.
             </li>
           </ul>
         </section>
@@ -89,14 +89,14 @@ export default function TermsPage() {
             4. Payments, Deposits &amp; Cancellations
           </h2>
           <p>
-            Hair Korter does not currently collect, hold, or process credit card payments or client deposits on-platform:
+            SP Korter does not currently collect, hold, or process credit card payments or client deposits on-platform:
           </p>
           <ul className="list-disc pl-5 space-y-1 text-xs">
             <li>
               Any deposits, full payments, or cancellation fees indicated on a stylist&apos;s profile are agreed directly between the client and the stylist, and paid through the stylist&apos;s chosen payment method (e.g. in person, bank transfer, or third-party booking link).
             </li>
             <li>
-              Hair Korter has no control over refunds, chargebacks, or deposit forfeitures. Any financial disputes must be resolved directly with the stylist.
+              SP Korter has no control over refunds, chargebacks, or deposit forfeitures. Any financial disputes must be resolved directly with the stylist.
             </li>
           </ul>
         </section>
@@ -106,7 +106,7 @@ export default function TermsPage() {
             5. Stylist Obligations &amp; Profile Claims
           </h2>
           <p>
-            Stylists who claim, register, or maintain a profile on Hair Korter warrant that:
+            Stylists who claim, register, or maintain a profile on SP Korter warrant that:
           </p>
           <ul className="list-disc pl-5 space-y-1 text-xs">
             <li>
@@ -116,7 +116,7 @@ export default function TermsPage() {
               All information, pricing, bios, and service durations are accurate and kept up to date.
             </li>
             <li>
-              They own or have all necessary licenses and client consents for any portfolio photography, logos, or media uploaded to Hair Korter.
+              They own or have all necessary licenses and client consents for any portfolio photography, logos, or media uploaded to SP Korter.
             </li>
           </ul>
         </section>

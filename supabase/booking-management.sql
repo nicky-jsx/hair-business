@@ -1,5 +1,5 @@
 -- =====================================================================
--- Booking management + verified reviews for Hair Korter
+-- Booking management + verified reviews for SP Korter
 -- Run in the Supabase SQL Editor AFTER security-hardening.sql.
 -- Idempotent.
 --

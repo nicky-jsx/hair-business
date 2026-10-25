@@ -1,7 +1,7 @@
 {
-  "name": "Hair Korter",
-  "short_name": "Hair Korter",
-  "description": "Find hair and beauty professionals in London",
+  "name": "SP Korter - Service Providers",
+  "short_name": "SP Korter",
+  "description": "SP Korter (Service Providers) - Find and book hair and beauty professionals in London",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#fbf9f8",

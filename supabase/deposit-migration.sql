@@ -1,4 +1,4 @@
--- Deposit & payment options migration for Hair Korter
+-- Deposit & payment options migration for SP Korter
 -- Run this once in your Supabase SQL Editor.
 
 -- 1) Deposit settings on the stylist (set by the stylist)

@@ -1,4 +1,4 @@
--- Seed data for Hair Korter - Sample stylists
+-- Seed data for SP Korter - Sample stylists
 -- Run this after schema.sql
 
 -- Insert sample stylists

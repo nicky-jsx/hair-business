@@ -1,5 +1,5 @@
 -- =====================================================================
--- Hair Korter — curated professional listings
+-- SP Korter — curated professional listings
 -- Categories: Wigs, Lashes (-> Eyelashes), Locs
 -- Areas: North / East / South / West London
 --

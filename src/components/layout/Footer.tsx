@@ -6,12 +6,12 @@ export function Footer() {
       <div className="space-y-4">
         {/* Brand header */}
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-1.5">
+          <div className="flex items-center gap-2">
             <span className="font-display text-sm font-bold tracking-tight text-primary">
-              HAIR KORTER
+              SP KORTER
             </span>
             <span className="text-[10px] uppercase tracking-wider text-secondary font-semibold">
-              • London
+              • Service Providers • London
             </span>
           </div>
           <Link
@@ -31,7 +31,7 @@ export function Footer() {
             <span>Platform Disclaimer</span>
           </div>
           <p>
-            Hair Korter is an independent introductory directory connecting clients with London hair and beauty artisans. Hair Korter is not a salon, employer, contractor, or agent of any listed stylist. All services, treatments, and payments are arranged directly with independent professionals.
+            SP Korter (Service Providers) is an independent introductory directory connecting clients with London hair and beauty artisans. SP Korter is not a salon, employer, contractor, or agent of any listed stylist. All services, treatments, and payments are arranged directly with independent professionals.
           </p>
           <div className="mt-2.5 pt-2 border-t border-outline-variant/40 flex flex-wrap gap-x-4 gap-y-1 text-[11px] font-semibold text-secondary">
             <Link href="/terms" className="hover:text-primary transition-colors underline">
@@ -48,7 +48,7 @@ export function Footer() {
 
         {/* Bottom footer notice */}
         <div className="flex flex-col sm:flex-row items-center justify-between gap-2 pt-2 text-[10px] text-outline">
-          <p>Hair Korter</p>
+          <p>SP Korter &bull; Service Providers</p>
           <p>Independent directory for London, UK.</p>
         </div>
       </div>

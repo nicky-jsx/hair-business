@@ -22,7 +22,7 @@ function ClaimLandingPage() {
       </h1>
       <p className="mt-3 text-sm text-on-surface-variant leading-relaxed max-w-sm mx-auto">
         Profile claiming is invite-only. If you&apos;re a stylist listed on
-        Hair&nbsp;Korter, we&apos;ll send you a unique link to unlock and manage
+        SP&nbsp;Korter (Service Providers), we&apos;ll send you a unique link to unlock and manage
         your profile.
       </p>
       <p className="mt-4 text-xs text-outline">

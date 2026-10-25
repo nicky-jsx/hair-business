@@ -71,7 +71,7 @@ function TakedownForm() {
           Removal, Takedown &amp; Report
         </h1>
         <p className="mt-1.5 text-xs text-on-surface-variant leading-relaxed">
-          Hair Korter respects the privacy, copyright, and business preferences of
+          SP Korter (Service Providers) respects the privacy, copyright, and business preferences of
           all hair professionals. If you would like your business profile removed
           or updated, have a copyright notice, or want to report a profile or
           review, please submit the form below. Genuine removal requests from

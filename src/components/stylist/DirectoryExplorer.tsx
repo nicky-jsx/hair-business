@@ -930,7 +930,7 @@ function DirectoryExplorerContent() {
           Are you a London hair professional?
         </h3>
         <p className="mx-auto mt-1 text-xs text-[#d7cebf] leading-relaxed max-w-xs">
-          Claim your profile on Hair Korter to unlock high-res portfolio lookbooks, verified placement, and direct client bookings.
+          Claim your profile on SP Korter (Service Providers) to unlock high-res portfolio lookbooks, verified placement, and direct client bookings.
         </p>
         <div className="mt-3 flex justify-center">
           <Link

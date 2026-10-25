@@ -1,5 +1,5 @@
 -- =====================================================================
--- Security hardening for Hair Korter  (idempotent — safe to re-run)
+-- Security hardening for SP Korter  (idempotent — safe to re-run)
 -- Run this ONCE in the Supabase SQL Editor, after all other migrations.
 --
 -- Model: the browser only ever holds the public `anon` key, so we CANNOT

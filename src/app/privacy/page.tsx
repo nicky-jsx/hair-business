@@ -3,8 +3,8 @@ import Link from "next/link";
 import { CONTACT_EMAILS } from "@/lib/site-config";
 
 export const metadata: Metadata = {
-  title: "Privacy Policy — Hair Korter",
-  description: "How Hair Korter collects, uses, stores, and protects personal data in compliance with the UK GDPR.",
+  title: "Privacy Policy — SP Korter",
+  description: "How SP Korter (Service Providers) collects, uses, stores, and protects personal data in compliance with the UK GDPR.",
 };
 
 export default function PrivacyPage() {
@@ -32,7 +32,7 @@ export default function PrivacyPage() {
             1. Who We Are (Data Controller)
           </h2>
           <p>
-            Hair Korter (&ldquo;we&rdquo;, &ldquo;us&rdquo;, or &ldquo;our&rdquo;) operates a London-focused hair and beauty discovery directory and booking platform. For the purposes of the UK General Data Protection Regulation (&ldquo;UK GDPR&rdquo;) and the Data Protection Act 2018, Hair Korter is the Data Controller for personal data processed through our platform.
+            SP Korter (&ldquo;we&rdquo;, &ldquo;us&rdquo;, or &ldquo;our&rdquo;), representing Service Providers Korter, operates a London-focused hair and beauty discovery directory and booking platform. For the purposes of the UK General Data Protection Regulation (&ldquo;UK GDPR&rdquo;) and the Data Protection Act 2018, SP Korter is the Data Controller for personal data processed through our platform.
           </p>
           <p className="text-xs">
             Contact email for privacy and data requests:{" "}

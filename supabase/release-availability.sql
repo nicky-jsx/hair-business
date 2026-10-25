@@ -1,4 +1,4 @@
--- Date-specific availability ("released" dates) for Hair Korter
+-- Date-specific availability ("released" dates) for SP Korter
 -- Stylists release specific dates (with specific times) ahead of time.
 -- A date is only bookable once it has been released.
 

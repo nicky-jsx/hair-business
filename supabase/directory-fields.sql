@@ -1,5 +1,5 @@
 -- =====================================================================
--- Directory mode fields for Hair Korter
+-- Directory mode fields for SP Korter
 -- Run in the Supabase SQL Editor. Idempotent.
 --
 -- Adds:

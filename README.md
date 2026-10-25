@@ -1,4 +1,4 @@
-# Hair Korter — London stylist directory & booking (PWA)
+# SP Korter (Service Providers) — London stylist directory & booking (PWA)
 
 A mobile-first progressive web app for discovering and booking hair and beauty
 professionals in London. Built with Next.js 15 (App Router), React 19,

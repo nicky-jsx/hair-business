@@ -53,12 +53,13 @@ export function InstallPrompt() {
       <div className="rounded-2xl border border-gray-100 bg-white p-4 shadow-lg">
         <div className="mb-3 flex items-start gap-3">
           <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-brand-600 text-sm font-bold text-white">
-            HK
+            SP
           </div>
           <div>
-            <p className="font-semibold text-gray-900">Add Hair Korter to Home Screen</p>
-            <p className="text-sm text-gray-500">
-              Install for quick access and a better experience.
+            <p className="font-semibold text-gray-900">Add SP Korter to Home Screen</p>
+            <p className="text-xs text-secondary font-medium">Service Providers Directory</p>
+            <p className="text-xs text-gray-500 mt-0.5">
+              Install for quick access and offline performance.
             </p>
           </div>
         </div>

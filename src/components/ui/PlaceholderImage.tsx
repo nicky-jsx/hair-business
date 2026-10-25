@@ -113,7 +113,7 @@ export function PlaceholderImage({
 
       {/* Bottom Directory Tag */}
       <div className="absolute bottom-2 left-2.5 right-2.5 flex items-center justify-between border-t border-white/10 pt-1 text-[9px] uppercase tracking-caps text-white/50">
-        <span>Hair Korter</span>
+        <span>SP Korter</span>
         <span>Curated</span>
       </div>
     </div>

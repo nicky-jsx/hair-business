@@ -37,10 +37,15 @@ export function SplashScreen() {
     >
       <div className="flex flex-col items-center gap-4">
         <div className="flex h-20 w-20 items-center justify-center rounded-2xl bg-white text-3xl font-bold text-brand-600 shadow-lg">
-          HK
+          SP
         </div>
-        <h1 className="text-2xl font-semibold text-white">Hair Korter</h1>
-        <p className="text-sm text-brand-100">Find your perfect professional</p>
+        <div className="text-center">
+          <h1 className="text-2xl font-bold tracking-tight text-white">SP Korter</h1>
+          <p className="mt-1 text-xs font-semibold uppercase tracking-[0.2em] text-brand-100">
+            Service Providers
+          </p>
+        </div>
+        <p className="text-xs text-brand-200">Find your perfect professional in London</p>
       </div>
       <div className="absolute bottom-12">
         <div className="h-1 w-16 overflow-hidden rounded-full bg-brand-500">

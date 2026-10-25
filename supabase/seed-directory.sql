@@ -1,5 +1,5 @@
 -- =====================================================================
--- Hair Korter — directory listing template
+-- SP Korter — directory listing template
 -- Run in the Supabase SQL Editor (after schema.sql + directory-fields.sql).
 --
 -- Each professional is ONE self-contained block. To add someone:

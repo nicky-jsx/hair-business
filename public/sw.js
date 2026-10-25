@@ -1,4 +1,4 @@
-const CACHE_NAME = 'hair-korter-v2';
+const CACHE_NAME = 'sp-korter-v1';
 // Routes that contain per-user data or tokens: never cache these.
 const NO_CACHE_PREFIXES = ['/api/', '/booking/', '/stylist/'];
 const STATIC_ASSETS = [

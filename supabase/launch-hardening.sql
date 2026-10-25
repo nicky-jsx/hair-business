@@ -1,5 +1,5 @@
 -- =====================================================================
--- Hair Korter — LAUNCH HARDENING  (idempotent — safe to re-run)
+-- SP Korter — LAUNCH HARDENING  (idempotent — safe to re-run)
 --
 -- Run in the Supabase SQL Editor AFTER every other migration, i.e. after
 --   security-hardening.sql  and  booking-management.sql.

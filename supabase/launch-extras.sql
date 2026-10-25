@@ -1,5 +1,5 @@
 -- =====================================================================
--- Hair Korter — LAUNCH EXTRAS  (idempotent — safe to re-run)
+-- SP Korter — LAUNCH EXTRAS  (idempotent — safe to re-run)
 --
 -- Run in the Supabase SQL Editor AFTER launch-hardening.sql.
 --

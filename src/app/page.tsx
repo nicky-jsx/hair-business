@@ -63,6 +63,12 @@ export default async function HomePage() {
           </Link>
         </div>
 
+        <div className="inline-flex items-center gap-1.5 rounded-full bg-secondary-fixed/20 border border-secondary-fixed/35 px-2.5 py-0.5 text-[11px] font-semibold text-secondary mb-2">
+          <span className="font-bold text-primary tracking-wide">SP KORTER</span>
+          <span className="text-secondary/50">•</span>
+          <span className="tracking-wide">Service Providers</span>
+        </div>
+
         <h1 className="font-display text-2xl sm:text-3xl font-bold tracking-tight text-primary leading-tight mb-3">
           Find your specialist <br className="hidden sm:inline" />
           in London
@@ -157,7 +163,7 @@ export default async function HomePage() {
           Are you a London hair or beauty professional?
         </h3>
         <p className="mx-auto mt-1 max-w-xs text-xs text-[#d7cebf] leading-relaxed">
-          Claim your profile on Hair Korter to unlock high-res portfolio lookbooks, verified directory placement, and direct client bookings.
+          Claim your profile on SP Korter (Service Providers) to unlock high-res portfolio lookbooks, verified directory placement, and direct client bookings.
         </p>
         <div className="mt-3.5 flex justify-center">
           <Link

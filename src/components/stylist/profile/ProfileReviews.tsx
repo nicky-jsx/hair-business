@@ -126,13 +126,13 @@ export function ProfileReviews({
         Client Reviews
       </h3>
       <p className="mx-auto mt-1.5 max-w-sm text-[13px] leading-relaxed text-on-surface-variant">
-        No client reviews have been published on Hair Korter yet. Verified reviews will appear here once booked clients complete their appointments.
+        No client reviews have been published on SP Korter yet. Verified reviews will appear here once booked clients complete their appointments.
       </p>
       <div className="mt-4 inline-flex items-center gap-1.5 rounded-full bg-surface-container px-3.5 py-1 text-[11px] font-medium text-outline">
         <span className="material-symbols-outlined text-[14px]">
           verified
         </span>
-        Hair Korter Verified Reviews
+        SP Korter Verified Reviews
       </div>
     </div>
   );

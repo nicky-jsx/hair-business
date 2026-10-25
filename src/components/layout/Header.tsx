@@ -8,17 +8,17 @@ export function Header() {
           href="/"
           className="flex items-center gap-2.5 text-primary transition-opacity hover:opacity-90"
         >
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#24211e] text-[#fbf9f8] shadow-xs">
-            <span className="material-symbols-outlined text-[17px] text-[#e4cb96]">
-              content_cut
+          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#24211e] text-[#fbf9f8] shadow-xs border border-[#82704b]/30">
+            <span className="font-display text-[13px] font-bold tracking-wider text-[#e4cb96]">
+              SP
             </span>
           </div>
           <div className="flex flex-col">
             <span className="font-display text-lg font-bold uppercase tracking-[0.15em] text-primary leading-none">
-              Hair Korter
+              SP Korter
             </span>
             <span className="text-[9px] uppercase tracking-[0.12em] font-medium text-secondary mt-0.5 whitespace-nowrap">
-              Hair &amp; Beauty Directory
+              Service Providers &bull; London
             </span>
           </div>
         </Link>

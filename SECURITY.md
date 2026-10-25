@@ -1,4 +1,4 @@
-# Security notes — Hair Korter
+# Security notes — SP Korter (Service Providers)
 
 ## Architecture
 The browser only ever holds the public Supabase **anon key**, so the client

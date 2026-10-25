@@ -1,4 +1,4 @@
-# Launch checklist — Hair Korter
+# Launch checklist — SP Korter (Service Providers)
 
 Work through this top to bottom. Items marked 🔴 are launch blockers.
 
