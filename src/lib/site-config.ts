@@ -8,11 +8,12 @@ export const SITE_NAME = "SP Korter";
 export const SITE_FULL_NAME = "SP Korter (Service Providers)";
 
 export const SITE_URL = (
-  process.env.NEXT_PUBLIC_SITE_URL || "https://hair-business-pied.vercel.app"
+  process.env.NEXT_PUBLIC_SITE_URL || "https://spkorter.co.uk"
 ).replace(/\/$/, "");
 
 export const CONTACT_EMAILS = {
-  privacy: "privacy@spkorter.com",
-  legal: "legal@spkorter.com",
-  takedown: "takedown@spkorter.com",
+  general: "info@spkorter.co.uk",
+  privacy: "info@spkorter.co.uk",
+  legal: "info@spkorter.co.uk",
+  takedown: "info@spkorter.co.uk",
 };

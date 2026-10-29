@@ -298,7 +298,7 @@ revoke all on public.password_reset_tokens from anon, authenticated;
 
 create or replace function public.admin_create_password_reset_link(
   p_email text,
-  p_base_url text default 'https://hair-business-pied.vercel.app'
+  p_base_url text default 'https://spkorter.co.uk'
 )
 returns text
 language plpgsql
@@ -436,7 +436,7 @@ $$;
 -- SQL Editor only:  select public.admin_generate_claim_url('<stylist uuid>');
 create or replace function public.admin_generate_claim_url(
   p_stylist_id uuid,
-  p_base_url text default 'https://hair-business-pied.vercel.app'
+  p_base_url text default 'https://spkorter.co.uk'
 )
 returns text
 language plpgsql
@@ -465,7 +465,7 @@ $$;
 -- SQL Editor only:  select * from public.admin_generate_all_claim_urls();
 -- (Re-running invalidates previously generated links.)
 create or replace function public.admin_generate_all_claim_urls(
-  p_base_url text default 'https://hair-business-pied.vercel.app'
+  p_base_url text default 'https://spkorter.co.uk'
 )
 returns table (stylist_id uuid, stylist_name text, claim_url text)
 language plpgsql

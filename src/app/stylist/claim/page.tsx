@@ -26,8 +26,11 @@ function ClaimLandingPage() {
         your profile.
       </p>
       <p className="mt-4 text-xs text-outline">
-        Haven&apos;t received your link? DM us on Instagram or email us and
-        we&apos;ll get you set up.
+        Haven&apos;t received your link? DM us on Instagram or email{" "}
+        <a href="mailto:info@spkorter.co.uk" className="text-secondary underline">
+          info@spkorter.co.uk
+        </a>{" "}
+        and we&apos;ll get you set up.
       </p>
       <Link
         href="/"

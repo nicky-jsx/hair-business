@@ -22,9 +22,12 @@ function ResetPasswordContent() {
           Forgot your password?
         </h1>
         <p className="mt-2 text-sm leading-relaxed text-gray-500">
-          DM us on Instagram or email us from the address on your account and
-          we&apos;ll send you a secure, single-use reset link (valid for 24
-          hours).
+          DM us on Instagram or email us at{" "}
+          <a href="mailto:info@spkorter.co.uk" className="text-brand-600 underline">
+            info@spkorter.co.uk
+          </a>{" "}
+          from the address on your account and we&apos;ll send you a secure,
+          single-use reset link (valid for 24 hours).
         </p>
         <Link
           href="/stylist/sign-in"

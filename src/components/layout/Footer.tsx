@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { CONTACT_EMAILS } from "@/lib/site-config";
 
 export function Footer() {
   return (
@@ -43,6 +44,12 @@ export function Footer() {
             <Link href="/takedown" className="hover:text-primary transition-colors underline">
               Request Profile Removal / Opt-Out
             </Link>
+            <a
+              href={`mailto:${CONTACT_EMAILS.general}`}
+              className="hover:text-primary transition-colors underline"
+            >
+              Contact: {CONTACT_EMAILS.general}
+            </a>
           </div>
         </div>
 
